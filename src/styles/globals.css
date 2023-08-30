@@ -1,0 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+#__next {
+  min-height: 100%;
+}
+
+.playmat {
+  opacity: 0.5;
+  /*background-size: 100%;*/
+  background-image: url("/images/background/Menu-Medium.4a0e84d.jpg");
+}
+
+.golden-frame {
+  background-size: 100%;
+  background-image: url("/images/background/frame.png");
+}
+
+.table-perspective-inner {
+  transform: rotateX(10deg);
+  margin-top: -5%;
+}
+
+.table-perspective-outer {
+  perspective: 1000px;
+  transform: scale(0.9);
+}
+
+.table-background {
+  position: relative;
+  background-color: #001836;
+  background-image: url("/images/background/LOR_Nebula_768.9a66f17.jpg");
+}

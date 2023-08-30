@@ -1,0 +1,7 @@
+Sitemap: https://play.lorcanito.com/sitemaps.txt
+
+User-agent: *
+Allow: /
+Disallow: /auth/
+Disallow: /api/
+Disallow: /game/

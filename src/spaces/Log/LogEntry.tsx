@@ -1,0 +1,360 @@
+import React, { memo } from "react";
+import { useUser } from "reactfire";
+import { CardLogEntry } from "~/spaces/Log/CardLogEntry";
+import { moveCard } from "~/spaces/Log/utils";
+import Image from "next/image";
+import type { InternalLogEntry } from "~/spaces/Log/game-log/types";
+import { useGameController } from "~/engine/rule-engine/lib/GameControllerProvider";
+import { useTurn } from "~/engine/GameProvider";
+import { CardEffectEntry } from "~/spaces/Log/CardEffectEntry";
+
+type LogEntryProps = {
+  entry: InternalLogEntry;
+};
+
+const playerAction = "▾ ";
+const systemAction = "◆ ";
+const opponentAction = "▴ ";
+
+export const Log = memo(
+  (props: LogEntryProps) => {
+    const engine = useGameController();
+    const { isMyTurn } = useTurn();
+    const { data: user } = useUser();
+    const { entry } = props;
+    const activePlayer = user?.uid || "";
+    const elements = [];
+
+    const isActivePlayerTheSender = activePlayer === entry.sender;
+    if (isActivePlayerTheSender) {
+      elements.push(`${playerAction} You `);
+    } else if (entry.sender === "SYSTEM") {
+      elements.push(`${systemAction} `);
+    } else {
+      elements.push(`${opponentAction} Opponent `);
+    }
+    switch (entry.type) {
+      case "SCRY": {
+        const { bottom, top } = entry;
+        elements.push(
+          `Looked at the top ${
+            bottom + top
+          } cards of the deck, putting ${bottom} on the bottom and ${top} on top.`
+        );
+        break;
+      }
+      case "NEW_GAME": {
+        elements.push(
+          `Thanks for playing! To start a new game click on the top right corner and select your deck.`
+        );
+        break;
+      }
+      case "GAME_RESTARTED": {
+        elements.push(`The game has been restarted.`);
+        break;
+      }
+      case "RESOLVING_ABILITIES": {
+        elements.push(` is resolving abilities.`);
+        break;
+      }
+      case "SHUFFLE_CARD": {
+        const { instanceId } = entry;
+        elements.push(`shuffled `);
+        elements.push(
+          <CardLogEntry
+            card={engine.findLorcanitoCard(instanceId)}
+            privateEntry={undefined}
+            player={activePlayer}
+          />
+        );
+        elements.push(` into owner's deck.`);
+        break;
+      }
+      case "RESOLVE_EFFECT": {
+        const { targetId, effect } = entry;
+        elements.push(<CardEffectEntry effect={effect} />);
+        elements.push(`, targeting `);
+        elements.push(
+          <CardLogEntry
+            card={engine.findLorcanitoCard(targetId)}
+            privateEntry={undefined}
+            player={activePlayer}
+          />
+        );
+        break;
+      }
+      case "BACK_TO_LOBBY": {
+        elements.push(`has moved back to the lobby.`);
+        break;
+      }
+      case "REVEAL_CARD": {
+        const { card, from } = entry;
+        elements.push(`reveals `);
+        elements.push(
+          <CardLogEntry
+            card={engine.findLorcanitoCard(card)}
+            privateEntry={undefined}
+            player={activePlayer}
+          />
+        );
+        elements.push(` from ${from}.`);
+        break;
+      }
+      case "READY_TO_START": {
+        elements.push(
+          `${isActivePlayerTheSender ? "are" : "is"} ready to start the game ${
+            entry.solo ? "in SOLO mode" : ""
+          }.`
+        );
+        break;
+      }
+      case "MULLIGAN": {
+        const { cards, player } = entry;
+        // TODO: Add to the activePlayer taking mulligan which cards were put to the bottom
+        elements.push(
+          ` ${
+            isActivePlayerTheSender ? "have" : "has"
+          } taken a mulligan, drawing ${cards?.length} new cards. `
+        );
+        if (player === activePlayer) {
+          cards?.forEach((card) => {
+            const lorcanitoCard = engine.findLorcanitoCard(card);
+            elements.push(
+              <CardLogEntry
+                card={lorcanitoCard}
+                privateEntry={entry.private}
+                player={activePlayer}
+              />
+            );
+            elements.push(", \n");
+          });
+        }
+
+        break;
+      }
+      case "MOVE_CARD": {
+        moveCard(
+          elements,
+          // @ts-expect-error I need to tweak the types
+          entry,
+          activePlayer,
+          engine.findLorcanitoCard(entry.instanceId)
+        );
+        break;
+      }
+      case "DAMAGE_CHANGE": {
+        const { from, to, instanceId } = entry;
+        const card = engine.findLorcanitoCard(instanceId);
+
+        const damageDelta = to - from;
+        const damageMark = damageDelta > 0 ? "taken" : "healed";
+        elements.push(
+          <CardLogEntry
+            card={card}
+            privateEntry={entry.private}
+            player={activePlayer}
+          />
+        );
+        elements.push(` ${damageMark} ${damageDelta} damage`);
+        break;
+      }
+      case "SHUFFLE_DECK": {
+        elements.push(
+          `shuffled ${isActivePlayerTheSender ? "your" : "their"} deck`
+        );
+        break;
+      }
+      case "SING": {
+        const { singer, song } = entry;
+        elements.push(
+          <CardLogEntry instanceId={singer} player={activePlayer} />
+        );
+        elements.push(` sang `);
+        elements.push(<CardLogEntry instanceId={song} player={activePlayer} />);
+        break;
+      }
+      case "SHIFT": {
+        const { shifter, shifted } = entry;
+        elements.push(`shifted `);
+
+        elements.push(
+          <CardLogEntry instanceId={shifted} player={activePlayer} />
+        );
+        elements.push(` into `);
+        elements.push(
+          <CardLogEntry instanceId={shifter} player={activePlayer} />
+        );
+        break;
+      }
+      case "CHALLENGE": {
+        const { attacker, defender } = entry;
+        const attackerCard = engine.findLorcanitoCard(attacker);
+        const defenderCard = engine.findLorcanitoCard(defender);
+
+        // TODO: add damage dealt
+        engine.findTableCard(attacker);
+        engine.findTableCard(defender);
+
+        elements.push(`challenged `);
+        elements.push(
+          <CardLogEntry card={defenderCard} player={activePlayer} />
+        );
+        elements.push(` with `);
+        elements.push(
+          <CardLogEntry card={attackerCard} player={activePlayer} />
+        );
+        break;
+      }
+      case "QUEST": {
+        const { amount, instanceId } = entry;
+        const card = engine.findLorcanitoCard(instanceId);
+
+        elements.push(`quests with `);
+        elements.push(
+          <CardLogEntry
+            card={card}
+            privateEntry={entry.private}
+            player={activePlayer}
+          />
+        );
+        elements.push(` for ${amount} lore`);
+
+        break;
+      }
+      case "LOAD_DECK": {
+        elements.push(`loaded a deck`);
+        break;
+      }
+      case "LORE_CHANGE": {
+        const { from, to, player } = entry;
+        const loreDelta = to - from;
+
+        // When LORE_CHANGE has activePlayer, it means a activePlayer removed from another
+        if (player) {
+          elements.pop();
+          if (activePlayer === player) {
+            elements.push(`${playerAction} You `);
+          } else {
+            elements.push(`${opponentAction} Opponent `);
+          }
+        }
+
+        elements.push(
+          `${loreDelta < 0 ? "lost ▼" : "gained ▲"} ${loreDelta} lore and now ${
+            isActivePlayerTheSender ? "have" : "has"
+          } ${to} lore.`
+        );
+
+        break;
+      }
+      case "PASS_TURN": {
+        elements.push(` passed the turn.`);
+        break;
+      }
+      case "NEW_TURN": {
+        const card = engine.findLorcanitoCard(entry.instanceId);
+        elements.push(
+          ` ${isMyTurn ? "are" : "is"} starting turn #${Math.round(
+            entry.turn / 2
+          )}. `
+        );
+
+        if (isMyTurn) {
+          elements.push("and you draw ");
+          elements.push(
+            <CardLogEntry
+              card={card}
+              privateEntry={entry.private}
+              player={activePlayer}
+            />
+          );
+        } else {
+          elements.push("Your opponent draws a card.");
+        }
+
+        break;
+      }
+      // TODO: THIS IS REEDUNDANT
+      case "ADD_TO_INKWELL": {
+        const card = engine.findLorcanitoCard(entry.instanceId);
+
+        elements.push(` added `);
+        // These images are wrongly sized, so I'm using the same image for both
+        const img = card?.inkwell
+          ? "https://lorcania.com/images/cards/elements/inkwell.svg"
+          : "https://lorcania.com/images/cards/elements/inkless.webp";
+        elements.push(
+          <Image
+            src={img}
+            width={8}
+            height={8}
+            alt="Inkless card"
+            quality={20}
+          />
+        );
+        elements.push(
+          <CardLogEntry
+            card={card}
+            privateEntry={entry.private}
+            player={activePlayer}
+          />
+        );
+        elements.push(` to inkwell. `);
+        break;
+      }
+      case "GOING_FIRST": {
+        elements.push(
+          `${entry.player} is going first, and skipping his/her draw step.`
+        );
+        break;
+      }
+      case "READY": {
+        elements.push(`[READY]`);
+        break;
+      }
+      case "SET": {
+        elements.push(`[SET]`);
+        break;
+      }
+      case "DRAW": {
+        elements.push(`draws a card`);
+        break;
+      }
+      case "TAP": {
+        // TODO: Check if the card is in the inkwell and show a different message
+        const card = engine.findLorcanitoCard(entry?.instanceId);
+
+        if (entry.inkwell) {
+          elements.push(`${entry?.value ? "taps" : "untaps"} from inkwell`);
+        } else if (!card) {
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          elements.push(`Unknown card ${entry?.instanceId}`);
+        } else {
+          elements.push(`${entry?.value ? "exert" : "ready"} `);
+          elements.push(
+            <CardLogEntry
+              card={card}
+              privateEntry={entry.private}
+              player={activePlayer}
+            />
+          );
+        }
+
+        break;
+      }
+      default: {
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        if (process.env.NODE_ENV === "development") {
+          elements.push(`Unknown action: ${entry}`);
+        }
+      }
+    }
+
+    return (
+      <p className="ml-2 break-words text-sm text-slate-400">{elements}</p>
+    );
+  },
+  (prev, next) => prev.entry.id === next.entry.id
+);
+
+Log.displayName = "LogEntry";

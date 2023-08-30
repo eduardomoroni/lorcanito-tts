@@ -1,0 +1,39 @@
+import type { Meta } from "~/providers/TabletopProvider";
+import { selectCardMeta } from "~/engine/rule-engine/lorcana/selectors";
+import type { LorcanitoGameState } from "~/engine/rule-engine/lorcana/types";
+
+export function updateCardMeta(
+  G: LorcanitoGameState,
+  instanceId: string,
+  // null means remove meta
+  meta: Partial<Meta> | null
+) {
+  const cardMeta = selectCardMeta(G, instanceId);
+  setCardMeta(G, instanceId, { ...cardMeta, ...meta });
+}
+
+export function setCardMeta(
+  state: LorcanitoGameState,
+  instanceId: string,
+  // null means remove meta
+  meta: Partial<Meta> | null
+) {
+  const card = state.cards[instanceId];
+  if (!card) {
+    console.error("Card not found", instanceId);
+    return;
+  }
+
+  if (!meta) {
+    // Setting to null removes the meta
+    card.meta = null;
+  } else if (!card.meta) {
+    card.meta = meta;
+  } else {
+    card.meta = {
+      // @ts-ignore
+      ...state.cards[instanceId].meta,
+      ...meta,
+    };
+  }
+}

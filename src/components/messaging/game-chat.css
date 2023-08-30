@@ -1,0 +1,18 @@
+.str-chat__channel-list {
+  width: 30%;
+}
+.str-chat__channel {
+  width: 100%;
+}
+.str-chat__thread {
+  width: 45%;
+}
+.str-chat__file-input-container {
+  display: none !important;
+}
+.str-chat__message-textarea-emoji-picker {
+  display: none !important;
+}
+.str-chat__send-button {
+  display: none !important;
+}
