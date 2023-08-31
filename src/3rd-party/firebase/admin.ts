@@ -4,9 +4,9 @@ import type { ServiceAccount } from "firebase-admin/lib/app/credential";
 import { shouldConnectAuthEmulator } from "~/3rd-party/firebase/emulator";
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-const secret: ServiceAccount = JSON.parse(env.FIREBASE_ADMIN || "{}");
+const secret: ServiceAccount = JSON.parse(process.env.FIREBASE_ADMIN || "{}");
 // @ts-expect-error - private_key is not in the types
-secret.private_key = env.FIREBASE_PRIVATE_KEY;
+secret.private_key = process.env.FIREBASE_PRIVATE_KEY;
 
 const emulatorEnabled = shouldConnectAuthEmulator();
 
@@ -15,15 +15,16 @@ if (!admin.apps.length) {
     console.log("Emulating Firebase ADMIN");
   }
 
-  admin.initializeApp({
+  const options = {
     credential: admin.credential.cert(secret),
     databaseURL: emulatorEnabled
       ? "http://127.0.0.1:9098"
-      : "https://lorcanito-default-rtdb.europe-west1.firebasedatabase.app",
+      : process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
     // databaseAuthVariableOverride: {
     //   uid: "lorcanito-simulator",
     // },
-  });
+  };
+  admin.initializeApp(options);
 }
 
 export const adminDatabase = admin.database();

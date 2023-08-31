@@ -70,10 +70,12 @@ export const Providers: React.FC<{
 
 export const FirebaseProvider: React.FC<{
   children: React.ReactNode;
-}> = ({ children }) => (
-  <SessionProvider>
-    <FirebaseAppProvider firebaseConfig={config}>
-      <Providers>{children}</Providers>
-    </FirebaseAppProvider>
-  </SessionProvider>
-);
+}> = ({ children }) => {
+  return (
+    <SessionProvider>
+      <FirebaseAppProvider firebaseConfig={config}>
+        <Providers>{children}</Providers>
+      </FirebaseAppProvider>
+    </SessionProvider>
+  );
+};

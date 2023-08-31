@@ -5,24 +5,22 @@ import { z } from "zod";
  * built with invalid env vars.
  */
 const server = z.object({
-  // NEXT_PUBLIC_STREAM_API_KEY: z.string(),
   // STREAM_API_SECRET: z.string(),
-  FIREBASE_ADMIN: z.string(),
-  FIREBASE_PRIVATE_KEY: z.string(),
-  FIREBASE_PRIVATE_CLEANUP_SECRET: z.string(),
-  // DATABASE_URL: z.string().url(),
+  // FIREBASE_ADMIN: z.string(),
+  // FIREBASE_ADMIN_PRIVATE_KEY: z.string(),
+  // FIREBASE_PRIVATE_CLEANUP_SECRET: z.string(),
   NODE_ENV: z.enum(["development", "test", "production"]),
   NEXTAUTH_SECRET:
     process.env.NODE_ENV === "production"
       ? z.string().min(1)
       : z.string().min(1).optional(),
-  NEXTAUTH_URL: z.preprocess(
-    // This makes Vercel deployments not fail if you don't set NEXTAUTH_URL
-    // Since NextAuth.js automatically uses the VERCEL_URL if present.
-    (str) => process.env.VERCEL_URL ?? str,
-    // VERCEL_URL doesn't include `https` so it cant be validated as a URL
-    process.env.VERCEL ? z.string().min(1) : z.string().url()
-  ),
+  // NEXTAUTH_URL: z.preprocess(
+  //   // This makes Vercel deployments not fail if you don't set NEXTAUTH_URL
+  //   // Since NextAuth.js automatically uses the VERCEL_URL if present.
+  //   (str) => process.env.VERCEL_URL ?? str,
+  //   // VERCEL_URL doesn't include `https` so it cant be validated as a URL
+  //   process.env.VERCEL ? z.string().min(1) : z.string().url()
+  // ),
   // Add `.min(1) on ID and SECRET if you want to make sure they're not empty
 });
 
@@ -32,6 +30,14 @@ const server = z.object({
  */
 const client = z.object({
   // NEXT_PUBLIC_STREAM_API_KEY: z.string(),
+  NEXT_PUBLIC_FIREBASE_API_KEY: z.string(),
+  NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: z.string(),
+  NEXT_PUBLIC_FIREBASE_PROJECT_ID: z.string(),
+  NEXT_PUBLIC_FIREBASE_DATABASE_URL: z.string(),
+  NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: z.string(),
+  NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: z.string(),
+  NEXT_PUBLIC_FIREBASE_APP_ID: z.string(),
+  NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: z.string(),
 });
 
 /**
@@ -41,14 +47,15 @@ const client = z.object({
  * @type {Record<keyof z.infer<typeof server> | keyof z.infer<typeof client>, string | undefined>}
  */
 const processEnv = {
-  // DATABASE_URL: process.env.DATABASE_URL,
   NODE_ENV: process.env.NODE_ENV,
-  NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
-  NEXTAUTH_URL: process.env.NEXTAUTH_URL,
-  FIREBASE_ADMIN: process.env.FIREBASE_ADMIN,
-  FIREBASE_PRIVATE_KEY: process.env.FIREBASE_PRIVATE_KEY,
-  FIREBASE_PRIVATE_CLEANUP_SECRET: process.env.FIREBASE_PRIVATE_CLEANUP_SECRET,
-  // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
+  NEXT_PUBLIC_FIREBASE_API_KEY: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  NEXT_PUBLIC_FIREBASE_PROJECT_ID: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  NEXT_PUBLIC_FIREBASE_DATABASE_URL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
+  NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  NEXT_PUBLIC_FIREBASE_APP_ID: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
 // Don't touch the part below

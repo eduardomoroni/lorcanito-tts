@@ -5,7 +5,7 @@
   "installCommand": "npm install",
   "crons": [
     {
-      "path": "/api/cron/purge_games?password=senha_que_ninguem_sabe",
+      "path": "/api/cron/purge_games",
       "schedule": "0 0 * * *"
     }
   ]
