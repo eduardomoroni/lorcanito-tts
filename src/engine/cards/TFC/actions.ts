@@ -91,8 +91,9 @@ export const healingGlow: LorcanitoActionCard = {
   number: 28,
   set: "TFC",
 };
+
 export const justInTime: LorcanitoActionCard = {
-  implemented: false,
+  implemented: true,
   id: "2b2ec1ded689159045ee10790d96e74ac7d07db4",
   url: "https://static.lorcanito.com/images/cards/TFC/29.webp",
   alternativeUrl:
@@ -105,8 +106,6 @@ export const justInTime: LorcanitoActionCard = {
   abilities: [
     {
       type: "resolution",
-      name: "Go Ahead And Sign",
-      text: "↷ − Put any card from your hand into your inkwell facedown.",
       effects: [
         {
           type: "move",
@@ -119,6 +118,11 @@ export const justInTime: LorcanitoActionCard = {
         filters: [
           { filter: "owner", value: "self" },
           { filter: "zone", value: "hand" },
+          {
+            filter: "attribute",
+            value: "cost",
+            comparison: { operator: "lte", value: 5 },
+          },
         ],
       },
       optional: false,

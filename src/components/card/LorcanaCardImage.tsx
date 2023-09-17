@@ -52,7 +52,7 @@ export function createImgixUrl(
   let url = `https://lorcanito.imgix.net/images/cards/EN/001/${pad(
     enchantedCard || card.number,
     3
-  )}.webp`;
+  )}.webp?fm=avif&auto=format&q=65&w=250`;
 
   if (opt?.imageOnly) {
     url = url.replace("/001/", "/001/art_only/");

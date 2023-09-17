@@ -33,7 +33,7 @@ export const useFirebaseSync = (
 
       rootStore.sync(firebaseState);
 
-      console.log(rootStore.toJSON());
+      console.log("update", rootStore.toJSON());
       console.groupEnd();
     }
   }, [data]);
@@ -44,6 +44,15 @@ export const useFirebaseSync = (
     return autorun(() => {
       try {
         const nextState: Game = rootStore.toJSON();
+
+        // If we have just synced, we don't have to update firebase with the same data;
+        if (getDiff(data, nextState).length === 0) {
+          console.log("Skipping firebase sync, no changes");
+          prevState = nextState;
+          return;
+        }
+
+        // const nextState: Game = data;
         const difference = getDiff(prevState, nextState);
 
         if (difference && prevState) {
@@ -82,7 +91,7 @@ export const useFirebaseSync = (
         console.error(e);
       }
     });
-  }, [rootStore]);
+  }, [rootStore, data]);
 };
 
 function recursivelyNullifyUndefinedValues(obj: unknown = {}) {
