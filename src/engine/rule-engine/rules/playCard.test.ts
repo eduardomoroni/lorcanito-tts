@@ -4,7 +4,7 @@
 
 import { expect, it } from "@jest/globals";
 import { createRuleEngine } from "~/engine/rule-engine/engine";
-import { mickeyMouseTrueFriend, moanaOfMotunui } from "~/engine/cards";
+import { mickeyMouseTrueFriend, moanaOfMotunui } from "~/engine/cards/TFC";
 import { createMockGame } from "~/engine/rule-engine/__mocks__/createGameMock";
 const testPlayer = "player_one";
 

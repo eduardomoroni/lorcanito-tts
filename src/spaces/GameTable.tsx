@@ -11,24 +11,24 @@ import { SideBar } from "~/spaces/Sidebar";
 import { StackZoneArena } from "~/spaces/StackZone";
 import { Transition } from "@headlessui/react";
 import { AlterHandModal } from "~/components/modals/AlterHandModal";
-import {
-  useGame,
-  useGameController,
-} from "~/engine/rule-engine/lib/GameControllerProvider";
+import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
 import { useTurn } from "~/engine/GameProvider";
 import { useLorcanitoSounds } from "~/engine/useLorcanitoSounds";
 import { EffectStackZoneArena } from "~/spaces/EffectStackZone";
+import { observer } from "mobx-react-lite";
 
 const GameTable: FC<{ gameId: string }> = (props) => {
-  const [game, playerId] = useGame();
+  const store = useGameStore();
+  const playerId = store.activePlayer;
 
-  if (!game) {
+  if (!store.toJSON()) {
     logAnalyticsEvent("game_table_error", { playerId, gameId: props.gameId });
     return <span>Failed to retrieve the game, please try to log in again</span>;
   }
 
+  // TODO: We have to ask for permission to play sounds
   useLorcanitoSounds();
-  const engine = useGameController();
+
   const {
     activePlayer,
     opponent,
@@ -37,11 +37,12 @@ const GameTable: FC<{ gameId: string }> = (props) => {
     isOpponentTurn,
     isSpectator,
     players,
-    tables,
   } = useTurn();
-  const cardsOnStack = engine.getStackCards();
-  const pendingEffects = engine.getPendingEffects();
-  const isStackZoneOpen = cardsOnStack.length > 0 || pendingEffects.length > 0;
+  const tables = store.tableStore.tables;
+  const cardsOnStack = store.tableStore.getStackCards();
+  const pendingEffects = store.tableStore.getPendingEffects();
+  const isStackZoneOpen =
+    cardsOnStack?.length > 0 || pendingEffects?.length > 0;
 
   const [isBugReportModalOpen, setBugReportModalOpen] = useState(false);
   const [isHelpModalOpen, setHelpModalOpen] = useState(false);
@@ -86,7 +87,7 @@ const GameTable: FC<{ gameId: string }> = (props) => {
           className="absolute bottom-0 left-0 m-2 h-12 w-12 cursor-pointer text-slate-50 opacity-25 hover:opacity-50"
         />
       )}
-      <SideBar gameId={game.id} />
+      <SideBar gameId={store.id} />
       <div className="table-perspective-outer relative h-screen w-screen rounded">
         {/*<QuestDropZone />*/}
         <Transition
@@ -156,4 +157,4 @@ const GameTable: FC<{ gameId: string }> = (props) => {
 // Steps to reproduce.
 // Join a table, load a deck and immediately click on the button to open the modal
 
-export default GameTable;
+export default observer(GameTable);

@@ -1,10 +1,7 @@
 import { StreamChat } from "stream-chat";
 import { createLogEntry } from "~/spaces/Log/game-log/GameLogProvider";
 import { adminDatabase } from "~/3rd-party/firebase/admin";
-import {
-  type InternalLogEntry,
-  type LogEntry,
-} from "~/spaces/Log/game-log/types";
+import { type InternalLogEntry, type LogEntry } from "~/spaces/Log/types";
 
 const api_key = process.env.NEXT_PUBLIC_STREAM_API_KEY;
 const api_secret = process.env.STREAM_API_SECRET;
@@ -21,7 +18,7 @@ export function getStreamServerClient() {
 }
 
 export async function getGameChatChannel(gameId: string) {
-  const serverClient = await getStreamServerClient();
+  const serverClient = getStreamServerClient();
 
   return serverClient.channel("messaging", gameId, {
     image: "https://goo.gl/Zefkbx",
@@ -29,16 +26,24 @@ export async function getGameChatChannel(gameId: string) {
   });
 }
 
-export async function updateStreamUser(userId: string, gameId: string) {
+// TODO: This might be causing additional requests to the database
+export async function updateStreamUser(userId: string) {
   const userName = (await adminDatabase.ref(`users/${userId}`).get()).val();
-  const serverClient = await getStreamServerClient();
+  const serverClient = getStreamServerClient();
   await serverClient.upsertUser({
     id: userId,
     username: userName,
     role: "admin",
   });
+}
 
-  const channel = serverClient.channel("messaging", gameId);
+export async function updateStreamGameChat(userId: string, gameId: string) {
+  await updateStreamUser(userId);
+
+  const serverClient = getStreamServerClient();
+  const channel = serverClient.channel("messaging", gameId, {
+    created_by_id: userId,
+  });
   await channel.create();
   await channel.addMembers([userId]);
 }

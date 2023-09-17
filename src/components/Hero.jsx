@@ -76,29 +76,29 @@ export function Hero() {
         </Button>
       </div>
 
-      <div className="mt-8 lg:mt-44">
-        <button
-          type="button"
-          onClick={() => router.push("https://beta.lorcanito.com")}
-          className="relative block w-full rounded-lg border-2 border-dashed border-gray-300 p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-        >
-          <span className="mt-2 block text-sm font-bold text-gray-900">
-            Note for regular players:
-          </span>
-          <span className="mt-2 block text-sm font-semibold text-gray-900">
-            we are implementing game lobby and matchmaking features. If you'd
-            like to help us shaping the future of this project, please use this
-            link instead{" "}
-            <Link className="text-indigo-500" href="https://beta.lorcanito.com">
-              beta.lorcanito.com
-            </Link>
-            .
-            <br />
-            Note that this is a beta version and it may have bugs. You're always
-            welcome to play on the stable version at play.lorcanito.com
-          </span>
-        </button>
-      </div>
+      {/*<div className="mt-8 lg:mt-44">*/}
+      {/*  <button*/}
+      {/*    type="button"*/}
+      {/*    onClick={() => router.push("https://beta.lorcanito.com")}*/}
+      {/*    className="relative block w-full rounded-lg border-2 border-dashed border-gray-300 p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"*/}
+      {/*  >*/}
+      {/*    <span className="mt-2 block text-sm font-bold text-gray-900">*/}
+      {/*      Note for regular players:*/}
+      {/*    </span>*/}
+      {/*    <span className="mt-2 block text-sm font-semibold text-gray-900">*/}
+      {/*      we are implementing game lobby and matchmaking features. If you'd*/}
+      {/*      like to help us shaping the future of this project, please use this*/}
+      {/*      link instead{" "}*/}
+      {/*      <Link className="text-indigo-500" href="https://beta.lorcanito.com">*/}
+      {/*        beta.lorcanito.com*/}
+      {/*      </Link>*/}
+      {/*      .*/}
+      {/*      <br />*/}
+      {/*      Note that this is a beta version and it may have bugs. You're always*/}
+      {/*      welcome to play on the stable version at play.lorcanito.com*/}
+      {/*    </span>*/}
+      {/*  </button>*/}
+      {/*</div>*/}
     </Container>
   );
 }

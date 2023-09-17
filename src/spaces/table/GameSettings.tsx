@@ -11,7 +11,7 @@ import { useDebounce } from "~/libs/useDebounce";
 import { ref, set } from "firebase/database";
 import { useIsPresent } from "~/providers/presence/PresenceProvider";
 import { useGameLobby } from "~/providers/lobby/GameLobbyProvider";
-import { useGame } from "~/engine/rule-engine/lib/GameControllerProvider";
+import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
 import { usePlayerNickname } from "~/engine/GameProvider";
 
 /**
@@ -324,7 +324,9 @@ export function PlayerId() {
 }
 
 export const SlideOverContent: React.FC = () => {
-  const [game, userUID] = useGame();
+  const store = useGameStore();
+  const game = store.toJSON();
+  const userUID = store.activePlayer;
   const players = Object.keys(game.tables || {});
   const isOwner = game.id === userUID;
   const playerHasJoined = players.includes(userUID);

@@ -1,10 +1,9 @@
 import React, { type FC } from "react";
 import { useCardPreview } from "~/providers/CardPreviewProvider";
 import { EyeSlashIcon } from "@heroicons/react/20/solid";
-
-import { useGameController } from "~/engine/rule-engine/lib/GameControllerProvider";
-import { InternalLogEntry } from "~/spaces/Log/game-log/types";
-import { LorcanitoCard } from "~/engine/cardTypes";
+import type { InternalLogEntry } from "~/spaces/Log/types";
+import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
+import type { CardModel } from "~/store/models/CardModel";
 
 const COLORS = {
   ruby: "text-ruby",
@@ -15,18 +14,28 @@ const COLORS = {
   amethyst: "text-amethyst",
 } as const;
 
-// TODO: This should receivee instance id
+// TODO: This should receive instance id
 export const CardLogEntry: FC<{
-  card?: LorcanitoCard;
+  card?: CardModel;
   instanceId?: string;
   privateEntry?: InternalLogEntry["private"];
   player: string;
 }> = ({ card, privateEntry, player, instanceId }) => {
   const setPreview = useCardPreview();
-  const engine = useGameController();
+  const store = useGameStore();
 
-  card = card || engine.findLorcanitoCard(instanceId);
+  if (!card && !instanceId) {
+    return null;
+  }
 
+  // @ts-ignore TODO: come back to this later
+  card =
+    card ||
+    // Don't remove this, it's a hack to make sure that the card is loaded
+    (store.cardStore.hasCard(instanceId) &&
+      store.cardStore.getCard(instanceId));
+
+  const lorcanitoCard = card?.lorcanitoCard;
   if (!card) {
     return null;
   }
@@ -47,16 +56,16 @@ export const CardLogEntry: FC<{
         </>
       )}
       <span
-        key={card.id}
+        key={card.instanceId}
         onMouseEnter={() => {
-          setPreview({ card });
+          setPreview({ card: lorcanitoCard });
         }}
         onMouseLeave={() => setPreview(undefined)}
         className={`cursor-pointer break-words text-sm font-extrabold underline ${
           COLORS[card.color]
         }`}
       >
-        {`${card.name}${card.title ? " - " + card.title : ""}`}
+        {`${card.fullName}`}
       </span>
     </>
   );

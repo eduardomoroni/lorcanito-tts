@@ -3,13 +3,14 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import { Log } from "~/spaces/Log/LogEntry";
 import { ref } from "firebase/database";
 import { useDatabase, useDatabaseListData } from "reactfire";
-import type { InternalLogEntry } from "~/spaces/Log/game-log/types";
-import { useGame } from "~/engine/rule-engine/lib/GameControllerProvider";
+import type { InternalLogEntry } from "~/spaces/Log/types";
+import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
 
 export function VirtualizedLogList(props: {
   size: { width: number; height: number };
 }) {
-  const [game] = useGame();
+  const store = useGameStore();
+  const game = store.toJSON();
   const database = useDatabase();
 
   const logsRef = ref(database, `logs/${game.id}/`);

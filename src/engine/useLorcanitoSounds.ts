@@ -1,7 +1,7 @@
 import useSound from "use-sound";
 import { usePrevious } from "~/hooks/usePrevious";
 import { useEffect } from "react";
-import { useGame } from "~/engine/rule-engine/lib/GameControllerProvider";
+import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
 
 export function useLorcanitoSounds() {
   const [passTurn] = useSound(
@@ -15,12 +15,12 @@ export function useLorcanitoSounds() {
     { volume: 0.5 }
   );
 
-  const [game] = useGame();
-  const previousGame = usePrevious(game);
+  const store = useGameStore();
+  const previousGame = usePrevious(store.turnPlayer);
 
   useEffect(() => {
-    if (previousGame?.turnPlayer !== game.turnPlayer) {
+    if (previousGame !== store.turnPlayer) {
       passTurn();
     }
-  }, [previousGame, game]);
+  }, [previousGame, store.turnPlayer]);
 }

@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useIdleTimer } from "react-idle-timer";
 import { IdleModal } from "~/components/modals/IdleModal";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { logAnalyticsEvent } from "~/3rd-party/firebase/FirebaseAnalyticsProvider";
 
 const timeout = 300_000;
@@ -48,7 +48,7 @@ function Layout({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (isIdle) {
+    if (isIdle && process.env.NODE_ENV === "production") {
       logAnalyticsEvent("idle");
       router.push("/idle");
     }

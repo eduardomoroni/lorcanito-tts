@@ -5,22 +5,22 @@ import { z } from "zod";
  * built with invalid env vars.
  */
 const server = z.object({
-  // STREAM_API_SECRET: z.string(),
-  // FIREBASE_ADMIN: z.string(),
-  // FIREBASE_ADMIN_PRIVATE_KEY: z.string(),
-  // FIREBASE_PRIVATE_CLEANUP_SECRET: z.string(),
+  STREAM_API_SECRET: z.string(),
+  FIREBASE_ADMIN: z.string(),
+  FIREBASE_ADMIN_PRIVATE_KEY: z.string(),
+  FIREBASE_PRIVATE_CLEANUP_SECRET: z.string(),
   NODE_ENV: z.enum(["development", "test", "production"]),
   NEXTAUTH_SECRET:
     process.env.NODE_ENV === "production"
       ? z.string().min(1)
       : z.string().min(1).optional(),
-  // NEXTAUTH_URL: z.preprocess(
-  //   // This makes Vercel deployments not fail if you don't set NEXTAUTH_URL
-  //   // Since NextAuth.js automatically uses the VERCEL_URL if present.
-  //   (str) => process.env.VERCEL_URL ?? str,
-  //   // VERCEL_URL doesn't include `https` so it cant be validated as a URL
-  //   process.env.VERCEL ? z.string().min(1) : z.string().url()
-  // ),
+  NEXTAUTH_URL: z.preprocess(
+    // This makes Vercel deployments not fail if you don't set NEXTAUTH_URL
+    // Since NextAuth.js automatically uses the VERCEL_URL if present.
+    (str) => process.env.VERCEL_URL ?? str,
+    // VERCEL_URL doesn't include `https` so it cant be validated as a URL
+    process.env.VERCEL ? z.string().min(1) : z.string()//.url()
+  ),
   // Add `.min(1) on ID and SECRET if you want to make sure they're not empty
 });
 
@@ -56,6 +56,12 @@ const processEnv = {
   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   NEXT_PUBLIC_FIREBASE_APP_ID: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
   NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
+  STREAM_API_SECRET: process.env.STREAM_API_SECRET,
+  FIREBASE_ADMIN: process.env.FIREBASE_ADMIN,
+  FIREBASE_ADMIN_PRIVATE_KEY: process.env.FIREBASE_ADMIN_PRIVATE_KEY,
+  FIREBASE_PRIVATE_CLEANUP_SECRET: process.env.FIREBASE_PRIVATE_CLEANUP_SECRET,
+  NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
+  NEXTAUTH_URL: process.env.NEXTAUTH_SECRET,
 };
 
 // Don't touch the part below
@@ -85,7 +91,6 @@ if (!!process.env.SKIP_ENV_VALIDATION == false) {
     );
     throw new Error("Invalid environment variables");
   }
-
   env = new Proxy(parsed.data, {
     get(target, prop) {
       if (typeof prop !== "string") return undefined;

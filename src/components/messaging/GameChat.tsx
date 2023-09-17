@@ -4,14 +4,13 @@ import {
   MessageInput,
   MessageList,
   useMessageContext,
-  VirtualizedMessageList,
   Window,
 } from "stream-chat-react";
 import "stream-chat-react/dist/css/v2/index.css";
 import "./game-chat.css";
 import { Log } from "~/spaces/Log/LogEntry";
 import { useStreamChat } from "~/providers/stream-chat-provider/StreamChatProvider";
-import type { InternalLogEntry } from "~/spaces/Log/game-log/types";
+import type { InternalLogEntry } from "~/spaces/Log/types";
 import { useFirebaseUserId } from "~/3rd-party/firebase/FirebaseSessionProvider";
 
 const CustomHeader = () => {

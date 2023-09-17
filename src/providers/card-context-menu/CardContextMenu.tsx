@@ -3,6 +3,7 @@ import { useOnClickOutside } from "~/hooks/useClickOutside";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { logAnalyticsEvent } from "~/3rd-party/firebase/FirebaseAnalyticsProvider";
+import { observer } from "mobx-react-lite";
 
 export type ContextMenuItem = {
   text: string;
@@ -10,7 +11,7 @@ export type ContextMenuItem = {
   items?: Array<Omit<ContextMenuItem, "items">>;
 };
 
-export default function CardContextMenu(props: {
+function CardContextMenu(props: {
   show: boolean;
   direction: "top" | "bottom";
   onClose: () => void;
@@ -139,3 +140,5 @@ function ListItem(props: {
     </li>
   );
 }
+
+export default observer(CardContextMenu);

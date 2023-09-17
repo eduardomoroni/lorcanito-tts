@@ -5,28 +5,25 @@ import {
   canSingFilter,
   challengeOpponentsCardsFilter,
 } from "~/components/modals/target/filters";
-import {
-  type GameEngine,
-  useGame,
-  useGameController,
-} from "~/engine/rule-engine/lib/GameControllerProvider";
+import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { CardModel } from "~/store/models/CardModel";
+import { MobXRootStore } from "~/store/RootStore";
 
 export const ItemTypes = {
   CARD: "card",
-  DAMAGE: "damage_counter",
 };
 
 type CardItemType = {
-  card: string;
+  card?: CardModel;
   from: Zones;
 };
 
 // TODO: Major issue with moving
 // the dep array holds the game in a prior state
 
-export function useDragCard(instanceID: string, zone: Zones) {
-  const game = useGame();
-  const item: CardItemType = { card: instanceID, from: zone };
+export function useDragCard(card: CardModel | undefined, zone: Zones) {
+  const store = useGameStore();
+  const item: CardItemType = { card: card, from: zone };
 
   // TODO: add a cool effect on drag
   const [collect, dragRef] = useDrag(
@@ -39,15 +36,15 @@ export function useDragCard(instanceID: string, zone: Zones) {
         };
       },
     }),
-    [zone, game]
+    // TODO: Revisit this
+    [zone, store.toJSON()]
   );
 
   return { opacity: collect.opacity, dragRef };
 }
 
-export function useDropCardInCard(droppingCard: string, zone: Zones) {
-  const game = useGame();
-  const engine = useGameController();
+export function useDropCardInCard(droppingCard: CardModel, zone: Zones) {
+  const store = useGameStore();
 
   const [
     { highlighted, hovered, canShift, canChallenge, canSing },
@@ -56,43 +53,46 @@ export function useDropCardInCard(droppingCard: string, zone: Zones) {
     () => ({
       accept: ItemTypes.CARD,
       canDrop: (dragging: CardItemType) => {
-        if (dragging.card === droppingCard) {
+        if (dragging.card?.isCard(droppingCard)) {
           return false;
         }
 
-        const canShift = canShiftIntoCard(engine, dragging, droppingCard, zone);
+        const canShift = canShiftIntoCard(store, dragging, droppingCard, zone);
         const canChallenge = canChallengeCard(
-          engine,
+          store,
           droppingCard,
           dragging.from
         );
-        const canSing = canSingCard(engine, droppingCard, dragging.card);
+        const canSing = canSingCard(store, droppingCard, dragging.card);
 
         return canShift || canChallenge || canSing;
       },
       drop: (dragging: CardItemType) => {
-        const canShift = canShiftIntoCard(engine, dragging, droppingCard, zone);
+        const canShift = canShiftIntoCard(store, dragging, droppingCard, zone);
         const canChallenge = canChallengeCard(
-          engine,
+          store,
           droppingCard,
           dragging.from
         );
-        const canSing = canSingCard(engine, droppingCard, dragging.card);
+        const canSing = canSingCard(store, droppingCard, dragging.card);
 
         if (canShift) {
-          engine.shift(dragging.card, droppingCard);
+          store.shiftCard(dragging.card?.instanceId, droppingCard.instanceId);
         }
 
         if (canChallenge) {
-          engine.challenge(dragging.card, droppingCard);
+          store.cardStore.challenge(
+            dragging.card?.instanceId,
+            droppingCard.instanceId
+          );
         }
 
         if (canSing) {
-          engine.sing(dragging.card, droppingCard);
+          droppingCard.sing(dragging.card);
         }
 
         return {
-          dragging: dragging.card,
+          dragging: dragging,
           dropping: droppingCard,
           shift: canShift,
           challenge: canChallenge,
@@ -102,9 +102,9 @@ export function useDropCardInCard(droppingCard: string, zone: Zones) {
       collect: (monitor) => {
         const item = monitor.getItem();
 
-        const canShift = canShiftIntoCard(engine, item, droppingCard, zone);
-        const canChallenge = canChallengeCard(engine, droppingCard, item?.from);
-        const canSing = canSingCard(engine, droppingCard, item?.card);
+        const canShift = canShiftIntoCard(store, item, droppingCard, zone);
+        const canChallenge = canChallengeCard(store, droppingCard, item?.from);
+        const canSing = canSingCard(store, droppingCard, item?.card);
 
         return {
           canShift,
@@ -115,7 +115,8 @@ export function useDropCardInCard(droppingCard: string, zone: Zones) {
         };
       },
     }),
-    [zone, droppingCard, engine, game]
+    // TODO: Revisit this
+    [zone, droppingCard, store.toJSON()]
   );
 
   return {
@@ -133,8 +134,7 @@ export function useDropCardInZone(
   zone: Zones,
   position: "first" | "last" = "last"
 ) {
-  const game = useGame();
-  const controller = useGameController();
+  const store = useGameStore();
   const [{ isActive, isOver }, dropZoneRef] = useDrop(
     () => ({
       accept: ItemTypes.CARD,
@@ -146,16 +146,16 @@ export function useDropCardInZone(
           logAnalyticsEvent("card_drop_in_zone", { from: item.from, to: zone });
 
           if (zone === "play" && item.from === "hand") {
-            controller.playCardFromHand(item.card);
+            store.playCardFromHand(item.card?.instanceId || "");
           } else if (zone === "inkwell" && item.from === "hand") {
-            controller.addToInkwell(item.card, item.from);
+            store.tableStore.addToInkwell(item.card?.instanceId || "");
           } else {
-            controller.moveCard({
-              instanceId: item.card,
-              from: item.from,
-              to: zone,
-              position,
-            });
+            store.tableStore.moveCard(
+              item.card?.instanceId,
+              item.from,
+              zone,
+              position
+            );
           }
 
           return {
@@ -166,9 +166,7 @@ export function useDropCardInZone(
         }
       },
       canDrop: (item: CardItemType) => {
-        return (
-          item.from !== zone && controller.findCardOwner(item.card) === playerId
-        );
+        return item.from !== zone && item.card?.ownerId === playerId;
       },
       collect: (monitor) => {
         return {
@@ -177,71 +175,65 @@ export function useDropCardInZone(
         };
       },
     }),
-    [playerId, zone, position, controller, game]
+    // TODO: Revisit this
+    [playerId, zone, position, store.toJSON()]
   );
 
   return { dropZoneRef, isActive, isOver };
 }
 
-// TODO: Move this to filter syntax
 export function canShiftIntoCard(
-  engine: GameEngine,
+  store: MobXRootStore,
   dragging: CardItemType,
-  droppingCard: string,
+  droppingCard: CardModel,
   zone: Zones
 ): boolean {
-  if (!dragging) {
+  if (zone !== "play") {
     return false;
   }
 
-  const shifterCard = engine.findLorcanitoCard(dragging.card);
-  const shiftedCard = engine.findLorcanitoCard(droppingCard);
+  if (!dragging || !droppingCard) {
+    return false;
+  }
+
+  if (dragging.card?.lorcanitoCard.name !== droppingCard.lorcanitoCard.name) {
+    return false;
+  }
 
   // WHen card in card drag&drop is also active, z-index of the card is higher
-  if (dragging.card === droppingCard || zone !== "play") {
+  if (dragging.card === droppingCard) {
     return false;
   }
 
-  const shiftCost = engine.findShiftCost(dragging.card);
-  // TODO: In order to makee this work, we need to update the closure based on card metadata so the closure is updated
-  const isAlreadyShifted = engine.findTableCard(droppingCard)?.meta?.shifted;
-
-  if (isAlreadyShifted || !shiftCost) {
-    return false;
-  }
-
-  return shifterCard?.name === shiftedCard?.name;
+  return dragging.card.canShiftInto(droppingCard);
 }
 
 function canChallengeCard(
-  engine: GameEngine,
-  droppingCard: string,
+  store: MobXRootStore,
+  droppingCard?: CardModel,
   zone?: Zones
 ) {
   if (!droppingCard || zone !== "play") {
     return false;
   }
 
-  return engine
+  return store.cardStore
     .getCardsByFilter(challengeOpponentsCardsFilter)
     .map((card) => card?.instanceId)
-    .includes(droppingCard);
+    .includes(droppingCard.instanceId);
 }
 
 function canSingCard(
-  engine: GameEngine,
-  droppingCard?: string,
-  draggingCard?: string
+  store: MobXRootStore,
+  droppingCard?: CardModel,
+  draggingCard?: CardModel
 ) {
   // I'm doing this to avoid running the filter
-  const card = engine.findLorcanitoCard(draggingCard);
+  const card = draggingCard?.lorcanitoCard;
   if (!droppingCard || !draggingCard || card?.type !== "action" || !card) {
     return false;
   }
 
   const filters = canSingFilter(card);
-  return engine
-    .getCardsByFilter(filters)
-    .map((card) => card?.instanceId)
-    .includes(droppingCard);
+  return droppingCard?.canSing(draggingCard);
 }

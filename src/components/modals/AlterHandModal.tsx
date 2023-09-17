@@ -1,12 +1,8 @@
 import React, { Fragment, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { CardImage } from "~/components/card/CardImage";
-import { useGameLogger } from "~/spaces/Log/game-log/GameLogProvider";
-import { logAnalyticsEvent } from "~/3rd-party/firebase/FirebaseAnalyticsProvider";
-import {
-  useGame,
-  useGameController,
-} from "~/engine/rule-engine/lib/GameControllerProvider";
+import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { observer } from "mobx-react-lite";
 
 type Props = {
   ownerId: string;
@@ -15,15 +11,13 @@ type Props = {
   open: boolean;
 };
 
-export function AlterHandModal(props: Props) {
+function AlterHandModalComponent(props: Props) {
   const { ownerId } = props;
 
-  const [game] = useGame();
-  const engine = useGameController();
-  const logger = useGameLogger();
+  const store = useGameStore();
   const [isLoading, setIsLoading] = useState(false);
   const { setOpen, open, onConfirm } = props;
-  const playerHand: string[] = game.tables[ownerId]?.zones?.hand || [];
+  const playerHand = store.tableStore.getPlayerZoneCards(ownerId, "hand");
   const [cardsToMulligan, setCardsToMulligan] = useState<string[]>([]);
 
   const toggleCardToKeep = (card: string) => {
@@ -35,12 +29,9 @@ export function AlterHandModal(props: Props) {
     });
   };
 
-  const takeMulligan = async () => {
+  const takeMulligan = () => {
     try {
-      if (cardsToMulligan.length > 0) {
-        engine.mulligan(ownerId, cardsToMulligan);
-      }
-
+      store.alterHand(cardsToMulligan, ownerId);
       setOpen(false);
     } catch (e) {
       console.error(e);
@@ -97,17 +88,21 @@ export function AlterHandModal(props: Props) {
                         </h2>
 
                         <div className="mt-8 grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8">
-                          {playerHand.map((card: string) => {
-                            const keep = !cardsToMulligan.includes(card);
+                          {playerHand.map((card) => {
+                            const keep = !cardsToMulligan.includes(
+                              card.instanceId
+                            );
                             return (
                               <div
-                                key={card}
-                                onClick={() => toggleCardToKeep(card)}
+                                key={card.instanceId}
+                                onClick={() =>
+                                  toggleCardToKeep(card.instanceId)
+                                }
                               >
                                 <div className="relative aspect-card h-72 w-full overflow-hidden rounded-lg">
                                   <CardImage
-                                    key={card}
-                                    instanceId={card}
+                                    key={card.instanceId}
+                                    card={card}
                                     zone="hand"
                                     className={
                                       "h-full w-full object-cover object-center" +
@@ -163,3 +158,5 @@ export function AlterHandModal(props: Props) {
     </Transition.Root>
   );
 }
+
+export const AlterHandModal = observer(AlterHandModalComponent);

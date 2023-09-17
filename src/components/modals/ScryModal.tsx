@@ -10,20 +10,32 @@ import {
   ChevronDoubleUpIcon,
 } from "@heroicons/react/24/solid";
 import { LorcanaCardImage } from "~/components/card/LorcanaCardImage";
-import { useGameController } from "~/engine/rule-engine/lib/GameControllerProvider";
-import { useGameLogger } from "~/spaces/Log/game-log/GameLogProvider";
+import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { observer } from "mobx-react-lite";
+import { ScryEffect } from "~/engine/effectTypes";
+import { ResolvingParam } from "~/store/StackLayerStore";
+import { CardModel } from "~/store/models/CardModel";
 
 type Props = {
-  onClose: () => void;
+  onClose: (param?: ResolvingParam["scry"]) => void;
   open: boolean;
-  cards: string[];
+  scryCount: number;
+  mode: ScryEffect["mode"];
+  tutorFilters?: ScryEffect["tutorFilters"];
+  limits?: ScryEffect["limits"];
 };
 
-export function ScryModal(props: Props) {
-  const { onClose, open, cards } = props;
-  const logger = useGameLogger();
+function ScryModalComponent(props: Props) {
+  const { onClose, open, scryCount } = props;
+  const mobXRootStore = useGameStore();
+  const player = mobXRootStore.activePlayer;
+  const cards = mobXRootStore.tableStore
+    .getPlayerZone(player, "deck")
+    ?.cards.map((c) => c.instanceId)
+    .slice(-scryCount);
+
   const [scry, setScry] = useState({ top: cards, bottom: [] as string[] });
-  const engine = useGameController();
+  const store = mobXRootStore;
 
   const toBottom = (card: string) => {
     if (scry.bottom.includes(card)) {
@@ -118,21 +130,17 @@ export function ScryModal(props: Props) {
     );
   }
 
-  // TODO: Create a command for this
   const onConfirmScry = () => {
-    engine.scry(scry.top, scry.bottom);
-    logger.log({
-      type: "SCRY",
-      bottom: scry.bottom.length,
-      top: scry.top.length,
-    });
-
-    onClose();
+    const top = scry.top.map((card) => store.cardStore.getCard(card));
+    const bottom = scry.bottom.map((card) => store.cardStore.getCard(card));
+    const hand: CardModel[] = [];
+    store.tableStore.scry(top, bottom);
+    onClose({ top, bottom, hand });
   };
 
   return (
     <Transition.Root show={open} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={onClose}>
+      <Dialog as="div" className="relative z-10" onClose={() => onClose()}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -161,7 +169,7 @@ export function ScryModal(props: Props) {
                   <button
                     type="button"
                     className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    onClick={onClose}
+                    onClick={() => onClose()}
                   >
                     <span className="sr-only">Close</span>
                     <XMarkIcon className="h-6 w-6" aria-hidden="true" />
@@ -250,3 +258,5 @@ function moveRight<T>(arr: T[], index: number) {
   }
   return copy;
 }
+
+export const ScryModal = observer(ScryModalComponent);

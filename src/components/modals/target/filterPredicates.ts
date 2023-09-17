@@ -1,87 +1,32 @@
 import type { TableCard } from "~/providers/TabletopProvider";
 import type {
   NumericComparison,
+  StringComparison,
   TargetFilter,
 } from "~/components/modals/target/filters";
 import { exhaustiveCheck } from "~/libs/exhaustiveCheck";
-import type { Engine } from "~/engine/rule-engine/engine";
-import { RootState } from "~/engine/redux";
+import { Characteristics, LorcanitoCard } from "~/engine/cardTypes";
 import {
-  selectCardOwner,
-  selectPlayers,
-  selectPlayerZone,
-} from "~/engine/rule-engine/lorcana/selectors";
-import { allCardsById } from "~/engine/cards";
-import {
-  bodyguardAbilityPredicate,
-  LorcanitoCard,
-  shiftAbilityPredicate,
-} from "~/engine/cardTypes";
-import { Keywords } from "~/components/modals/target/filters";
-
-export function selectByFilter(
-  activeFilters: TargetFilter[],
-  playerId: string
-) {
-  return function selector(state: { game: RootState["game"] }): TableCard[] {
-    if (activeFilters.length === 0) {
-      return [];
-    }
-
-    return Object.values(state.game.cards || {}).filter((card: TableCard) => {
-      return activeFilters.every((filter): boolean => {
-        const lorcanitoCard = allCardsById[card.cardId];
-
-        const activeFilter = filter.filter;
-
-        switch (activeFilter) {
-          case "zone": {
-            const players = selectPlayers(state);
-            let zoneCards: string[] = [];
-            players.forEach((player) => {
-              zoneCards = zoneCards.concat(
-                selectPlayerZone(state.game, player, filter.value)
-              );
-            });
-
-            return zoneCards.includes(card.instanceId);
-          }
-          case "owner": {
-            const owner = selectCardOwner(state, card.instanceId);
-            return filterByOwner(filter.value, playerId, card, owner);
-          }
-          case "status": {
-            return filterByStatus(filter.value, card);
-          }
-          case "type": {
-            return lorcanitoCard?.type === filter.value;
-          }
-          case "keyword": {
-            return filterByKeyword(filter.value, lorcanitoCard);
-          }
-          case "attribute": {
-            return filterByAttribute(
-              filter.value,
-              filter.comparison,
-              lorcanitoCard
-            );
-          }
-          default: {
-            exhaustiveCheck(activeFilter);
-            return false;
-          }
-        }
-      });
-    });
-  };
-}
+  OwnerFilterValue,
+  StatusFilterValue,
+  isNumericComparison,
+  isStringComparison,
+  Keywords,
+  AttributeFilterValue,
+} from "~/components/modals/target/filters";
+import { MobXRootStore } from "~/store/RootStore";
+import { CardModel } from "~/store/models/CardModel";
+import { keys } from "mobx";
+import { Zones } from "~/providers/TabletopProvider";
 
 export function applyAllCardFilters(
   activeFilters: TargetFilter[],
-  engine: Engine,
-  playerId: string
+  player: string,
+  store: MobXRootStore
 ) {
-  function predicate(card: TableCard) {
+  const playerId = player || store.activePlayer;
+
+  function predicate(card: CardModel) {
     // TODO: If we change this semantic to ALL cards instead of no cards, search for occurences and update them
     // or else drag&drop will break
     if (activeFilters.length === 0) {
@@ -89,39 +34,60 @@ export function applyAllCardFilters(
     }
 
     return activeFilters.every((filter): boolean => {
-      const lorcanitoCard = engine.get.lorcanitoCard(card.instanceId);
-
+      const lorcanitoCard = card.lorcanitoCard;
       const activeFilter = filter.filter;
+
       switch (activeFilter) {
         case "zone": {
-          const players = engine.get.players();
-          let zoneCards: string[] = [];
-          players.forEach((player) => {
-            zoneCards = zoneCards.concat(
-              engine.get.zoneCards(filter.value, player)
-            );
-          });
+          const players = keys(store.tableStore.tables) as string[];
+          let includes = false;
 
-          return zoneCards.includes(card.instanceId);
+          players.forEach((player) => {
+            const playerZone = store.tableStore.getPlayerZone(
+              player,
+              filter.value as Zones
+            );
+            if (playerZone?.hasCard(card)) {
+              includes = true;
+            }
+          });
+          return includes;
         }
         case "owner": {
-          return filterByOwner(filter.value, playerId, card);
+          return filterByOwner(
+            filter.value as OwnerFilterValue,
+            playerId,
+            card
+          );
         }
         case "status": {
-          return filterByStatus(filter.value, card);
+          return filterByStatus(filter.value as StatusFilterValue, card);
         }
         case "type": {
-          return lorcanitoCard?.type === filter.value;
+          if (Array.isArray(filter.value)) {
+            return filter.value.includes(lorcanitoCard?.type);
+          } else {
+            return filter.value === lorcanitoCard?.type;
+          }
         }
         case "attribute": {
           return filterByAttribute(
-            filter.value,
+            filter.value as AttributeFilterValue,
             filter.comparison,
             lorcanitoCard
           );
         }
         case "keyword": {
-          return filterByKeyword(filter.value, lorcanitoCard);
+          return filterByKeyword(filter.value as Keywords, card);
+        }
+        case "characteristics": {
+          return filterByCharacteristics(
+            filter.value as Characteristics[],
+            card
+          );
+        }
+        case "ability": {
+          return card.hasAbility(filter.value);
         }
         default: {
           exhaustiveCheck(activeFilter);
@@ -135,23 +101,22 @@ export function applyAllCardFilters(
 }
 
 export function filterByOwner(
-  value: "self" | "opponent" | string,
+  value: OwnerFilterValue,
   playerId: string,
-  card: TableCard,
-  owner = ""
+  card: CardModel
 ): boolean {
   if (value === "opponent") {
     return card.ownerId !== playerId;
   } else if (value === "self") {
     return card.ownerId === playerId;
   } else {
-    return value === owner;
+    return value === card.ownerId;
   }
 }
 
 export function filterByStatus(
-  value: "ready" | "exerted" | "dry",
-  card: TableCard
+  value: StatusFilterValue,
+  card: CardModel
 ): boolean {
   if (value === "ready") {
     return !card.meta?.exerted;
@@ -169,8 +134,8 @@ export function filterByStatus(
 }
 
 export function filterByAttribute(
-  value: "cost" | "name",
-  comparison: NumericComparison,
+  value: AttributeFilterValue,
+  comparison: NumericComparison | StringComparison,
   card?: LorcanitoCard
 ): boolean {
   if (!card) {
@@ -183,48 +148,90 @@ export function filterByAttribute(
     return false;
   }
 
-  if (typeof attribute === "string") {
-    attribute = attribute.toLocaleLowerCase();
-  }
-
-  if (typeof comparison.value === "string") {
+  if (isStringComparison(comparison) && typeof attribute === "string") {
     comparison.value = comparison.value.toLocaleLowerCase();
+    return (
+      comparison.value.toLocaleLowerCase() === attribute.toLocaleLowerCase()
+    );
   }
 
-  const operator = comparison.operator;
-  switch (operator) {
-    case "eq": {
-      return attribute === comparison.value;
+  if (isNumericComparison(comparison) && typeof attribute === "number") {
+    const operator = comparison.operator;
+    switch (operator) {
+      case "eq": {
+        return attribute === comparison.value;
+      }
+      case "gt": {
+        return attribute > comparison.value;
+      }
+      case "gte": {
+        return attribute >= comparison.value;
+      }
+      case "lt": {
+        return attribute < comparison.value;
+      }
+      case "lte": {
+        return attribute <= comparison.value;
+      }
+      default: {
+        exhaustiveCheck(operator);
+        return false;
+      }
     }
-    case "gt": {
-      return attribute > comparison.value;
+  }
+
+  return false;
+}
+
+function filterByKeyword(value: Keywords, card?: CardModel): boolean {
+  if (!card) {
+    return false;
+  }
+
+  switch (value) {
+    case "bodyguard": {
+      return card.hasBodyguard;
     }
-    case "gte": {
-      return attribute >= comparison.value;
+    case "reckless": {
+      return card.hasReckless;
     }
-    case "lt": {
-      return attribute < comparison.value;
+    case "evasive": {
+      return card.hasEvasive;
     }
-    case "lte": {
-      return attribute <= comparison.value;
+    case "challenger": {
+      return card.hasChallenger;
+    }
+    case "singer": {
+      return card.hasSinger;
+    }
+    case "rush": {
+      return card.hasRush;
+    }
+    case "ward": {
+      return card.hasWard;
+    }
+    case "shift": {
+      return card.hasShift;
+    }
+    case "support": {
+      return card.hasSupport;
     }
     default: {
-      exhaustiveCheck(operator);
+      exhaustiveCheck(value);
       return false;
     }
   }
 }
 
-function filterByKeyword(value: Keywords, card?: LorcanitoCard): boolean {
+function filterByCharacteristics(
+  value: Characteristics[],
+  card?: CardModel
+): boolean {
   if (!card) {
     return false;
   }
 
-  if (value === "shift") {
-    return !!card?.abilities?.find(shiftAbilityPredicate);
-  } else if (value === "bodyguard") {
-    return !!card?.abilities?.find(bodyguardAbilityPredicate);
-  }
-
-  return false;
+  return value.every((characteristic) => {
+    return card.lorcanitoCard.characteristics?.includes(characteristic);
+  });
 }

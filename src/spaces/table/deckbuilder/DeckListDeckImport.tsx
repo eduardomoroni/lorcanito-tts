@@ -1,5 +1,5 @@
 import React from "react";
-import { allCards } from "~/engine/cards";
+import { allCards } from "~/engine/cards/cards";
 import { getCardFullName } from "~/spaces/table/deckbuilder/parseDeckList";
 import { logAnalyticsEvent } from "~/3rd-party/firebase/FirebaseAnalyticsProvider";
 

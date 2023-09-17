@@ -1,63 +1,56 @@
 import { useDropCardInZone } from "~/hooks/dndCard";
-import React, { FC, useState } from "react";
+import React, { FC } from "react";
 import CardStack from "~/components/card-stack/cardStack";
-import DiscardPileModal from "~/spaces/DiscardPileModal";
 import { DragNDropOverlay } from "~/components/DragNDropOverlay";
 import { CardCounter } from "~/spaces/table/CardCounter";
-import { useGameController } from "~/engine/rule-engine/lib/GameControllerProvider";
+import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { observer } from "mobx-react-lite";
+import type { CardModel } from "~/store/models/CardModel";
+import { useTargetModal } from "~/providers/TargetModalProvider";
 
-export const DiscardPileZone: FC<{ cards: string[]; playerId: string }> = ({
-  cards,
-  playerId,
-}) => {
-  const engine = useGameController();
+const DiscardPileZoneComponent: FC<{
+  cards: CardModel[];
+  playerId: string;
+}> = ({ cards, playerId }) => {
+  const store = useGameStore();
   const { dropZoneRef, isActive, isOver } = useDropCardInZone(
     playerId,
     "discard"
   );
-  const [open, setOpen] = useState(false);
+  const { openTargetModal } = useTargetModal();
 
   return (
     <div
       ref={dropZoneRef}
       draggable={false}
-      className="group relative flex grow grayscale"
+      className="group relative mb-2 ml-2 flex aspect-card w-full rounded grayscale"
     >
-      <DiscardPileModal
-        open={open}
-        setOpen={setOpen}
-        discardPile={cards}
-        tableId={playerId}
-        onClick={(instanceId: string) =>
-          engine.moveCard({
-            instanceId,
-            from: "discard",
-            to: "hand",
-            position: "last",
-          })
-        }
-      />
       <CardCounter length={cards.length} />
       <DragNDropOverlay isActive={isActive} isOver={isOver}>
         Discard card
       </DragNDropOverlay>
-      {/*experimental*/}
       <CardStack
         cards={cards}
         ownerId={playerId}
         onClick={() => {
-          setOpen(true);
+          openTargetModal({
+            title: `Looking at the discard pile`,
+            subtitle: `You can take a card from the discard pile, by clicking on it.`,
+            filters: [
+              { filter: "zone", value: "discard" },
+              { filter: "owner", value: playerId },
+            ],
+            callback: (card) => {
+              if (card) {
+                store.tableStore.moveCard(card.instanceId, "discard", "hand");
+              }
+            },
+            type: "resolution",
+          });
         }}
       />
-      {/*{card && (*/}
-      {/*  <CardImage*/}
-      {/*    instanceId={card}*/}
-      {/*    ownerId={playerId}*/}
-      {/*    draggable={false}*/}
-      {/*    zone="deck"*/}
-      {/*    grow="vertical"*/}
-      {/*  />*/}
-      {/*)}*/}
     </div>
   );
 };
+
+export const DiscardPileZone = observer(DiscardPileZoneComponent);

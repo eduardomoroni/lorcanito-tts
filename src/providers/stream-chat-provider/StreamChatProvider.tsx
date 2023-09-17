@@ -100,6 +100,7 @@ export const StreamChatProvider: React.FC<{
     const gameChannel = chatClient.channel("messaging", chatId, {
       name: chatId,
       members: players,
+      created_by: user,
     });
 
     setChannel(gameChannel);

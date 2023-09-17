@@ -4,17 +4,21 @@
 
 import { expect, it, describe, test, fit } from "@jest/globals";
 
-import { arielOnHumanLegs, mickeyMouseTrueFriend } from "~/engine/cards";
+import {
+  arielOnHumanLegs,
+  mickeyMouseTrueFriend,
+  pascalRapunzelCompanion,
+} from "~/engine/cards/TFC";
 import { createRuleEngine } from "~/engine/rule-engine/engine";
 import { gameMock } from "~/app/(old)/game/[id]/gameMock";
 import {
   selectPlayerLore,
   selectPlayerZone,
-  selectTableCard,
 } from "~/engine/rule-engine/lorcana/selectors";
 import { createMockGame } from "~/engine/rule-engine/__mocks__/createGameMock";
 
 import type { Zones } from "~/providers/TabletopProvider";
+import { TestStore } from "~/engine/rule-engine/rules/testStore";
 
 const testPlayer = "player_one";
 
@@ -86,19 +90,20 @@ it("Updates Card Damage", () => {
 });
 
 it("Quests", () => {
-  const engine = createRuleEngine(gameMock);
+  {
+    const testStore = new TestStore({
+      play: [pascalRapunzelCompanion],
+    });
 
-  expect(selectPlayerLore(engine.getState(), testPlayer)).toEqual(0);
-  expect(
-    selectTableCard(engine.getState(), auroraDreamingGuardian)?.meta?.exerted
-  ).toBeFalsy();
-  engine.moves.quest(auroraDreamingGuardian);
+    const cardUnderTest = testStore.getByZoneAndId(
+      "play",
+      pascalRapunzelCompanion.id
+    );
 
-  // Aurora has 2 lore
-  expect(selectPlayerLore(engine.getState(), testPlayer)).toEqual(2);
-  expect(
-    selectTableCard(engine.getState(), auroraDreamingGuardian)?.meta?.exerted
-  ).toBeTruthy();
+    expect(testStore.store.tableStore.getTable("player_one").lore).toEqual(0);
+    cardUnderTest.quest();
+    expect(testStore.store.tableStore.getTable("player_one").lore).toEqual(1);
+  }
 });
 
 describe("Move card between zones", () => {

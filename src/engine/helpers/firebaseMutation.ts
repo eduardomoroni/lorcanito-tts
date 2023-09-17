@@ -12,6 +12,8 @@ export function updateMetaHelper(dbMeta: Meta, meta: Meta) {
     console.log("updated ", { ...dbMeta, ...meta });
     return { ...dbMeta, ...meta };
   }
+
+  return meta;
 }
 
 export function updateCardMetaHelper(card?: TableCard, meta?: Meta) {

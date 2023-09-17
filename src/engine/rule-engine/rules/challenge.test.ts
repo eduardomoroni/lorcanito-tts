@@ -4,9 +4,15 @@
 
 import { expect, it, describe, test, fdescribe } from "@jest/globals";
 
-import { mickeyMouseTrueFriend, moanaOfMotunui } from "~/engine/cards";
+import {
+  mickeyMouseTrueFriend,
+  moanaOfMotunui,
+  sebastianCourtComposer,
+  zeusGodOfLightning,
+} from "~/engine/cards/TFC";
 import { createRuleEngine } from "~/engine/rule-engine/engine";
 import { createMockGame } from "~/engine/rule-engine/__mocks__/createGameMock";
+import { TestStore } from "~/engine/rule-engine/rules/testStore";
 
 // TODO: players have reported that moving to discard is problematic, as the engine is not yet ready.
 // We should enable this test once we have all cards implemented.
@@ -89,6 +95,37 @@ it("Exerts challenger", () => {
   expect(engine.get.tableCard(attacker)?.meta?.exerted).toBeFalsy();
   engine.moves?.challenge(attacker, defender);
   expect(engine.get.tableCard(attacker)?.meta?.exerted).toBeTruthy();
+});
+
+it("Can't challenge with fresh ink", () => {
+  const testStore = new TestStore(
+    {
+      inkwell: moanaOfMotunui.cost,
+      hand: [moanaOfMotunui],
+    },
+    {
+      play: [sebastianCourtComposer],
+    }
+  );
+
+  const attacker = testStore.getByZoneAndId("hand", moanaOfMotunui.id);
+  testStore.store.playCardFromHand(attacker.instanceId);
+
+  const defender = testStore.getByZoneAndId(
+    "play",
+    sebastianCourtComposer.id,
+    "player_two"
+  );
+  defender.updateCardMeta({ exerted: true });
+
+  testStore.store.cardStore.challenge(attacker.instanceId, defender.instanceId);
+
+  expect(attacker.meta.damage).toBeFalsy();
+  expect(defender.meta.damage).toBeFalsy();
+});
+
+it.skip("doesn't challenge ready characters", () => {
+  expect(false).toEqual(true);
 });
 
 // TODO: effects when challenge and banish

@@ -12,7 +12,7 @@ const coconutBasket = "tjky2hlfxfwy9myr5ugn4kuh";
 it("can put card in inkwell", () => {
   const engine = createRuleEngine(gameBeforeAlterHand);
 
-  engine.moves.addToInkwell(maleficent);
+  engine.store.tableStore.addToInkwell(maleficent);
 
   expect(engine.get.zoneCards("inkwell", testPlayer)).toContain(maleficent);
   expect(engine.getState().cards[maleficent]?.meta?.playedThisTurn).toBe(true);
@@ -22,8 +22,8 @@ it("can put card in inkwell", () => {
 it("Cannot put two cards in the inkwell zone the same turn", () => {
   const engine = createRuleEngine(gameBeforeAlterHand);
 
-  engine.moves.addToInkwell(maleficent);
-  engine.moves.addToInkwell(coconutBasket);
+  engine.store.tableStore.addToInkwell(maleficent);
+  engine.store.tableStore.addToInkwell(coconutBasket);
 
   expect(engine.getState().tables[testPlayer]?.zones.inkwell).toHaveLength(1);
   expect(engine.getState().tables[testPlayer]?.zones.hand).toContain(

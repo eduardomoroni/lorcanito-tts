@@ -65,6 +65,8 @@ export const LobbyPage: FC<{ lobbyId: string; streamToken: string }> = (
     if (firebaseUser?.uid && firebaseUser.uid === gameLobby.ownerId) {
       return setUpLobbyPresence(gameLobby, firebaseUser);
     }
+
+    return undefined;
   }, [gameLobby, firebaseUser]);
 
   useEffect(() => {
@@ -138,8 +140,7 @@ export const LobbyPage: FC<{ lobbyId: string; streamToken: string }> = (
 function JoinTableCopy() {
   return (
     <span>
-      You have not joined this game, go to game setting (top right corner) and
-      click on Join game
+      You have not joined this game, click on Join game button to join the game.
     </span>
   );
 }

@@ -3,9 +3,9 @@
 import React, { createContext, useContext, useState } from "react";
 import Image from "next/image";
 import { cardLoader, createImgixUrl } from "~/components/card/LorcanaCardImage";
-import { useGameController } from "~/engine/rule-engine/lib/GameControllerProvider";
 import { getCardFullName } from "~/spaces/table/deckbuilder/parseDeckList";
 import { LorcanitoCard } from "~/engine/cardTypes";
+import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
 
 // TODO: No longer needs lorcanito card
 type CardPreviewPayload =
@@ -21,7 +21,7 @@ type SetPreview =
 
 export function CardPreviewProvider({ children }: { children: JSX.Element }) {
   const [card, setCard] = useState<LorcanitoCard | undefined>(undefined);
-  const engine = useGameController();
+  const store = useGameStore();
 
   const setCardPreview = (args: SetPreview) => {
     if (!args) {
@@ -30,7 +30,7 @@ export function CardPreviewProvider({ children }: { children: JSX.Element }) {
     } else if (args.card) {
       setCard(args.card);
     } else if (args.instanceId) {
-      const card = engine.findLorcanitoCard(args.instanceId);
+      const card = store.cardStore.getCard(args.instanceId)?.lorcanitoCard;
       setCard(card);
     }
   };

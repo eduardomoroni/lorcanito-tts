@@ -128,12 +128,14 @@ function Navigation() {
   return (
     <nav className="mt-px font-display text-5xl font-medium tracking-tight text-white">
       <NavigationRow>
-        <NavigationItem href="/work">Our Work</NavigationItem>
-        <NavigationItem href="/about">About Us</NavigationItem>
+        <NavigationItem href="/lobbies">Find a lobby</NavigationItem>
+        <NavigationItem href="/lobby">Create a lobby</NavigationItem>
       </NavigationRow>
       <NavigationRow>
-        <NavigationItem href="/process">Our Process</NavigationItem>
-        <NavigationItem href="/blog">Blog</NavigationItem>
+        <NavigationItem href="https://discord.com/invite/w7DzwKFN8M">
+          Get in touch
+        </NavigationItem>
+        <NavigationItem href="/auth/signout">Log out</NavigationItem>
       </NavigationRow>
     </nav>
   );

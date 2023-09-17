@@ -761,7 +761,12 @@ export const gameBeforeAlterHand: Game = {
   effects: [],
   lastActionId: 0,
   id: "player_two",
-  lastActivity: "1690957421314",
+  lastActivity: 1690957421314,
+  players: {
+    player_one: true,
+    player_two: true,
+  },
+  continuousEffects: [],
   turnPlayer: "player_one",
   visibility: "public",
   turnCount: 0,

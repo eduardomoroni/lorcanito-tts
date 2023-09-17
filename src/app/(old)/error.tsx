@@ -6,6 +6,18 @@ import "./error.css";
 import { api } from "~/utils/api";
 import { useFirebaseUserId } from "~/3rd-party/firebase/FirebaseSessionProvider";
 
+import * as Sentry from "@sentry/nextjs";
+
+process.env.NODE_ENV === "production" &&
+  Sentry.init({
+    dsn: "https://1e7436a8287b42edb42beec6b932d735@o4504793791201280.ingest.sentry.io/4505074207948800",
+
+    // Set tracesSampleRate to 1.0 to capture 100%
+    // of transactions for performance monitoring.
+    // We recommend adjusting this value in production
+    tracesSampleRate: 1.0,
+  });
+
 export default function Error({
   error,
   reset,
@@ -20,22 +32,9 @@ export default function Error({
     // Log the error to an error reporting service
     console.error(error);
     logAnalyticsEvent("error", { error: error.message });
+    Sentry.captureException(error);
     // reset();
   }, [error]);
-
-  useLayoutEffect(() => {
-    window.document.body.addEventListener("keydown", () => {
-      window.location.reload();
-    });
-  }, []);
-
-  const restartGame = () => {
-    if (userId) {
-      purge.mutate({ gameId: userId });
-      window.location.reload();
-      // reset();
-    }
-  };
 
   return (
     <div className="error-main">

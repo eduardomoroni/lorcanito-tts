@@ -1,26 +1,57 @@
 import type { Zones } from "~/providers/TabletopProvider";
-import { LorcanitoCard } from "~/engine/cardTypes";
+import { Characteristics, LorcanitoCard } from "~/engine/cardTypes";
 
 export type NumericComparison = {
   operator: "gt" | "lt" | "eq" | "gte" | "lte";
-  value: number | string;
+  value: number;
+};
+
+export type StringComparison = {
+  operator: "eq";
+  value: string;
 };
 
 type FilterId = "owner" | "zone" | "status" | "keyword" | "type";
-export type Keywords = "shift" | "bodyguard";
+
+export type Abilities =
+  | "singer"
+  | "shift"
+  | "challenger"
+  | "bodyguard"
+  | "rush"
+  | "reckless"
+  | "evasive"
+  | "support"
+  | "ward";
+
+export type Keywords =
+  | "singer"
+  | "shift"
+  | "challenger"
+  | "bodyguard"
+  | "rush"
+  | "reckless"
+  | "evasive"
+  | "support"
+  | "ward";
+
+export type StatusFilterValue = "ready" | "exerted" | "dry";
+export type OwnerFilterValue = "self" | "opponent" | string;
+export type AttributeFilterValue = "cost" | "name";
+
 export type TargetFilter =
   | {
       filter: "attribute";
-      value: "cost" | "name";
-      comparison: NumericComparison;
+      value: AttributeFilterValue;
+      comparison: NumericComparison | StringComparison;
     }
   | {
       filter: "owner";
-      value: "self" | "opponent" | string;
+      value: OwnerFilterValue;
     }
   | {
       filter: "status";
-      value: "ready" | "exerted" | "dry";
+      value: StatusFilterValue;
     }
   | {
       filter: "zone";
@@ -31,8 +62,16 @@ export type TargetFilter =
       value: Keywords;
     }
   | {
+      filter: "ability";
+      value: Abilities;
+    }
+  | {
+      filter: "characteristics";
+      value: Characteristics[];
+    }
+  | {
       filter: "type";
-      value: LorcanitoCard["type"];
+      value: LorcanitoCard["type"] | Array<LorcanitoCard["type"]>;
     };
 
 export const filters: Array<{
@@ -126,4 +165,16 @@ export function canSingFilter(song: LorcanitoCard): TargetFilter[] {
       comparison: { operator: "gte", value: song.cost },
     },
   ];
+}
+
+export function isStringComparison(
+  comparison: NumericComparison | StringComparison
+): comparison is StringComparison {
+  return typeof comparison.value === "string";
+}
+
+export function isNumericComparison(
+  comparison: NumericComparison | StringComparison
+): comparison is NumericComparison {
+  return typeof comparison.value === "number";
 }

@@ -1,25 +1,30 @@
 import type { Deck, Table, TableCard } from "~/providers/TabletopProvider";
 import { createId } from "@paralleldrive/cuid2";
 import { shuffleDeck } from "~/libs/shuffle";
-import { ResolutionAbility } from "~/engine/cardTypes";
+
+import { Ability } from "~/engine/abilities";
+import { ContinuousEffect } from "~/engine/effectTypes";
 
 export type GameEffect = {
   instanceId: string;
   id: string;
-  ability: ResolutionAbility;
+  responder: string;
+  ability: Ability;
 };
 
 export type Game = {
   id: string;
   lastActionId: number;
-  lastActivity?: string;
+  lastActivity?: number;
   visibility: "public" | "private";
   turnPlayer: string;
   turnCount: number;
   mode: "solo" | "multiplayer";
   tables: Record<string, Table>;
+  players: Record<string, boolean>;
   cards: Record<string, TableCard>;
   effects: GameEffect[];
+  continuousEffects: ContinuousEffect[];
 };
 
 export type GameLobby = {
@@ -149,6 +154,7 @@ export function createEmptyGame(
     tables: {},
     cards: {},
     effects: [],
+    continuousEffects: [],
   };
 }
 

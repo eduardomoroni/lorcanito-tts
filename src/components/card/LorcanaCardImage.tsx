@@ -5,12 +5,10 @@ import Image, { type ImageLoaderProps } from "next/image";
 import { CardNotFound } from "~/components/card/CardNotFound";
 import { FaceDownCard } from "~/components/card/FaceDownCard";
 import { getCardFullName } from "~/spaces/table/deckbuilder/parseDeckList";
-import { useGameController } from "~/engine/rule-engine/lib/GameControllerProvider";
+import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
 import { LorcanitoCard } from "~/engine/cardTypes";
+import { observer } from "mobx-react-lite";
 
-// const cardLoader = ({ src, width }: ImageLoaderProps) => {
-//   return `https://lorcanito.imgix.net/images/cards/${src}?h=500&w=${width}&fm=webp`;
-// };
 export const cardLoader = ({ src, width }: ImageLoaderProps) => {
   if (src.includes("lorcania")) {
     return src + `?w=${width}`;
@@ -79,7 +77,7 @@ type Props = {
   height?: number;
 };
 
-export const LorcanaCardImage: FC<Props> = ({
+const LorcanaCardImageComponent: FC<Props> = ({
   className,
   isFaceDown,
   style,
@@ -90,8 +88,8 @@ export const LorcanaCardImage: FC<Props> = ({
   ...rest
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
-  const engine = useGameController();
-  card = card || engine.findLorcanitoCard(instanceId);
+  const mobXRootStore = useGameStore();
+  card = card || mobXRootStore.cardStore.getCard(instanceId)?.lorcanitoCard;
 
   if (!card) {
     return <CardNotFound />;
@@ -132,3 +130,5 @@ export const LorcanaCardImage: FC<Props> = ({
     </>
   );
 };
+
+export const LorcanaCardImage = observer(LorcanaCardImageComponent);

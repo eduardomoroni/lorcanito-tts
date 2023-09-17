@@ -1,6 +1,7 @@
 import type { Meta } from "~/providers/TabletopProvider";
 import { selectCardMeta } from "~/engine/rule-engine/lorcana/selectors";
 import type { LorcanitoGameState } from "~/engine/rule-engine/lorcana/types";
+import { Game } from "~/libs/game";
 
 export function updateCardMeta(
   G: LorcanitoGameState,
@@ -13,7 +14,7 @@ export function updateCardMeta(
 }
 
 export function setCardMeta(
-  state: LorcanitoGameState,
+  state: Game,
   instanceId: string,
   // null means remove meta
   meta: Partial<Meta> | null

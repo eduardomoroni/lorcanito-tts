@@ -5,10 +5,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { useUser } from "reactfire";
 import { type Zones } from "~/providers/TabletopProvider";
 import { SingletonChat } from "~/providers/stream-chat-provider/StreamChatProvider";
-import {
-  type InternalLogEntry,
-  type LogEntry,
-} from "~/spaces/Log/game-log/types";
+import { type InternalLogEntry, type LogEntry } from "~/spaces/Log/types";
 import { type UserResponse } from "stream-chat";
 
 type ContextType = {

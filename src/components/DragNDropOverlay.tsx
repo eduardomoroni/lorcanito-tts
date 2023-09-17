@@ -13,7 +13,7 @@ export const DragNDropOverlay: React.FC<{
     <div
       className={` ${
         isOver ? "opacity-50" : ""
-      } absolute inset-0 z-10 h-full w-full border-2 border-dashed bg-white p-2 opacity-10 hover:border-gray-800 hover:opacity-50`}
+      } absolute inset-0 z-10 h-full w-full rounded border-2 border-dashed bg-white p-2 opacity-10 hover:border-gray-800 hover:opacity-50`}
     >
       {children}
     </div>

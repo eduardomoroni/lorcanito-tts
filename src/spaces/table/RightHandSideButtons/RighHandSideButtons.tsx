@@ -3,7 +3,7 @@ import React from "react";
 import { usePreGame } from "~/providers/PreGameProvider";
 import { useTurn } from "~/engine/GameProvider";
 import { useHotkeys } from "react-hotkeys-hook";
-import { useGameController } from "~/engine/rule-engine/lib/GameControllerProvider";
+import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
 
 type Props = {
   playerHand: string[];
@@ -35,7 +35,7 @@ export function RighHandSideButtons() {
     isPassingTurn,
     isMyTurn,
   } = useTurn();
-  const engine = useGameController();
+  const store = useGameStore();
 
   useHotkeys("space", passTurn, {
     scopes: ["game"],
@@ -54,7 +54,7 @@ export function RighHandSideButtons() {
       isLoading={isPassingTurn}
       isMyTurn={isMyTurn}
       onClick={() => {
-        engine.passTurn();
+        store.passTurn(store.activePlayer);
       }}
     />
   );

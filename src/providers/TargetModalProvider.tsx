@@ -1,17 +1,16 @@
-import React, { createContext, useContext, useState } from "react";
-
-import { type TableCard } from "~/providers/TabletopProvider";
-
-import { TargetFilter } from "~/components/modals/target/filters";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import type { TargetFilter } from "~/components/modals/target/filters";
 import { TargetModal } from "~/components/modals/target/TargetModal";
+import type { CardModel } from "~/store/models/CardModel";
+import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
 
-type OpenTargetModalParams = {
+export type OpenTargetModalParams = {
   title?: string;
   subtitle?: string;
   filters: TargetFilter[];
-  callback: (target: TableCard) => void;
+  callback: (target?: CardModel) => void;
   onCancel?: () => void;
-  type: "challenge" | "resolution" | "";
+  type?: "challenge" | "resolution" | "activated" | "static-triggered" | "";
 };
 const TargetModalContext = createContext<{
   openTargetModal: (args: OpenTargetModalParams) => void;
@@ -20,6 +19,7 @@ const TargetModalContext = createContext<{
 });
 
 export function TargetModalProvider({ children }: { children: JSX.Element }) {
+  const store = useGameStore();
   const [activeFilter, setActiveFilter] = useState<OpenTargetModalParams>({
     filters: [],
     callback: () => {},
@@ -40,6 +40,11 @@ export function TargetModalProvider({ children }: { children: JSX.Element }) {
     });
   };
 
+  useEffect(() => {
+    //TODO: THIS IS HACKY, I NEED TO FIX THIS
+    store.dependencies.modals.openTargetModal = setActiveFilter;
+  }, []);
+
   return (
     <TargetModalContext.Provider
       value={{
@@ -51,12 +56,16 @@ export function TargetModalProvider({ children }: { children: JSX.Element }) {
         <TargetModal
           title={activeFilter.title}
           subtitle={activeFilter.subtitle}
-          type={activeFilter.type}
+          type={activeFilter.type || ""}
           activeFilters={activeFilter.filters}
           onClose={() => {
+            onClose();
+          }}
+          onCancel={() => {
             if (activeFilter.onCancel) {
               activeFilter.onCancel();
             }
+
             onClose();
           }}
           onTargetChosen={activeFilter.callback}

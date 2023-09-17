@@ -3,24 +3,26 @@ import { type Zones } from "~/providers/TabletopProvider";
 import { DamageCounter } from "~/spaces/table/DamageCounter";
 import { PlusCircleIcon, MinusCircleIcon } from "@heroicons/react/24/outline";
 import { logAnalyticsEvent } from "~/3rd-party/firebase/FirebaseAnalyticsProvider";
-import { useGameController } from "~/engine/rule-engine/lib/GameControllerProvider";
+import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
 import { Button } from "~/components/Button";
+import { observer } from "mobx-react-lite";
+import { CardModel } from "~/store/models/CardModel";
 
-export function CardImageDamageOverlay(props: {
-  instanceId: string;
-  isDead?: boolean;
+function CardImageDamageOverlayComponent(props: {
+  card: CardModel;
   className?: string;
   zone: Zones;
-  isFresh?: boolean;
 }) {
-  const { isDead, instanceId, zone, className, isFresh } = props;
-  const engine = useGameController();
-  const tableCard = engine.tableCard(instanceId);
+  const { zone, className, card } = props;
 
-  if (!tableCard) {
-    return null;
-  }
-  const damage = tableCard.meta?.damage;
+  const store = useGameStore();
+  const meta = card.meta;
+  const damage = meta?.damage || 0;
+
+  const isDead =
+    zone === "play" &&
+    !!damage &&
+    damage >= (card.lorcanitoCard?.willpower || 0);
 
   return (
     <>
@@ -33,13 +35,7 @@ export function CardImageDamageOverlay(props: {
               color={"slate"}
               onClick={(event) => {
                 event.stopPropagation();
-                engine.moveCard({
-                  instanceId,
-                  from: "play",
-                  to: "discard",
-                  position: "last",
-                });
-                logAnalyticsEvent("banish_card");
+                card.banish();
               }}
             >
               BANISH CARD
@@ -50,9 +46,7 @@ export function CardImageDamageOverlay(props: {
             onClick={(event) => {
               event.stopPropagation();
             }}
-            className={`${
-              isFresh ? "bottom-[35%]" : "bottom-0"
-            } absolute left-0 z-20 flex rounded bg-black ${className} ${
+            className={`absolute left-0 top-0 z-20 flex rounded bg-black hover:z-40 ${className} ${
               !damage ? "opacity-0 hover:opacity-75" : "opacity-100"
             }`}
           >
@@ -60,7 +54,7 @@ export function CardImageDamageOverlay(props: {
               type="button"
               onClick={(event) => {
                 event.stopPropagation();
-                engine.updateCardDamageCounter(instanceId, 1, "remove");
+                card.updateCardDamage(1, "remove");
                 logAnalyticsEvent("card_damage_counter");
               }}
               className="-m-2 inline-flex p-2 text-gray-200 hover:text-gray-500"
@@ -73,7 +67,7 @@ export function CardImageDamageOverlay(props: {
               type="button"
               onClick={(event) => {
                 event.stopPropagation();
-                engine.updateCardDamageCounter(instanceId, 1, "add");
+                card.updateCardDamage(1, "add");
                 logAnalyticsEvent("card_damage_counter");
               }}
               className="-m-2 inline-flex p-2 text-gray-200 hover:text-gray-500"
@@ -89,3 +83,5 @@ export function CardImageDamageOverlay(props: {
     </>
   );
 }
+
+export const CardImageDamageOverlay = observer(CardImageDamageOverlayComponent);

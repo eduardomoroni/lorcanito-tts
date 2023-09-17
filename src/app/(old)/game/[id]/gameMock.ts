@@ -6,6 +6,10 @@ export const skipFirebase =
 export const gameMock: Game = {
   lastActionId: 0,
   effects: [],
+  players: {
+    player_one: true,
+    player_two: true,
+  },
   cards: {
     agwwar4acf91zwftou3vgy1n: {
       cardId: "fe51f849e11152e0acb9c6363f7a4f9bca9a987b",
@@ -613,7 +617,7 @@ export const gameMock: Game = {
     },
   },
   id: "player_two",
-  lastActivity: "1690957421314",
+  lastActivity: 1690957421314,
   mode: "multiplayer",
   tables: {
     player_one: {
@@ -765,6 +769,7 @@ export const gameMock: Game = {
       },
     },
   },
+  continuousEffects: [],
   turnCount: 2,
   turnPlayer: "player_one",
   visibility: "public",

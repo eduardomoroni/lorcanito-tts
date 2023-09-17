@@ -2,6 +2,8 @@ import React from "react";
 import { animated, to as interpolate, useSprings } from "@react-spring/web";
 import { CardImage } from "~/components/card/CardImage";
 import { useDragCard } from "~/hooks/dndCard";
+import { LorcanaCardImage } from "~/components/card/LorcanaCardImage";
+import { CardModel } from "~/store/models/CardModel";
 
 const to = (i: number) => ({
   x: 0,
@@ -19,7 +21,7 @@ const trans = (r: number, s: number) =>
 
 // https://codesandbox.io/s/to6uf?file=/src/App.tsx:3441-3449
 export default function CardStack(props: {
-  cards: string[];
+  cards: CardModel[];
   ownerId: string;
   onClick: () => void;
 }) {
@@ -46,7 +48,7 @@ export default function CardStack(props: {
             }}
             className={`aspect-card w-full rounded-lg object-cover shadow-lg will-change-transform`}
           >
-            <DiscardPileCard instanceId={cards[i]} />
+            <DiscardPileCard card={cards[i]} />
           </animated.div>
         </animated.div>
       ))}
@@ -54,14 +56,14 @@ export default function CardStack(props: {
   );
 }
 
-function DiscardPileCard(props: { instanceId?: string }) {
+function DiscardPileCard(props: { card?: CardModel }) {
   /* This is the card itself, we're binding our gesture to it (and inject its index so we know which is which) */
+  const card = props.card;
+
   return (
-    <CardImage
-      instanceId={props.instanceId || ""}
-      draggable={false}
-      zone="discard"
-      grow="vertical"
+    <LorcanaCardImage
+      instanceId={card?.instanceId}
+      card={card?.lorcanitoCard}
     />
   );
 }

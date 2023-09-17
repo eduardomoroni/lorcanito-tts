@@ -1,17 +1,19 @@
 "use client";
 // TODO: Remove this
-import { createContext, useContext, useState } from "react";
+import { createContext, useState } from "react";
 import type { Game } from "~/libs/game";
 
 import { LorcanitoCard } from "~/engine/cardTypes";
+import { ContinuousEffect } from "~/engine/effectTypes";
 
 export type Meta = {
   exerted?: boolean | null;
   playedThisTurn?: boolean | null;
   damage?: number | null;
-  shifter?: string;
-  shifted?: string;
-  revealed?: boolean;
+  shifter?: string | null;
+  shifted?: string | null;
+  revealed?: boolean | null;
+  continuousEffects?: string[];
 };
 
 export type TableCard = {
@@ -60,8 +62,4 @@ export function TabletopProvider({
       {children}
     </TabletopContext.Provider>
   );
-}
-
-export function useGameId(): string {
-  return useContext(TabletopContext);
 }

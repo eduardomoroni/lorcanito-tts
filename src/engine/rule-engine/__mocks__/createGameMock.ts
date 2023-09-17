@@ -2,15 +2,17 @@ import { createEmptyGame, type Game } from "~/libs/game";
 import type { Zones } from "~/providers/TabletopProvider";
 import { createId } from "@paralleldrive/cuid2";
 import type { LorcanitoCard } from "~/engine/cardTypes";
+import { simbaProtectiveCub } from "~/engine/cards/TFC";
+
+function range(size: number, startAt = 0) {
+  return [...Array(size).keys()].map((i) => i + startAt);
+}
 
 export type PartialRecord<K extends keyof any, T> = {
   [P in K]?: T;
 };
 
-export type TestInitialState = PartialRecord<
-  Zones,
-  LorcanitoCard[] | undefined
->;
+export type TestInitialState = PartialRecord<Zones, LorcanitoCard[] | number>;
 
 function prepareGame(playerId: string, state: TestInitialState, game: Game) {
   game.tables[playerId] = {
@@ -26,9 +28,14 @@ function prepareGame(playerId: string, state: TestInitialState, game: Game) {
   };
 
   Object.keys(state).forEach((zone) => {
-    const zoneCards = state[zone as Zones];
+    const value = state[zone as Zones];
+    const zoneCards: LorcanitoCard[] =
+      typeof value === "number"
+        ? range(value).map(() => simbaProtectiveCub)
+        : (value as LorcanitoCard[]);
+
     if (zoneCards) {
-      zoneCards.forEach((card) => {
+      zoneCards.filter(Boolean).forEach((card) => {
         const instanceId = createId();
         game.cards[instanceId] = {
           instanceId,

@@ -4,6 +4,7 @@ import { type Zones } from "~/providers/TabletopProvider";
 import { useHotkeys } from "react-hotkeys-hook";
 import { logAnalyticsEvent } from "~/3rd-party/firebase/FirebaseAnalyticsProvider";
 import { useCardContextMenu } from "~/providers/card-context-menu/useCardContextMenu";
+import { CardModel } from "~/store/models/CardModel";
 
 const HAND_HOTKEYS = ["A", "S", "D", "F", "G", "H", "J", "K", "L"];
 const PLAY_HOTKEYS = ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"];
@@ -16,12 +17,12 @@ const HOTKEYS: Record<Zones, string[]> = {
 };
 
 export function CardHotKeyOverlay(props: {
-  instanceId: string;
+  card: CardModel;
   zone: Zones;
   index: number;
   callback?: () => void;
 }) {
-  const { zone, index, instanceId, callback } = props;
+  const { zone, index, card, callback } = props;
   const hotKey = HOTKEYS[zone][index];
   const { openContextMenu } = useCardContextMenu(props.zone);
   const textRef = React.useRef<HTMLSpanElement>(null);
@@ -34,7 +35,7 @@ export function CardHotKeyOverlay(props: {
         callback();
       } else {
         openContextMenu(
-          instanceId,
+          card,
           textRef.current,
           zone === "play" ? "bottom" : "top"
         );

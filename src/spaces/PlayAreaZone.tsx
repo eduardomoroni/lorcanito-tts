@@ -4,18 +4,19 @@ import { DragNDropOverlay } from "~/components/DragNDropOverlay";
 import { CardImage } from "~/components/card/CardImage";
 import React, { FC, useEffect } from "react";
 import { useUser } from "reactfire";
-import { logAnalyticsEvent } from "~/3rd-party/firebase/FirebaseAnalyticsProvider";
 import { useTurn } from "~/engine/GameProvider";
 import { useHotkeysContext } from "react-hotkeys-hook";
 import { LorcanaCardImage } from "~/components/card/LorcanaCardImage";
-import { useGameController } from "~/engine/rule-engine/lib/GameControllerProvider";
+import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { observer } from "mobx-react-lite";
+import type { CardModel } from "~/store/models/CardModel";
 
-export const PlayArea: FC<{
-  cards: string[];
-  cardsOnStack: string[];
+const PlayAreaComponent: FC<{
+  cards: CardModel[];
+  cardsOnStack: CardModel[];
   playerId: string;
 }> = ({ cards, playerId, cardsOnStack }) => {
-  const engine = useGameController();
+  const store = useGameStore();
   const { dropZoneRef, isActive, isOver } = useDropCardInZone(playerId, "play");
   const { data: user } = useUser();
 
@@ -31,28 +32,30 @@ export const PlayArea: FC<{
   }, [isMyTurn]);
 
   const playAreaCards = cards
-    .filter((card) => !cardsOnStack.includes(card))
-    .filter((card) => !engine.tableCard(card)?.meta?.shifted);
+    .filter(
+      (card) => !cardsOnStack.map((c) => c.instanceId).includes(card.instanceId)
+    )
+    .filter((card) => !card.meta?.shifted);
 
-  const freshInk = playAreaCards.filter(
-    (card) => engine.findTableCard(card)?.meta?.playedThisTurn
-  );
-  const dryInk = playAreaCards.filter(
-    (card) => !engine.findTableCard(card)?.meta?.playedThisTurn
-  );
+  const freshInk = playAreaCards.filter((card) => card.meta?.playedThisTurn);
+  const dryInk = playAreaCards.filter((card) => !card.meta?.playedThisTurn);
   const shiftedCards = cards
-    .filter((card) => !cardsOnStack.includes(card))
-    .filter((card) => engine.tableCard(card)?.meta?.shifter)
+    .filter(
+      (card) => !cardsOnStack.map((c) => c.instanceId).includes(card.instanceId)
+    )
+    .filter((card) => card.meta?.shifter)
     .filter((card, index, cards) => {
       // TODO: I'm not quite sure about this one
-      const shifter = engine.tableCard(card)?.meta?.shifter || "";
-      return cards.indexOf(shifter) === index;
+      const shifter = card.meta?.shifter || "";
+      return cards.map((card) => card.instanceId).indexOf(shifter) === index;
     });
 
-  const toCardImage = (instanceId: string, index: number) => {
-    const owner = engine.findCardOwner(instanceId);
-    const card = engine.findLorcanitoCard(instanceId);
-    const isFreshInkCard = freshInk.includes(instanceId);
+  const toCardImage = (cardModel: CardModel, index: number) => {
+    const owner = cardModel.ownerId;
+    const isFreshInkCard = freshInk
+      .map((card) => card.instanceId)
+      .includes(cardModel.instanceId);
+    const instanceId = cardModel.instanceId;
 
     return (
       <CardImage
@@ -61,40 +64,39 @@ export const PlayArea: FC<{
             return;
           }
 
-          engine.tapCard({ toggle: true, instanceId });
-          logAnalyticsEvent("tap_card", { zone: "play_area" });
+          if (cardModel.hasActivatedAbility) {
+            cardModel.activate();
+            return;
+          }
+
+          store.cardStore.tapCard(instanceId, { toggle: true });
         }}
         zone="play"
         index={isFreshInkCard ? index + dryInk.length : index}
         key={instanceId}
-        instanceId={instanceId}
-        className={`${
-          isFreshInkCard && card?.type === "character"
-            ? "translate-y-[35%]"
-            : "ml-2"
-        }`}
+        card={cardModel}
+        className={`ml-2`}
       />
     );
   };
 
-  const toShiftedCardImage = (instanceId: string, index: number) => {
-    const owner = engine.findCardOwner(instanceId);
-    const card = engine.findLorcanitoCard(instanceId);
-    const isFreshInkCard = freshInk.includes(instanceId);
-    const shiftedCard = engine.tableCard(instanceId)?.meta?.shifted;
+  const toShiftedCardImage = (cardModel: CardModel, index: number) => {
+    const mobXRootStore = useGameStore();
+    const shifted = cardModel.meta?.shifted || "";
+    const shiftedCard = mobXRootStore.cardStore.getCard(shifted);
 
     return (
       <div
-        key={instanceId}
-        data-id-shifter={instanceId}
-        data-id-shifted={shiftedCard}
+        key={cardModel.instanceId}
+        data-id-shifter={cardModel.instanceId}
+        data-id-shifted={shifted}
         className="relative ml-14 flex aspect-card h-full"
       >
         <LorcanaCardImage
           className="-translate-x-8 -rotate-6"
-          card={engine.findLorcanitoCard(shiftedCard)}
+          card={shiftedCard.lorcanitoCard}
         />
-        {toCardImage(instanceId, index)}
+        {toCardImage(cardModel, index)}
       </div>
     );
   };
@@ -109,8 +111,10 @@ export const PlayArea: FC<{
         Play Card
       </DragNDropOverlay>
       {shiftedCards.map(toShiftedCardImage)}
-      {dryInk.map(toCardImage)}
       {freshInk.map(toCardImage)}
+      {dryInk.map(toCardImage)}
     </div>
   );
 };
+
+export const PlayArea = observer(PlayAreaComponent);

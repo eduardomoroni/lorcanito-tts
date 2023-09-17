@@ -14,9 +14,8 @@ export const TableOverlay: React.FC<{
             <div className="m-4">
               {position === "top" ? (
                 <span>
-                  No opponent has joined, you can invite people by sharing this
-                  page url and asking them to join the game under the game
-                  setting (top right corner).
+                  No opponent has joined, if you want to play with someone. Go
+                  back to lobby and the the link with them.
                 </span>
               ) : (
                 <span>

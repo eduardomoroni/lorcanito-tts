@@ -72,6 +72,8 @@ export const confirmSignIn = async (emailLink: string, email: string) => {
     window.localStorage.setItem("emailForSignIn", "");
     return signInWithEmailLink(auth, email, emailLink);
   }
+
+  return Promise.reject(new Error("Invalid email link"));
 };
 
 export function setAuthListener(callback: NextOrObserver<User | null>) {

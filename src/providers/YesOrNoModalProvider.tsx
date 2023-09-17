@@ -1,7 +1,6 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useState } from "react";
 
 import { YesOrNoModal } from "~/components/modals/YesOrNoModal";
-import { useHotkeysContext } from "react-hotkeys-hook";
 
 type ModalProps = {
   title: string;

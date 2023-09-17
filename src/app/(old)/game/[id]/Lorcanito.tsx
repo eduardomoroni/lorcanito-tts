@@ -12,17 +12,18 @@ import { PreGameProvider } from "~/providers/PreGameProvider";
 import { WelcomeModal } from "~/components/modals/WelcomeModal";
 import { PresenceProvider } from "~/providers/presence/PresenceProvider";
 import { GameLobbyProvider } from "~/providers/lobby/GameLobbyProvider";
-import { useGame } from "~/engine/rule-engine/lib/GameControllerProvider";
+import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
 
 export const Lorcanito: FC<{
   game: Game;
   gameId: string;
   isMobile: boolean;
 }> = ({ isMobile }) => {
-  const [game, playerId] = useGame();
+  const store = useGameStore();
   const [isOpen, setIsOpen] = useState(isMobile);
 
-  if (!game) {
+  // TODO: STOP using toJSON, as it forces a full re-render of the game
+  if (!store.toJSON()) {
     return <span>Game not found</span>;
   }
 
@@ -34,12 +35,15 @@ export const Lorcanito: FC<{
             <PreGameProvider>
               <GameLobbyProvider
                 ssrLobby={undefined}
-                playerId={playerId}
-                gameId={game.id}
+                playerId={store.activePlayer}
+                gameId={store.id}
               >
-                <PresenceProvider gameId={game.id} playerId={playerId}>
+                <PresenceProvider
+                  gameId={store.id}
+                  playerId={store.activePlayer}
+                >
                   <>
-                    {game ? <GameTable gameId={game?.id || ""} /> : null}
+                    {store ? <GameTable gameId={store.id || ""} /> : null}
                     <PrivacyPolicyBanner />
                     <WelcomeModal
                       open={isOpen}

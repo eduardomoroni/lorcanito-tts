@@ -6,7 +6,7 @@ import { shouldConnectAuthEmulator } from "~/3rd-party/firebase/emulator";
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const secret: ServiceAccount = JSON.parse(process.env.FIREBASE_ADMIN || "{}");
 // @ts-expect-error - private_key is not in the types
-secret.private_key = process.env.FIREBASE_PRIVATE_KEY;
+secret.private_key = process.env.FIREBASE_ADMIN_PRIVATE_KEY;
 
 const emulatorEnabled = shouldConnectAuthEmulator();
 

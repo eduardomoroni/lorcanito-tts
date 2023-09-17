@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { FirebaseProvider } from "~/3rd-party/firebase/FirebaseProvider";
 import { api } from "~/utils/api";
 import { useReportWebVitals } from "next/web-vitals";
+import { NextUIProvider } from "@nextui-org/react";
 
 function RootTemplate({ children }: { children: React.ReactNode }) {
   const metrics: unknown[] = [];
@@ -18,7 +19,9 @@ function RootTemplate({ children }: { children: React.ReactNode }) {
 
   return (
     <FirebaseProvider>
+      {/*<NextUIProvider>{children}</NextUIProvider>*/}
       {children}
+
       <Analytics
         mode="auto"
         beforeSend={(event) => {

@@ -5,19 +5,20 @@ import { LorcanaCardImage } from "~/components/card/LorcanaCardImage";
 import { useCardPreview } from "~/providers/CardPreviewProvider";
 import { useHotkeys, useHotkeysContext } from "react-hotkeys-hook";
 import { logAnalyticsEvent } from "~/3rd-party/firebase/FirebaseAnalyticsProvider";
-import {
-  useGame,
-  useGameController,
-} from "~/engine/rule-engine/lib/GameControllerProvider";
+import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { CardModel } from "~/store/models/CardModel";
 
 // The game does not have a stack, but I want to add one.
 export const StackZoneArena: FC = () => {
-  const [game] = useGame();
-  const engine = useGameController();
+  const store = useGameStore();
   const { turnPlayer, activePlayer } = useTurn();
-  const cards: string[] = (game.tables?.[turnPlayer]?.zones?.play || []).filter(
-    (card: string) => engine.findLorcanitoCard(card)?.type === "action"
-  );
+
+  const cards =
+    store.tableStore
+      .getPlayerZone(turnPlayer, "play")
+      ?.cards.filter(
+        (card: CardModel) => card.lorcanitoCard?.type === "action"
+      ) ?? [];
   const setCardPreview = useCardPreview();
   const ref = React.useRef<HTMLDivElement>(null);
 
@@ -25,14 +26,7 @@ export const StackZoneArena: FC = () => {
 
   const resolveStack = () => {
     cards.forEach((card, index) => {
-      window.setTimeout(() => {
-        engine.moveCard({
-          instanceId: card,
-          from: "play",
-          to: "discard",
-          position: "last",
-        });
-      }, 200 * (index + 1));
+      store.tableStore.moveCard(card.instanceId, "play", "discard");
     });
   };
 
@@ -61,18 +55,18 @@ export const StackZoneArena: FC = () => {
       ) : null}
 
       {cards.map((card) => {
-        const lorcanitoCard = engine.findLorcanitoCard(card);
+        const lorcanitoCard = card.lorcanitoCard;
         return (
           <div
-            key={card}
+            key={card.instanceId}
             className={`z-10 mx-1`}
             onMouseEnter={() => {
-              setCardPreview({ instanceId: card });
+              setCardPreview({ instanceId: card.instanceId });
             }}
             onMouseLeave={() => setCardPreview(undefined)}
           >
             <LorcanaCardImage
-              key={card}
+              key={card.instanceId}
               card={lorcanitoCard}
               fill={undefined}
               width={108}

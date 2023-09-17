@@ -1,24 +1,16 @@
 "use client";
 
-import React, {
-  createContext,
-  type FC,
-  type ReactNode,
-  useContext,
-} from "react";
+import React, { createContext, type FC, type ReactNode } from "react";
 import { type Game } from "~/libs/game";
 import { useDatabase, useDatabaseObjectData } from "reactfire";
 import { ref } from "firebase/database";
 import { type Zones } from "~/providers/TabletopProvider";
 import { api } from "~/utils/api";
 import { logAnalyticsEvent } from "~/3rd-party/firebase/FirebaseAnalyticsProvider";
-import { useGame } from "~/engine/rule-engine/lib/GameControllerProvider";
-import { useSelector } from "react-redux";
-import { selectTurnPlayer } from "~/engine/rule-engine/lorcana/selectors";
+import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
 
 const Context = createContext<{ game: Game; playerId: string }>({
-  // @ts-expect-error game is null on initial render
-  game: null,
+  game: null!,
   playerId: "",
 });
 
@@ -72,49 +64,20 @@ export const usePlayerNickname = (uid: string) => {
   return status === "success" ? data : uid;
 };
 
-export const useLegacyGame = () => {
-  const ctx = useContext(Context);
-  return [ctx.game, ctx.playerId] as const;
-};
-
-// TODO: move to gameprovider
-export function useTables() {
-  const [game] = useGame();
-  return { tables: game.tables };
-}
-
-// TODO: Move to gameprovider.tsx
-export function usePlayerTable(playerId = "") {
-  const { tables } = useTables();
-  return { table: tables[playerId] };
-}
-export const usePlayers = () => {
-  const [game, activePlayer] = useGame();
-  const tables = game.tables;
-  const turnPlayer = game.turnPlayer;
-  const players = Object.keys(tables || {});
-  const opponent = players.find((p) => p !== activePlayer) || "";
-
-  return {
-    opponent: { id: opponent, isOnTurn: turnPlayer === opponent },
-    player: { id: activePlayer, isOnTurn: turnPlayer === activePlayer },
-  } as const;
-};
-
-// TODO: Write a function to handle this
-// https://firebase.google.com/docs/database/extend-with-functions?gen=2nd
+// TODO: GET RID OF THI
 export function useTurn() {
-  const [game, activePlayer] = useGame();
-  const tables = game?.tables;
-  const turnPlayer = useSelector(selectTurnPlayer);
+  const store = useGameStore();
+  const activePlayer = store.activePlayer;
+  const tables = store.tableStore.tables;
+  const turnPlayer = store.turnPlayer;
   const passTurnMutation = api.game.passTurn.useMutation();
   const startGameMutation = api.game.startGame.useMutation();
   const readyToStartMutation = api.game.readyToStart.useMutation();
   const restartGameMutation = api.game.restartGame.useMutation();
 
-  const inkwell: string[] = game.tables?.[turnPlayer]?.zones?.inkwell || [];
-  const hasAddedCardToInkWellThisTurn = inkwell.find((card: string) => {
-    return game.cards[card]?.meta?.playedThisTurn;
+  const inkwell = tables?.[turnPlayer]?.zones?.inkwell.cards || [];
+  const hasAddedCardToInkWellThisTurn = inkwell.find((card) => {
+    return card.meta.playedThisTurn;
   });
 
   const players = Object.keys(tables || {});
@@ -122,24 +85,24 @@ export function useTurn() {
 
   // TODO: This can mess up, if player clicks more than once
   const passTurn = () => {
-    passTurnMutation.mutate({ gameId: game.id, forcePass: true });
-    logAnalyticsEvent("pass_turn", { gameId: game.id, turnPlayer });
+    passTurnMutation.mutate({ gameId: store.id, forcePass: true });
+    logAnalyticsEvent("pass_turn", { gameId: store.id, turnPlayer });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   };
 
   const startGame = (playerGoingFirst: string) => {
-    startGameMutation.mutate({ gameId: game.id, playerGoingFirst });
+    startGameMutation.mutate({ gameId: store.id, playerGoingFirst });
     logAnalyticsEvent("start_game");
   };
 
   const readyToStart = (isSolo?: boolean) => {
-    readyToStartMutation.mutate({ gameId: game.id, solo: isSolo });
-    logAnalyticsEvent("ready_to_start", { gameId: game.id, solo: isSolo });
+    readyToStartMutation.mutate({ gameId: store.id, solo: isSolo });
+    logAnalyticsEvent("ready_to_start", { gameId: store.id, solo: isSolo });
   };
 
   const restartGame = () => {
-    restartGameMutation.mutate({ gameId: game.id });
-    logAnalyticsEvent("restart_game", { gameId: game.id });
+    restartGameMutation.mutate({ gameId: store.id });
+    logAnalyticsEvent("restart_game", { gameId: store.id });
     // TODO: refresh both browsers
   };
 

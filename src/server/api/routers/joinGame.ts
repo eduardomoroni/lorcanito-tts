@@ -20,7 +20,7 @@ import { parseDeckList } from "~/spaces/table/deckbuilder/parseDeckList";
 import {
   deleteChannelMessages,
   sendLog,
-  updateStreamUser,
+  updateStreamGameChat,
 } from "~/server/serverGameLogger";
 
 function getRandomElement<T>(array: T[]): T {
@@ -34,7 +34,7 @@ export const gameRouter = createTRPCRouter({
       const userUID = ctx.session.user.uid;
       const gameId = input.gameId;
 
-      await updateStreamUser(userUID, gameId);
+      await updateStreamGameChat(userUID, gameId);
 
       // TODO: to avoid polluted data, we should recreate the game from scratch
       const gameReference = adminDatabase.ref(`games/${gameId}`);
@@ -171,7 +171,7 @@ export const gameRouter = createTRPCRouter({
       });
 
       // Whene creating the lobby/game, we don't have the streamId yet
-      await updateStreamUser(userUID, gameId);
+      await updateStreamGameChat(userUID, gameId);
 
       await sendLog(gameId, { type: "LOAD_DECK" });
     }),
@@ -309,11 +309,11 @@ export const gameRouter = createTRPCRouter({
       updates[`lastActivity`] = admin.database.ServerValue.TIMESTAMP;
       await gameReference.update(updates);
 
-      await sendLog(
-        gameId,
-        { type: "PASS_TURN", player: turnPlayer },
-        turnPlayer
-      );
+      // await sendLog(
+      //   gameId,
+      //   { type: "PASS_TURN", player: turnPlayer, turn: "SERVER" },
+      //   turnPlayer
+      // );
 
       const turnCount = (
         await adminDatabase.ref(`games/${gameId}/turnCount`).get()
@@ -437,16 +437,18 @@ export const gameRouter = createTRPCRouter({
       const { gameId } = input;
       const playerId = ctx.session.user.uid;
 
-      if (playerId !== gameId) {
-        console.info("Non-owner trying to purge a game.");
-        return;
-      }
+      return null;
 
-      const game = createEmptyGame(
-        gameId,
-        admin.database.ServerValue.TIMESTAMP
-      );
-      await adminDatabase.ref(`games/${gameId}`).set(game);
+      // if (playerId !== gameId) {
+      //   console.info("Non-owner trying to purge a game.");
+      //   return;
+      // }
+      //
+      // const game = createEmptyGame(
+      //   gameId,
+      //   admin.database.ServerValue.TIMESTAMP
+      // );
+      // await adminDatabase.ref(`games/${gameId}`).set(game);
     }),
 });
 

@@ -7,7 +7,7 @@ import {
 } from "~/components/notifications/Notifications";
 import { createId } from "@paralleldrive/cuid2";
 
-type NotificationType = Omit<NotificationPayload, "id">;
+export type NotificationType = Omit<NotificationPayload, "id">;
 type ContextType = {
   sendNotification: (notification: NotificationType) => void;
   clearNotification: (id: string) => void;
@@ -15,12 +15,12 @@ type ContextType = {
 };
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const noOp = () => {};
-const defaultValue: ContextType = {
+export const defaultNotifierValue: ContextType = {
   sendNotification: noOp,
   clearNotification: noOp,
   clearAllNotifications: noOp,
 };
-const NotificationContext = createContext<ContextType>(defaultValue);
+const NotificationContext = createContext<ContextType>(defaultNotifierValue);
 
 export function NotificationProvider({ children }: { children: JSX.Element }) {
   const [notifications, setNotifications] = useState<NotificationPayload[]>([]);

@@ -3,38 +3,47 @@ import { MobileFilterDialog } from "~/components/modals/target/MobileFilter";
 import { TargetModalHeader } from "~/components/modals/target/TargetModalHeader";
 import { GenericModal } from "~/components/modals/generic/GenericModal";
 import { type TargetFilter } from "~/components/modals/target/filters";
-import { type TableCard } from "~/providers/TabletopProvider";
 import { LorcanaCardImage } from "~/components/card/LorcanaCardImage";
-import { DamageCounter } from "~/spaces/table/DamageCounter";
-import { useGameController } from "~/engine/rule-engine/lib/GameControllerProvider";
+import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
 import { CardImageOverlay } from "~/components/card/CardImageOverlay";
-import { bodyguardAbilityPredicate } from "~/engine/cardTypes";
+import { CardModel } from "~/store/models/CardModel";
+import { observer } from "mobx-react-lite";
+import { bodyguardAbilityPredicate } from "~/engine/abilities";
+import { CardIcons } from "~/components/card-icons/CardIcons";
 
-export function TargetModal(props: {
+function TargetModalComponent(props: {
   activeFilters: TargetFilter[];
   onClose: () => void;
-  onTargetChosen: (card: TableCard) => void;
-  type: "challenge" | "resolution" | "";
+  onCancel: () => void;
+  onTargetChosen: (card?: CardModel) => void;
+  type: "challenge" | "resolution" | "activated" | "static-triggered" | "";
   title?: string;
   subtitle?: string;
 }) {
-  const { activeFilters, onClose, onTargetChosen, type, title, subtitle } =
-    props;
+  const {
+    activeFilters,
+    onClose,
+    onCancel,
+    onTargetChosen,
+    type,
+    title,
+    subtitle,
+  } = props;
   const [open, setOpen] = useState(false);
-  const controller = useGameController();
-  const filteredTableCards = controller.getCardsByFilter(activeFilters);
-  const [selected, setSelected] = useState<TableCard | undefined>(undefined);
+  const store = useGameStore();
+  const filteredTableCards = store.cardStore.getCardsByFilter(activeFilters);
+  const [selected, setSelected] = useState<CardModel | undefined>(undefined);
 
   const bodyguardPresent =
     type === "challenge" &&
     filteredTableCards.some((card) => {
-      const lorcanitoCard = controller.findLorcanitoCard(card.instanceId);
+      const lorcanitoCard = card.lorcanitoCard;
       return lorcanitoCard?.abilities?.find(bodyguardAbilityPredicate);
     });
 
-  function filterByOwner(tableCard: TableCard) {
-    const owner = controller.findCardOwner(tableCard.instanceId);
-    return owner === controller.getActivePlayer();
+  function filterByOwner(card: CardModel) {
+    const owner = card.ownerId;
+    return owner === store.activePlayer;
   }
 
   const cardsYouOwn = filteredTableCards.filter(filterByOwner);
@@ -50,12 +59,13 @@ export function TargetModal(props: {
       title={title || "Choose a target"}
       subtitle={subtitle || ""}
       open={true}
-      onCancel={onClose}
+      onCancel={onCancel}
       onConfirm={() => {
         if (selected) {
           onTargetChosen(selected);
-          onClose();
         }
+
+        onClose();
       }}
     >
       <div className="flex w-full flex-col">
@@ -118,16 +128,12 @@ function GridItem({
   selected,
   setSelected,
 }: {
-  card: TableCard;
+  card: CardModel;
   bodyguardPresent: boolean;
-  selected?: TableCard;
-  setSelected: (card: TableCard | undefined) => void;
+  selected?: CardModel;
+  setSelected: (card: CardModel | undefined) => void;
 }) {
-  const controller = useGameController();
-  const lorcanitoCard = controller.findLorcanitoCard(card.instanceId);
-  const cardHasBodyGuard = !!lorcanitoCard?.abilities?.find(
-    bodyguardAbilityPredicate
-  );
+  const cardHasBodyGuard = card.hasBodyguard;
   const canBeSelected =
     !bodyguardPresent || (bodyguardPresent && cardHasBodyGuard);
 
@@ -149,20 +155,19 @@ function GridItem({
     >
       {!canBeSelected ? (
         <CardImageOverlay isActive={!canBeSelected} isOver={!canBeSelected}>
-          BODYGUARDED
+          BODY GUARDED
         </CardImageOverlay>
       ) : null}
 
       <TargetCardImage
-        card={card.instanceId}
+        card={card}
         selected={selected?.instanceId === card.instanceId}
       />
     </a>
   );
 }
 
-function TargetCardImage(props: { card: string; selected?: boolean }) {
-  const engine = useGameController();
+function TargetCardImage(props: { card: CardModel; selected?: boolean }) {
   const { card, selected } = props;
 
   return (
@@ -174,10 +179,10 @@ function TargetCardImage(props: { card: string; selected?: boolean }) {
       <CardImageOverlay isActive={selected || false} isOver={false}>
         SELECTED
       </CardImageOverlay>
-      <LorcanaCardImage hideCardText instanceId={card} />
-      <div className={"absolute left-0 top-0 m-2"}>
-        <DamageCounter damage={engine.findTableCard(card)?.meta?.damage} />
-      </div>
+      <LorcanaCardImage hideCardText instanceId={card.instanceId} />
+      <CardIcons card={card} />
     </div>
   );
 }
+
+export const TargetModal = observer(TargetModalComponent);

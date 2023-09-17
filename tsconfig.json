@@ -1,16 +1,19 @@
 {
   "compilerOptions": {
+    "strict": true,
+    "noImplicitReturns": true,
+    "useDefineForClassFields": true,
     "types": ["jest", "node"],
-    "target": "es2017",
+    "target": "ES6",
     "lib": [
       "dom",
       "dom.iterable",
-      "esnext"
+      "esnext",
+      "ES2023"
     ],
     "allowJs": true,
     "checkJs": false,
     "skipLibCheck": true,
-    "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,

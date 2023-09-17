@@ -2,57 +2,98 @@ import { ZoneOverlay } from "~/components/ZoneOverlay";
 import React, { FC, useEffect } from "react";
 import { LorcanaCardImage } from "~/components/card/LorcanaCardImage";
 import { useCardPreview } from "~/providers/CardPreviewProvider";
-import { useGameController } from "~/engine/rule-engine/lib/GameControllerProvider";
+import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
 import { useTargetModal } from "~/providers/TargetModalProvider";
-import { TableCard } from "~/providers/TabletopProvider";
+import { CardModel } from "~/store/models/CardModel";
+import { useYesOrNoModal } from "~/providers/YesOrNoModalProvider";
+import { useScryModal } from "~/providers/ScryModalProvider";
+import { scryEffectPredicate } from "~/engine/effectTypes";
+import { toJS } from "mobx";
+import { staticTriggeredAbilityPredicate } from "~/engine/abilities";
 
 // The game does not have a stack, but I want to add one.
 // This is a temporary step while not all cards are coded.
 export const EffectStackZoneArena: FC = () => {
-  const controller = useGameController();
-  const pendingEffects = controller.getPendingEffects();
+  const store = useGameStore();
+  const pendingEffects = store.tableStore.getPendingEffects();
   const setCardPreview = useCardPreview();
   const { openTargetModal } = useTargetModal();
+  const openYesOrNoModal = useYesOrNoModal();
+  const openScryModal = useScryModal();
   const topOfStack = pendingEffects[pendingEffects.length - 1];
   const activePlayerOwnsTheEffect =
-    controller.findCardOwner(topOfStack?.instanceId) ===
-    controller.getActivePlayer();
+    store.activePlayer === topOfStack?.source.ownerId;
 
   const selectTarget = () => {
     if (!topOfStack) {
+      console.log("No top of stack");
       return;
     }
 
     const ability = topOfStack.ability;
 
-    let callback = (target: TableCard) => {};
+    let callback = (target?: CardModel) => {
+      topOfStack.resolve({ targetId: target?.instanceId });
+    };
+    let onCancel = () => {
+      topOfStack.cancel();
+    };
 
-    if (ability.effect === "shuffle") {
-      callback = (target: TableCard) => {
-        controller.shuffleCardIntoDeck({
-          instanceId: target.instanceId,
-          from: "discard",
-        });
-        controller.resolveEffect({
-          effectId: topOfStack.id,
-          targetId: target.instanceId,
-        });
-      };
+    const title = ability.name || topOfStack.source.fullName;
+    const subtitle = ability.text || topOfStack.source.lorcanitoCard.text || "";
+    const filters =
+      ability.targets?.type === "card" ? ability.targets.filters : [];
+
+    // Musketeer tabard, coconut
+    const musk = ability.optional;
+    // Ursula's cauldron
+    const scryEffect = ability?.effects.find(scryEffectPredicate);
+
+    console.log(toJS(ability));
+
+    if (scryEffect) {
+      // TODO: THIS IS NOT IDEAL, it breaks encapsulation
+      openScryModal({
+        ...scryEffect,
+        callback: (params) => topOfStack.resolve({ scry: params }),
+      });
+    } else if (musk) {
+      openYesOrNoModal({
+        title: `Choose a target for ${title}`,
+        text: subtitle,
+        onYes: () => {
+          // musketeer tabard
+          if (ability?.effects.filter((e) => e.type === "draw")) {
+            topOfStack.resolve({ player: "self" });
+          }
+
+          // THERE ARE EFFECTS THAT TARGET ALL CARDS: jasmine for instance
+
+          if (staticTriggeredAbilityPredicate(ability)) {
+            openTargetModal({
+              title: `Choose a target for ${title}`,
+              subtitle: subtitle,
+              filters: filters,
+              callback: callback,
+              onCancel,
+              type: topOfStack.ability.type,
+            });
+          }
+        },
+        onNo: () => {
+          onCancel();
+        },
+      });
+    } else {
+      openTargetModal({
+        title: `Choose a target for ${title}`,
+        subtitle: subtitle,
+        filters: filters,
+        callback: callback,
+        onCancel,
+        type: topOfStack.ability.type,
+      });
     }
-
-    openTargetModal({
-      title: `Choose a target for ${ability.name}`,
-      subtitle: ability.text,
-      filters: ability.filters,
-      callback: callback,
-      onCancel: () => {
-        controller.resolveEffect({
-          effectId: topOfStack.id,
-          targetId: undefined,
-        });
-      },
-      type: "resolution",
-    });
   };
 
   useEffect(() => {
@@ -64,22 +105,9 @@ export const EffectStackZoneArena: FC = () => {
   }, [pendingEffects.length]);
 
   const clearEffect = () => {
-    const id = topOfStack?.id;
-    if (id === undefined) {
-      pendingEffects.forEach((effect) => {
-        controller.resolveEffect({
-          effectId: effect.id,
-          targetId: undefined,
-        });
-      });
-    } else {
-      pendingEffects.forEach((effect) => {
-        controller.resolveEffect({
-          effectId: id,
-          targetId: undefined,
-        });
-      });
-    }
+    pendingEffects.forEach((effect) => {
+      effect.resolve({ targetId: undefined });
+    });
   };
 
   // Only show the button to turn player
@@ -88,15 +116,15 @@ export const EffectStackZoneArena: FC = () => {
       {activePlayerOwnsTheEffect ? (
         <>
           <div
-            className="z-10 flex h-full -rotate-180 cursor-pointer select-none flex-col items-center justify-center rounded bg-green-800 px-2 font-mono text-xl font-bold text-white underline hover:bg-green-500"
+            className="z-10 flex h-full -rotate-180 cursor-pointer select-none flex-col items-center justify-center rounded bg-red-800 px-2 font-mono text-xl font-bold text-white underline hover:bg-red-500"
             onClick={clearEffect}
             style={{ writingMode: "vertical-rl" }}
           >
-            <span>RESOLVE</span>
+            <span>CANCEL</span>
             <span>EFFECT</span>
           </div>
           <div
-            className="z-10 flex h-full -rotate-180 cursor-pointer select-none flex-col items-center justify-center rounded bg-green-800 px-2 font-mono text-xl font-bold text-white underline hover:bg-green-500"
+            className="z-10 mx-2 flex h-full -rotate-180 cursor-pointer select-none flex-col items-center justify-center rounded bg-green-800 px-2 font-mono text-xl font-bold text-white underline hover:bg-green-500"
             onClick={selectTarget}
             style={{ writingMode: "vertical-rl" }}
           >
@@ -107,12 +135,13 @@ export const EffectStackZoneArena: FC = () => {
       ) : null}
 
       {pendingEffects.map((effect) => {
-        const instanceId = effect.instanceId;
-        const lorcanitoCard = controller.findLorcanitoCard(instanceId);
+        const instanceId = effect.source.instanceId;
+        const lorcanitoCard =
+          store.cardStore.getCard(instanceId)?.lorcanitoCard;
 
         return (
           <div
-            key={effect.instanceId + effect.ability.name}
+            key={effect.source.instanceId + effect.ability.name}
             className={`z-10 mx-1`}
             onMouseEnter={() => {
               setCardPreview({ instanceId: instanceId });

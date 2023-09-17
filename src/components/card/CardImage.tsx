@@ -10,11 +10,13 @@ import { CardNotFound } from "~/components/card/CardNotFound";
 import { CardHotKeyOverlay } from "~/components/card/CardHotKeyOverlay";
 import { CardImageOverlay } from "~/components/card/CardImageOverlay";
 import { useCardContextMenu } from "~/providers/card-context-menu/useCardContextMenu";
-import { useGameController } from "~/engine/rule-engine/lib/GameControllerProvider";
 import { useTurn } from "~/engine/GameProvider";
+import { observer } from "mobx-react-lite";
+import { CardModel } from "~/store/models/CardModel";
+import { CardIcons } from "~/components/card-icons/CardIcons";
 
-export function CardImage(props: {
-  instanceId: string;
+function CardImageComponent(props: {
+  card?: CardModel;
   onClick?: (event: MouseEvent<HTMLDivElement>) => void;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
@@ -25,9 +27,10 @@ export function CardImage(props: {
   draggable?: boolean;
   style?: unknown;
   grow?: "horizontal" | "vertical";
+  image?: "full" | "image";
 }) {
   const {
-    instanceId,
+    card,
     onClick,
     zone,
     index,
@@ -35,42 +38,36 @@ export function CardImage(props: {
     className,
     draggable = true,
     grow = "horizontal",
+    image = "full",
   } = props;
-  const engine = useGameController();
-  const lorcanitoCard = engine.findLorcanitoCard(instanceId);
-  const tableCard = engine.findTableCard(instanceId);
-  const ownerId = engine.findCardOwner(instanceId);
+  const lorcanitoCard = card?.lorcanitoCard;
+  const ownerId = card?.ownerId;
+
+  if (!ownerId || !lorcanitoCard || !card) {
+    return <CardNotFound />;
+  }
+
   const { isMyTurn, turnPlayer } = useTurn();
   const { openContextMenu } = useCardContextMenu(zone);
   // TODO: when play is draggin the card, change scale to 1.1 to the card seems to be lifted
-  const { opacity, dragRef } = useDragCard(instanceId, zone);
+  const { opacity, dragRef } = useDragCard(card, zone);
   const { dropZoneRef, highlighted, hovered, canShift, canChallenge, canSing } =
-    useDropCardInCard(instanceId, zone);
+    useDropCardInCard(card, zone);
 
   const setCardPreview = useCardPreview();
   const { data: user } = useUser();
   const showHotKey =
     isMyTurn && ownerId === turnPlayer && (zone === "hand" || zone === "play");
 
-  const tapped = tableCard?.meta?.exerted;
+  const meta = card.meta;
+  const tapped = meta?.exerted;
   const isDead =
     zone === "play" &&
-    !!tableCard?.meta?.damage &&
-    tableCard?.meta?.damage >= (lorcanitoCard?.willpower || 0);
+    !!meta?.damage &&
+    meta?.damage >= (lorcanitoCard?.willpower || 0);
   const isOpponentsCard = ownerId !== user?.uid;
-  const isFresh = (zone === "play" && tableCard?.meta?.playedThisTurn) || false;
 
   const hotKeyBorder = "border-2 border-solid border-amber";
-  if (!ownerId || !lorcanitoCard || !tableCard) {
-    // console.log(
-    //   `CardImage: card not found`,
-    //   lorcanitoCard,
-    //   tableCard,
-    //   instanceId,
-    //   ownerId
-    // );
-    return <CardNotFound />;
-  }
 
   return (
     <div
@@ -83,31 +80,31 @@ export function CardImage(props: {
         }
       }}
       draggable={draggable}
-      data-id-card={instanceId}
+      data-id-card={card.instanceId}
       onClick={onClick}
       onMouseEnter={() => {
         if (!isFaceDown) {
-          setCardPreview({ instanceId, tableId: ownerId });
+          setCardPreview({ instanceId: card.instanceId, tableId: ownerId });
         }
       }}
       onMouseLeave={() => setCardPreview(undefined)}
-      onContextMenu={(event) => openContextMenu(instanceId, event, "top")}
+      onContextMenu={(event) => openContextMenu(card, event, "top")}
       className={`${showHotKey ? hotKeyBorder : ""} ${
         grow === "horizontal" ? "h-full" : "w-full"
       } ${className || ""} ${
         tapped ? "-translate-x-full rotate-90" : "rotate-0"
       } ${isOpponentsCard ? "cursor-not-allowed" : "cursor-pointer"} ${
         isDead ? "grayscale" : ""
-      } ${hovered ? "scale-110" : ""} ${
-        highlighted ? "z-20" : ""
-      } group relative flex aspect-card origin-bottom-right select-none rounded-lg transition-all ease-linear hover:z-10 hover:border-indigo-500`}
+      } ${hovered ? "scale-110" : ""} ${highlighted ? "z-20" : ""} ${
+        image === "full" ? "aspect-card" : "aspect-card-image-name"
+      } group relative flex origin-bottom-right select-none rounded-lg transition-all ease-linear hover:z-10 hover:border-indigo-500`}
     >
       {zone === "play" && !isOpponentsCard && (
         <div
           className={`absolute left-0 top-0 m-2 opacity-0 group-hover:opacity-100`}
           onClick={(event: MouseEvent<HTMLDivElement>) => {
             event.stopPropagation();
-            openContextMenu(instanceId, event, "bottom");
+            openContextMenu(card, event, "bottom");
           }}
         >
           <CardContextMenuTrigger />
@@ -121,27 +118,27 @@ export function CardImage(props: {
         </CardImageOverlay>
       ) : null}
 
-      {zone === "play" && (
+      {zone === "play" && card.type === "character" && (
         <CardImageDamageOverlay
-          instanceId={instanceId}
-          isFresh={isFresh}
-          isDead={isDead}
-          className="group-hover:opacity-100"
+          card={card}
           zone={zone}
+          className="group-hover:opacity-100"
         />
       )}
       {showHotKey && (
-        <CardHotKeyOverlay
-          instanceId={instanceId}
-          zone={zone}
-          index={index ?? -1}
-        />
+        <CardHotKeyOverlay card={card} zone={zone} index={index ?? -1} />
       )}
+      {zone === "play" && card.type === "character" ? (
+        <CardIcons card={card} />
+      ) : null}
       <LorcanaCardImage
         isFaceDown={isFaceDown}
         style={{ opacity }}
         card={lorcanitoCard}
+        hideCardText={image === "image"}
       />
     </div>
   );
 }
+
+export const CardImage = observer(CardImageComponent);

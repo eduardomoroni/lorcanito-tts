@@ -1,12 +1,7 @@
 import React, { type FC } from "react";
 import { useCardPreview } from "~/providers/CardPreviewProvider";
-import { EyeSlashIcon } from "@heroicons/react/20/solid";
-
-import { useGameController } from "~/engine/rule-engine/lib/GameControllerProvider";
-import { InternalLogEntry } from "~/spaces/Log/game-log/types";
 import { GameEffect } from "~/libs/game";
-import { instanceId } from "firebase-admin";
-import { LorcanitoCard } from "~/engine/cardTypes";
+import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
 
 const COLORS = {
   ruby: "text-ruby",
@@ -21,17 +16,16 @@ export const CardEffectEntry: FC<{
   effect?: GameEffect;
 }> = ({ effect }) => {
   if (!effect) {
-    return <span> resolved an effect.</span>;
+    return <span> an effect.</span>;
   }
 
   const setPreview = useCardPreview();
-  const engine = useGameController();
-
-  const card = engine.findLorcanitoCard(effect.instanceId);
+  const store = useGameStore();
+  const card = store.cardStore.getCard(effect.instanceId)?.lorcanitoCard;
 
   return (
     <>
-      <span> resolved an effect: </span>
+      <span> an effect: </span>
       <span
         key={card?.id}
         onMouseEnter={() => {

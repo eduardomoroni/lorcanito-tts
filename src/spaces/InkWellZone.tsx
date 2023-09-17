@@ -3,55 +3,27 @@ import { ZoneOverlay } from "~/components/ZoneOverlay";
 import { DragNDropOverlay } from "~/components/DragNDropOverlay";
 import { CardImage } from "~/components/card/CardImage";
 import React, { FC } from "react";
+import type { CardModel } from "~/store/models/CardModel";
+import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { observer } from "mobx-react-lite";
 
-import { useGameController } from "~/engine/rule-engine/lib/GameControllerProvider";
-
-export const InkWell: FC<{
-  cards: string[];
+const InkWellComponent: FC<{
+  cards: CardModel[];
   playerId: string;
   position: "bottom" | "top";
 }> = ({ cards, playerId, position }) => {
-  const engine = useGameController();
+  const store = useGameStore();
   const { dropZoneRef, isActive, isOver } = useDropCardInZone(
     playerId,
     "inkwell"
   );
 
-  const freshInk = cards.filter(
-    (card) => engine.findTableCard(card)?.meta?.playedThisTurn
-  );
-  const dryInk = cards.filter(
-    (card) => !engine.findTableCard(card)?.meta?.playedThisTurn
-  );
-  const tappedInk = cards.filter(
-    (card) => !engine.findTableCard(card)?.meta?.exerted
-  );
-
-  const toCardImage = (card: string, index: number) => {
-    const owner = engine.findCardOwner(card);
-
-    return (
-      <CardImage
-        key={`${index}-${card}`}
-        style={{ transform: `translateX(-${index * 25}%)` }}
-        className={`${freshInk.includes(card) ? "grayscale" : ""}`}
-        instanceId={card}
-        zone="inkwell"
-        onClick={() => {
-          if (engine.playerId !== owner) {
-            return;
-          }
-          engine.tapCard({ toggle: true, instanceId: card, inkwell: true });
-        }}
-        isFaceDown
-      />
-    );
-  };
+  const tappedInk = cards.filter((card) => !card.ready);
 
   return (
     <div
       ref={dropZoneRef}
-      className="relative z-20 m-1 mt-0 flex h-full grow p-1"
+      className="relative z-20 m-1 mt-0 flex h-full grow overflow-y-auto p-1"
     >
       <ZoneOverlay>Ink Well</ZoneOverlay>
       <DragNDropOverlay isOver={isOver} isActive={isActive}>
@@ -64,8 +36,30 @@ export const InkWell: FC<{
       >
         <span>{`Ink available: ${tappedInk.length}/${cards.length}`}</span>
       </div>
-      {dryInk.map(toCardImage)}
-      {freshInk.map(toCardImage)}
+      {cards.map((card: CardModel, index: number) => {
+        return (
+          <CardImage
+            key={`${index}-${card}`}
+            style={{ transform: `translateX(-${index * 25}%)` }}
+            className={`${card.meta.playedThisTurn ? "grayscale" : ""}`}
+            card={card}
+            zone="inkwell"
+            onClick={() => {
+              if (store.activePlayer !== card.ownerId) {
+                return;
+              }
+
+              store.cardStore.tapCard(card.instanceId, {
+                toggle: true,
+                inkwell: true,
+              });
+            }}
+            isFaceDown
+          />
+        );
+      })}
     </div>
   );
 };
+
+export const InkWell = observer(InkWellComponent);

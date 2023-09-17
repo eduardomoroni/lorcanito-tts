@@ -1,5 +1,5 @@
 import { type Deck, type DeckCard } from "~/providers/TabletopProvider";
-import { allCards } from "~/engine/cards";
+import { allCards } from "~/engine/cards/cards";
 import { LorcanitoCard } from "~/engine/cardTypes";
 
 export function getCardFullName(card: LorcanitoCard) {

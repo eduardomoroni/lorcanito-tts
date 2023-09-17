@@ -5,7 +5,7 @@ import { useFirebaseUserId } from "~/3rd-party/firebase/FirebaseSessionProvider"
 import { useSigninCheck } from "reactfire";
 import type { Game } from "~/libs/game";
 import { Lorcanito } from "./Lorcanito";
-import { GameControllerProvider } from "~/engine/rule-engine/lib/GameControllerProvider";
+import { GameStoreProvider } from "~/engine/rule-engine/lib/GameStoreProvider";
 import { GameProvider } from "~/engine/GameProvider";
 import { StreamChatProvider } from "~/providers/stream-chat-provider/StreamChatProvider";
 import { GameLogProvider } from "~/spaces/Log/game-log/GameLogProvider";
@@ -13,6 +13,7 @@ import { NotificationProvider } from "~/providers/NotificationProvider";
 import { YesOrNoModalProvider } from "~/providers/YesOrNoModalProvider";
 import { ConfirmationModalProvider } from "~/providers/ConfirmationModalProvider";
 import { TargetModalProvider } from "~/providers/TargetModalProvider";
+import { ScryModalProvider } from "~/providers/ScryModalProvider";
 
 // TODO: I created this file because firebase was initializing as null and it was breaking the app
 const GamePage: FC<{
@@ -62,20 +63,22 @@ const GamePage: FC<{
           >
             <GameLogProvider>
               <GameProvider ssrGame={ssrGame} playerId={userId}>
-                <GameControllerProvider
+                <GameStoreProvider
                   ssrGame={ssrGame}
                   gameId={props.gameId}
                   playerId={userId}
                 >
                   {/*We have a cyclic dependency here, GameProvider depends on TargetModalProvider that depends on GameProvider */}
-                  <TargetModalProvider>
-                    <Lorcanito
-                      game={ssrGame}
-                      gameId={gameId}
-                      isMobile={props.isMobile}
-                    />
-                  </TargetModalProvider>
-                </GameControllerProvider>
+                  <ScryModalProvider>
+                    <TargetModalProvider>
+                      <Lorcanito
+                        game={ssrGame}
+                        gameId={gameId}
+                        isMobile={props.isMobile}
+                      />
+                    </TargetModalProvider>
+                  </ScryModalProvider>
+                </GameStoreProvider>
               </GameProvider>
             </GameLogProvider>
           </StreamChatProvider>

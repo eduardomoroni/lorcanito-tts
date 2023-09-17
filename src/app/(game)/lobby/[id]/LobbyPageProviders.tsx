@@ -13,7 +13,7 @@ import { Game, type GameLobby } from "~/libs/game";
 import { DeckImportProvider } from "~/providers/DeckImportProvider";
 import { PresenceProvider } from "~/providers/presence/PresenceProvider";
 import { GameLobbyProvider } from "~/providers/lobby/GameLobbyProvider";
-import { GameControllerProvider } from "~/engine/rule-engine/lib/GameControllerProvider";
+import { GameStoreProvider } from "~/engine/rule-engine/lib/GameStoreProvider";
 import { gameMock } from "~/app/(old)/game/[id]/gameMock";
 
 type Props = {
@@ -31,11 +31,7 @@ export const LobbyPageProviders: FC<Props> = ({
 }) => {
   return (
     <GameLobbyProvider ssrLobby={lobby} playerId={userId} gameId={lobby.id}>
-      <GameControllerProvider
-        ssrGame={game}
-        gameId={lobby.id}
-        playerId={userId}
-      >
+      <GameStoreProvider ssrGame={game} gameId={lobby.id} playerId={userId}>
         <NotificationProvider>
           <GameLogProvider>
             <HotkeysProvider initiallyActiveScopes={["game", "hand"]}>
@@ -58,7 +54,7 @@ export const LobbyPageProviders: FC<Props> = ({
             </HotkeysProvider>
           </GameLogProvider>
         </NotificationProvider>
-      </GameControllerProvider>
+      </GameStoreProvider>
     </GameLobbyProvider>
   );
 };

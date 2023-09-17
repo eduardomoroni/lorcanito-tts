@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import { useGame } from "~/engine/rule-engine/lib/GameControllerProvider";
+import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
 import { Game } from "~/libs/game";
 
 type ContextType = {
@@ -26,8 +26,11 @@ const initialState: ContextType = {
 
 const PreGameContext = createContext(initialState);
 
+// TODO: get rid of this
 export function PreGameProvider({ children }: { children: JSX.Element }) {
-  const [game, userId] = useGame();
+  const store = useGameStore();
+  const game = store.toJSON();
+  const userId = store.activePlayer;
 
   const isSolo = game.mode === "solo";
   const tables: Game["tables"] = game.tables;

@@ -1,14 +1,15 @@
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { z } from "zod";
 import { StreamChat } from "stream-chat";
-import { sendLog } from "~/server/serverGameLogger";
+import { sendLog, updateStreamUser } from "~/server/serverGameLogger";
 
-import { InternalLogEntry } from "~/spaces/Log/game-log/types";
+import type { InternalLogEntry } from "~/spaces/Log/types";
 
 const api_key = process.env.NEXT_PUBLIC_STREAM_API_KEY;
 const api_secret = process.env.STREAM_API_SECRET;
 
 export async function createStreamClientToken(userUID: string) {
+  await updateStreamUser(userUID);
   const serverClient = StreamChat.getInstance(api_key || "", api_secret);
   return serverClient.createToken(userUID);
 }

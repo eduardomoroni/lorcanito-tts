@@ -50,6 +50,12 @@ function filterToText(filter: TargetFilter) {
     case "keyword": {
       return `Keyword: ${filter.value}`;
     }
+    case "characteristics": {
+      return `Characteristics: ${filter.value.join(", ")}`;
+    }
+    case "ability": {
+      return `Ability: ${filter.value}`;
+    }
     default: {
       // If this is failing, it means you forgot to add a case for a new filter
       exhaustiveCheck(activeFilter);

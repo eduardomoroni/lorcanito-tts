@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useRef } from "react";
 import {
   AuthProvider,
   FirebaseAppProvider,
@@ -19,6 +19,7 @@ import { shouldConnectAuthEmulator } from "~/3rd-party/firebase/emulator";
 import { app, init } from "~/3rd-party/firebase/index";
 import { getAnalytics } from "firebase/analytics";
 import {
+  Firestore,
   getFirestore,
   initializeFirestore,
   persistentLocalCache,
@@ -34,18 +35,20 @@ export const Providers: React.FC<{
   const analytics =
     typeof window !== "undefined" ? getAnalytics(app) : undefined;
 
-  let firestore = undefined;
+  let firestore = useRef<Firestore>();
 
   try {
-    firestore = initializeFirestore(getApp(), {
-      ignoreUndefinedProperties: true,
-      localCache: persistentLocalCache({
-        tabManager: persistentSingleTabManager(undefined),
-      }),
-    });
+    if (!firestore.current) {
+      firestore.current = initializeFirestore(getApp(), {
+        ignoreUndefinedProperties: true,
+        localCache: persistentLocalCache({
+          tabManager: persistentSingleTabManager(undefined),
+        }),
+      });
+    }
   } catch (e) {
     console.error(e);
-    firestore = getFirestore(app);
+    firestore.current = getFirestore(app);
   }
 
   // TODO: Think about this later
@@ -54,7 +57,7 @@ export const Providers: React.FC<{
 
   // any child components will be able to use `useUser`, `useDatabaseObjectData`, etc
   return (
-    <FirestoreProvider sdk={firestore}>
+    <FirestoreProvider sdk={firestore.current}>
       <AuthProvider sdk={auth}>
         <FirebaseSessionProvider emulatorEnabled={emulatorEnabled} sdk={auth}>
           <FirebaseAnalyticsProvider sdk={analytics}>

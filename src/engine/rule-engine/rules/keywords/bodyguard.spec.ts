@@ -7,9 +7,11 @@ import { createRuleEngine } from "~/engine/rule-engine/engine";
 import { createMockGame } from "~/engine/rule-engine/__mocks__/createGameMock";
 import {
   heiheiBoatSnack,
+  liloMakingAWish,
   moanaOfMotunui,
   simbaProtectiveCub,
-} from "~/engine/cards";
+} from "~/engine/cards/TFC";
+import { TestStore } from "~/engine/rule-engine/rules/testStore";
 
 const testPlayer = "player_one";
 const opponent = "player_two";
@@ -36,43 +38,38 @@ it("Let's you play a bodyguard character exerted", () => {
   expect(cardUnderTest?.meta?.exerted).toBeTruthy();
 });
 
-it("doesn't let you challenge a bodyguarded character", () => {
+it("doesn't let you challenge a body guarded character", () => {
   const inkwell = [moanaOfMotunui, moanaOfMotunui];
-  const engine = createRuleEngine(
-    createMockGame(
-      {
-        inkwell,
-        play: [heiheiBoatSnack],
-      },
-      {
-        inkwell,
-        play: [simbaProtectiveCub, heiheiBoatSnack],
-      }
-    )
+
+  const testStore = new TestStore(
+    {
+      inkwell,
+      play: [liloMakingAWish],
+    },
+    {
+      inkwell,
+      play: [simbaProtectiveCub, heiheiBoatSnack],
+    }
   );
 
-  engine.get.zoneCards("play", opponent).forEach((card) => {
-    engine.moves.tapCard(card, { exerted: true });
-    expect(engine.get.tableCard(card)?.meta?.exerted).toBeTruthy();
-  });
+  testStore.store.tableStore
+    .getPlayerZone("player_two", "play")
+    ?.cards.forEach((card) => {
+      card.updateCardMeta({ exerted: true });
+    });
 
-  const attacker = engine.get.byZoneAndId({
-    owner: testPlayer,
-    zone: "play",
-    lorcanitoId: heiheiBoatSnack.id,
-  });
-  const defender = engine.get.byZoneAndId({
-    owner: opponent,
-    zone: "play",
-    // Simba is the bodyguard
-    lorcanitoId: heiheiBoatSnack.id,
-  });
+  const attacker = testStore.getByZoneAndId("play", liloMakingAWish.id);
+  const defender = testStore.getByZoneAndId(
+    "play",
+    heiheiBoatSnack.id,
+    "player_two"
+  );
 
-  engine.moves.challenge(attacker, defender);
+  attacker.challenge(defender);
 
   // Bodyguard should prevent the challenge from happening, in case of an invalid target
-  expect(engine.get.tableCard(defender)?.meta?.damage).toBeFalsy();
-  expect(engine.get.tableCard(attacker)?.meta?.damage).toBeFalsy();
+  expect(attacker.meta?.damage).toBeFalsy();
+  expect(defender.meta?.damage).toBeFalsy();
 });
 
 it("Let players challenge bodyguards", () => {

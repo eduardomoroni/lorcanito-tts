@@ -3,20 +3,23 @@ import { DeckZone } from "~/spaces/table/DeckZone";
 import { DiscardPileZone } from "~/spaces/DiscardPileZone";
 import { PlayArea } from "~/spaces/PlayAreaZone";
 import { InkWell } from "~/spaces/InkWellZone";
-import { LoreCounter } from "~/spaces/table/LoreCounter";
-import { Hand } from "~/spaces/Hand";
+import { HandZone } from "~/spaces/HandZone";
 import { TableOverlay } from "~/spaces/table/TableOverlay";
 import { PlayerOfflineBanner } from "~/components/banners/PlayerOfflineBanner";
-import { usePlayerTable } from "~/engine/GameProvider";
+import { observer } from "mobx-react-lite";
+import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { CardModel } from "~/store/models/CardModel";
+import { LoreCounter } from "~/spaces/table/lore/LoreCounter";
+import { ItemArea } from "~/spaces/ItemArea";
 
-export const PlayerTable: React.FC<{
+const PlayerTableComponent: React.FC<{
   position: "bottom" | "top";
   tableOwner?: string;
   isStackZoneOpen?: boolean;
-  cardsOnStack: string[];
+  cardsOnStack: CardModel[];
 }> = ({ position, tableOwner, isStackZoneOpen, cardsOnStack }) => {
-  const { table } = usePlayerTable(tableOwner);
-  const zones = table?.zones;
+  const rootStore = useGameStore();
+  const table = rootStore.tableStore.getTable(tableOwner);
 
   if (!table || !tableOwner) {
     return (
@@ -29,60 +32,81 @@ export const PlayerTable: React.FC<{
     );
   }
 
+  const zones = table?.zones;
+
+  const playAreaCards =
+    zones?.play.cards.filter((card) => card.lorcanitoCard?.type !== "item") ||
+    [];
+  const items =
+    zones?.play.cards.filter((card) => card.lorcanitoCard?.type === "item") ||
+    [];
   return (
     <div className="relative flex h-full w-full rounded-lg border border-solid border-slate-700">
       <PlayerOfflineBanner playerId={tableOwner} />
       <div className="playmat absolute inset-0 rounded-lg"></div>
       <div
-        className={`flex h-full w-36 min-w-[9rem] ${
+        className={`min-w-32 mr-2 flex h-full w-32 justify-between ${
           position === "bottom" ? "flex-col" : "flex-col-reverse"
         }`}
       >
-        <div className={`flex h-1/2 w-full`}>
-          <DeckZone ownerId={tableOwner} cards={zones?.deck || []} />
+        <LoreCounter loreOwner={tableOwner} position={position} />
+        <div className={`flex aspect-card w-full`}>
+          <DeckZone ownerId={tableOwner} cards={zones?.deck.cards || []} />
         </div>
-        <div className="flex h-1/2 w-full">
-          <DiscardPileZone playerId={tableOwner} cards={zones?.discard || []} />
+        <div className="flex aspect-card w-full">
+          <DiscardPileZone
+            playerId={tableOwner}
+            cards={zones?.discard.cards || []}
+          />
         </div>
       </div>
       <div
-        className={`flex h-full w-10/12 flex-grow ${
+        className={`flex h-full flex-grow ${
           position === "bottom" ? "flex-col" : "flex-col-reverse"
         }`}
       >
         <div className="flex h-4/6 w-full">
           <PlayArea
             playerId={tableOwner}
-            cards={zones?.play || []}
+            cards={playAreaCards}
             cardsOnStack={cardsOnStack}
           />
         </div>
         <div className="z-0 flex h-2/6 w-full">
           <InkWell
             playerId={tableOwner}
-            cards={zones?.inkwell || []}
+            cards={zones?.inkwell.cards || []}
             position={position}
           />
         </div>
       </div>
-      <div
-        className={`z-10 mr-1 flex h-full w-12 rounded-lg bg-black opacity-25 ${
-          position === "bottom" ? "flex-col-reverse" : "flex-col"
-        }`}
-      >
-        <LoreCounter loreOwner={tableOwner} position={position} />
-      </div>
+      {items.length ? (
+        <div
+          className={`flex h-full w-[20%] max-w-[150px] ${
+            position === "bottom" ? "flex-col" : "flex-col-reverse"
+          }`}
+        >
+          <ItemArea
+            playerId={tableOwner}
+            cards={items}
+            position={position}
+            hotkeyOffset={playAreaCards.length}
+          />
+        </div>
+      ) : null}
       <div
         className={`${position === "top" ? "-top-44" : "-bottom-44"} ${
           isStackZoneOpen ? "-translate-y-3/4" : ""
         } absolute left-1/2 z-10 flex h-44 w-auto min-w-1/2 max-w-full -translate-x-1/2 justify-center overflow-y-visible transition-all duration-700 hover:scale-125`}
       >
-        <Hand
+        <HandZone
           playerId={tableOwner}
           position={position}
-          cards={zones?.hand || []}
+          cards={zones?.hand.cards || []}
         />
       </div>
     </div>
   );
 };
+
+export const PlayerTable = observer(PlayerTableComponent);

@@ -51,11 +51,11 @@ export async function purgeGames() {
   const removed: string[] = [];
   function areDatesDaysApart(
     days: number,
-    prevString: string,
+    prevString: number,
     later = new Date()
   ) {
     try {
-      const prev = new Date(parseInt(prevString));
+      const prev = new Date(parseInt(prevString as unknown as string));
       const oneDayInMilliseconds = 24 * 60 * 60 * 1000;
       // @ts-ignore
       const differenceInMilliseconds = Math.abs(prev - later);
@@ -95,7 +95,10 @@ export async function purgeGames() {
         }
 
         Object.values(lobbies).forEach((lobby) => {
-          if (!lobby.lastActivity || areDatesDaysApart(1, lobby.lastActivity)) {
+          if (
+            !lobby.lastActivity ||
+            areDatesDaysApart(1, lobby.lastActivity as unknown as number)
+          ) {
             removed.push(lobby.id);
             delete lobbies[lobby.id];
           }
