@@ -10,6 +10,7 @@ import { CardModel } from "~/store/models/CardModel";
 
 // The game does not have a stack, but I want to add one.
 export const StackZoneArena: FC = () => {
+  return null;
   const store = useGameStore();
   const { turnPlayer, activePlayer } = useTurn();
 

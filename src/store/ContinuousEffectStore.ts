@@ -1,11 +1,11 @@
 import { makeAutoObservable, toJS } from "mobx";
-import { Dependencies } from "~/store/types";
 import type { MobXRootStore } from "~/store/RootStore";
 import type { ContinuousEffect } from "~/engine/effectTypes";
 import { ContinuousEffectModel } from "~/store/models/ContinuousEffectModel";
 import { CardModel } from "~/store/models/CardModel";
 import {
   loreEffectPredicate,
+  replacementEffectPredicate,
   strengthEffectPredicate,
 } from "~/engine/effectTypes";
 import { mapContinuousEffectToAbility } from "~/store/utils";
@@ -15,15 +15,23 @@ export class ContinuousEffectStore {
   continuousEffects: ContinuousEffectModel[];
 
   private readonly rootStore: MobXRootStore;
+  private readonly observable: boolean;
 
-  constructor(initialState: ContinuousEffect[], rootStore: MobXRootStore) {
-    makeAutoObservable<ContinuousEffectStore, "dependencies" | "rootStore">(
-      this,
-      {
-        rootStore: false,
-        dependencies: false,
-      }
-    );
+  constructor(
+    initialState: ContinuousEffect[],
+    rootStore: MobXRootStore,
+    observable: boolean
+  ) {
+    if (observable) {
+      makeAutoObservable<ContinuousEffectStore, "dependencies" | "rootStore">(
+        this,
+        {
+          rootStore: false,
+          dependencies: false,
+        }
+      );
+    }
+    this.observable = observable;
     this.rootStore = rootStore;
 
     this.continuousEffects = [];
@@ -32,19 +40,26 @@ export class ContinuousEffectStore {
 
   sync(effects: ContinuousEffect[] = []) {
     const rootStore = this.rootStore;
-    this.continuousEffects = effects.map(
-      (effect) => new ContinuousEffectModel(effect, rootStore)
-    );
+    this.continuousEffects = effects.map((effect) => {
+      const { id, source, target, duration } = effect;
+      return new ContinuousEffectModel(
+        id,
+        rootStore.cardStore.getCard(source),
+        target ? rootStore.cardStore.getCard(target) : undefined,
+        duration,
+        effect.effect,
+        rootStore,
+        this.observable
+      );
+    });
   }
 
   toJSON(): ContinuousEffect[] {
     return toJS(this.continuousEffects.map((effect) => effect.toJSON()));
   }
 
-  startContinuousEffect(effect: ContinuousEffect) {
-    this.continuousEffects.push(
-      new ContinuousEffectModel(effect, this.rootStore)
-    );
+  startContinuousEffect(effect: ContinuousEffectModel) {
+    this.continuousEffects.push(effect);
   }
 
   stopContinuousEffect(effect: ContinuousEffectModel) {
@@ -57,6 +72,14 @@ export class ContinuousEffectStore {
 
   findContinuousEffect(id: string): ContinuousEffectModel | undefined {
     return this.continuousEffects.find((effect) => effect.id === id);
+  }
+
+  onPlay(card: CardModel) {
+    this.continuousEffects
+      .filter((continuous) => {
+        return replacementEffectPredicate(continuous.effect);
+      })
+      .forEach((continuous) => continuous.cardPlayed(card));
   }
 
   findContinuousEffectsByCard(card: CardModel): ContinuousEffectModel[] {

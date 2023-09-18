@@ -21,21 +21,25 @@ export class TableStore {
     initialState: Record<string, TableModel>,
     dependencies: Dependencies,
     cardStore: CardStore,
-    rootStore: MobXRootStore
+    rootStore: MobXRootStore,
+    observable: boolean
   ) {
     this.dependencies = dependencies;
     this.tables = initialState;
     this.cardStore = cardStore;
     this.rootStore = rootStore;
 
-    makeAutoObservable(this, { rootStore: false, dependencies: false });
+    if (observable) {
+      makeAutoObservable(this, { rootStore: false, dependencies: false });
+    }
   }
 
   static fromTable(
     tables: Record<string, Table>,
     dependencies: Dependencies,
     cardStore: CardStore,
-    rootStore: MobXRootStore
+    rootStore: MobXRootStore,
+    observable: boolean
   ): TableStore {
     const tableModels: Record<string, TableModel> = {};
 
@@ -46,12 +50,19 @@ export class TableStore {
           table,
           playerId,
           cardStore,
-          rootStore
+          rootStore,
+          observable
         );
       }
     });
 
-    return new TableStore(tableModels, dependencies, cardStore, rootStore);
+    return new TableStore(
+      tableModels,
+      dependencies,
+      cardStore,
+      rootStore,
+      observable
+    );
   }
 
   sync(tables: Game["tables"]) {

@@ -14,9 +14,12 @@ export class ZoneModel {
     zone: Zones,
     cards: CardModel[],
     ownerId: string,
-    rootStore: MobXRootStore
+    rootStore: MobXRootStore,
+    observable: boolean
   ) {
-    makeAutoObservable<ZoneModel, "rootStore">(this);
+    if (observable) {
+      makeAutoObservable<ZoneModel, "rootStore">(this);
+    }
 
     this.zone = zone;
     this.cards = cards;

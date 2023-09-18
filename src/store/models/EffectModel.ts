@@ -2,10 +2,12 @@ import { makeAutoObservable } from "mobx";
 import type { MobXRootStore } from "~/store/RootStore";
 import { CardModel } from "~/store/models/CardModel";
 import { createId } from "@paralleldrive/cuid2";
-import type { ContinuousEffect, Effect } from "~/engine/effectTypes";
+import type { AttributeEffect, Effect } from "~/engine/effectTypes";
 import { exhaustiveCheck } from "~/libs/exhaustiveCheck";
-import { EffectTargets } from "~/engine/effectTypes";
+import { conditionEffectPredicate, EffectTargets } from "~/engine/effectTypes";
 import { ResolvingParam } from "~/store/StackLayerStore";
+import { ContinuousEffectModel } from "~/store/models/ContinuousEffectModel";
+import { TargetFilter } from "~/components/modals/target/filters";
 
 export type EffectOutput = {
   source: string;
@@ -15,17 +17,23 @@ export type EffectOutput = {
 export class EffectModel {
   effects: Effect[];
   source: CardModel;
-  private rootStore: MobXRootStore;
+  private readonly rootStore: MobXRootStore;
+  private readonly observable: boolean;
 
   constructor(
     effects: Effect | Effect[],
     source: CardModel,
-    rootStore: MobXRootStore
+    rootStore: MobXRootStore,
+    observable: boolean
   ) {
-    makeAutoObservable<EffectModel, "rootStore">(this, {
-      rootStore: false,
-    });
+    if (observable) {
+      makeAutoObservable<EffectModel, "rootStore" | "observable">(this, {
+        rootStore: false,
+        observable: false,
+      });
+    }
 
+    this.observable = observable;
     this.effects = Array.isArray(effects) ? effects : [effects];
     this.source = source;
     this.rootStore = rootStore;
@@ -104,8 +112,8 @@ export class EffectModel {
 
         return [];
       }
-      case "cardModel": {
-        return [targets.card];
+      case "instanceId": {
+        return [this.rootStore.cardStore.getCard(targets.instanceId)];
       }
       default: {
         return [];
@@ -114,234 +122,200 @@ export class EffectModel {
   }
 
   resolve(params: ResolvingParam = {}) {
-    this.effects.forEach((effect) => {
-      const cardTargets = this.resolveCardTargets(effect.target, params);
-      const turn = this.rootStore.turnCount;
-      switch (effect.type) {
-        case "restriction": {
-          cardTargets.forEach((target) => {
-            const continuousEffect: ContinuousEffect = {
-              type: "continuous",
-              id: createId(),
-              source: this.source.instanceId,
-              target: target.instanceId,
-              duration: { turn: effect.duration === "turn" ? turn : turn + 1 },
-              effect: effect,
-            };
+    this.effects.forEach((effect) => this.resolveEffect(effect, params));
+  }
 
-            this.rootStore.continuousEffectStore.startContinuousEffect(
-              continuousEffect
-            );
-          });
+  private resolveEffect(effect: Effect, params: ResolvingParam = {}) {
+    const cardTargets = this.resolveCardTargets(effect.target, params);
+    const turn = this.rootStore.turnCount;
 
-          break;
-        }
-        case "shuffle": {
-          cardTargets.forEach((target) => {
-            this.rootStore.cardStore.shuffleCardIntoDeck(
-              target.instanceId,
-              "discard"
-            );
-            this.rootStore.log({
-              type: "SHUFFLE_CARD",
-              instanceId: target.instanceId,
-            });
-          });
+    switch (effect.type) {
+      case "restriction": {
+        cardTargets.forEach((target) => {
+          this.rootStore.continuousEffectStore.startContinuousEffect(
+            new ContinuousEffectModel(
+              createId(),
+              this.source,
+              target,
+              { turn: effect.duration === "turn" ? turn : turn + 1 },
+              effect,
+              this.rootStore,
+              this.observable
+            )
+          );
+        });
 
-          break;
-        }
-        case "heal": {
-          const healAmount = effect.amount;
-          cardTargets.forEach((card) => {
-            this.rootStore.cardStore.updateCardDamage(
-              card.instanceId,
-              healAmount,
-              "remove"
-            );
-          });
+        break;
+      }
+      case "shuffle": {
+        console.log("shuffle not implemented");
+        cardTargets.forEach((target) => {
+          this.rootStore.cardStore.shuffleCardIntoDeck(
+            target.instanceId,
+            "discard"
+          );
+        });
+        break;
+      }
+      case "heal": {
+        const healAmount = effect.amount;
 
-          break;
-        }
-        case "damage": {
-          const damage = effect.amount;
-          cardTargets.forEach((card) => {
-            this.rootStore.cardStore.updateCardDamage(
-              card.instanceId,
-              damage,
-              "add"
-            );
-          });
+        cardTargets.forEach((card) => {
+          card.updateCardDamage(healAmount, "remove");
+        });
 
-          break;
+        break;
+      }
+      case "damage": {
+        const damage = effect.amount;
+
+        cardTargets.forEach((card) => {
+          card.updateCardDamage(damage, "add");
+        });
+
+        break;
+      }
+      case "draw": {
+        this.resolvePlayerTargets(effect.target).forEach((playerId) => {
+          this.rootStore.drawCard(playerId, effect.amount || 1);
+        });
+        break;
+      }
+      case "discard": {
+        console.log("discard not implemented");
+
+        break;
+      }
+      case "move": {
+        cardTargets.forEach((card) => {
+          card.moveTo(effect.to);
+        });
+        break;
+      }
+      case "exert": {
+        cardTargets.forEach((card) => {
+          card.updateCardMeta({ exerted: effect.exert });
+        });
+
+        break;
+      }
+      case "banish": {
+        cardTargets.forEach((card) => {
+          card.banish();
+        });
+        break;
+      }
+      case "scry": {
+        if (params.scry) {
+          const { top, hand, bottom } = params.scry;
+          this.rootStore.tableStore.scry(
+            top,
+            bottom,
+            hand,
+            effect.tutorFilters,
+            effect.limits
+          );
+        } else {
+          console.error("Invalid scry params");
         }
-        case "draw": {
-          this.resolvePlayerTargets(effect.target).forEach((playerId) => {
-            this.rootStore.drawCard(playerId, effect.amount || 1);
-          });
-          break;
-        }
-        case "move": {
-          cardTargets.forEach((card) => {
-            card.moveTo(effect.to);
-          });
-          break;
-        }
-        case "attribute": {
-          const amount = effect.amount || 0;
-          const attribute = effect.attribute;
-          cardTargets.forEach((target) => {
-            const continuousEffect: ContinuousEffect = {
-              type: "continuous",
-              id: createId(),
-              source: this.source.instanceId,
-              target: target.instanceId,
-              duration: { turn: turn },
-              effect: {
+        break;
+      }
+      case "ability": {
+        cardTargets.forEach((target) => {
+          this.rootStore.continuousEffectStore.startContinuousEffect(
+            new ContinuousEffectModel(
+              createId(),
+              this.source,
+              target,
+              { turn: effect.duration === "turn" ? turn : turn + 1 },
+              effect,
+              this.rootStore,
+              this.observable
+            )
+          );
+        });
+
+        break;
+      }
+      // Replacement effect has no targets, in this sense it means that it can be applied to any card that match the filter
+      case "replacement": {
+        this.rootStore.continuousEffectStore.startContinuousEffect(
+          new ContinuousEffectModel(
+            createId(),
+            this.source,
+            undefined,
+            // TODO: This might cause issues
+            // effect.filters,
+            { turn: turn, times: effect.duration === "next" ? 1 : 0 },
+            effect,
+            this.rootStore,
+            this.observable
+          )
+        );
+
+        break;
+      }
+      case "attribute": {
+        const amount = effect.amount || 0;
+        const attribute = effect.attribute;
+
+        cardTargets.forEach((target) => {
+          this.rootStore.continuousEffectStore.startContinuousEffect(
+            new ContinuousEffectModel(
+              createId(),
+              this.source,
+              target,
+              { turn: turn },
+              {
                 type: "attribute",
                 modifier: effect.modifier,
                 attribute,
                 amount,
                 duration: "turn",
                 target: {
-                  type: "cardModel",
-                  card: target,
+                  type: "instanceId",
+                  instanceId: target.instanceId,
                 },
-              },
-            };
-            this.rootStore.continuousEffectStore.startContinuousEffect(
-              continuousEffect
-            );
-          });
-
-          break;
-        }
-        case "exert": {
-          cardTargets.forEach((card) => {
-            card.updateCardMeta({ exerted: effect.exert });
-          });
-
-          break;
-        }
-        case "banish": {
-          cardTargets.forEach((card) => {
-            card.banish();
-          });
-          break;
-        }
-        case "scry": {
-          if (params.scry) {
-            const { top, hand, bottom } = params.scry;
-            this.rootStore.tableStore.scry(
-              top,
-              bottom,
-              hand,
-              effect.tutorFilters,
-              effect.limits
-            );
-          } else {
-            console.error("Invalid scry params");
-          }
-          break;
-        }
-        case "discard": {
-          console.log("discard not implemented");
-
-          break;
-        }
-        case "ability": {
-          cardTargets.forEach((target) => {
-            const continuousEffect: ContinuousEffect = {
-              type: "continuous",
-              id: createId(),
-              source: this.source.instanceId,
-              target: target.instanceId,
-              duration: { turn: effect.duration === "turn" ? turn : turn + 1 },
-              effect: effect,
-            };
-
-            this.rootStore.continuousEffectStore.startContinuousEffect(
-              continuousEffect
-            );
-          });
-
-          break;
-        }
-        case "replacement": {
-          const continuousEffect: ContinuousEffect = {
-            type: "continuous",
-            id: createId(),
-            source: this.source.instanceId,
-            filters: effect.filters,
-            duration: { turn: turn, times: effect.duration === "next" ? 1 : 0 },
-            effect: effect,
-          };
-
-          this.rootStore.continuousEffectStore.startContinuousEffect(
-            continuousEffect
+              } as AttributeEffect,
+              this.rootStore,
+              this.observable
+            )
           );
-          break;
-        }
-        case "conditional": {
-          cardTargets.forEach((target) => {
-            effect.effects.forEach((conditionalEffect) => {
-              const metConditions = target.isValidTarget(
-                conditionalEffect.target
-              );
+        });
 
-              // TODO: Fix this it only works for attribute
-              if (metConditions) {
-                const currentEffect = conditionalEffect.effect;
-                if (currentEffect.type === "attribute") {
-                  const continuousEffect: ContinuousEffect = {
-                    type: "continuous",
-                    id: createId(),
-                    source: this.source.instanceId,
-                    target: target.instanceId,
-                    duration: {
-                      turn: currentEffect.duration === "turn" ? turn : turn + 1,
-                    },
-                    effect: currentEffect,
-                  };
-
-                  this.rootStore.continuousEffectStore.startContinuousEffect(
-                    continuousEffect
-                  );
-                  // TODO: fix this
-                } else if (currentEffect.type === "banish") {
-                  target.banish();
-                }
-              } else if (effect.fallback) {
-                // TODO: This is worng
-                const currentEffect = effect.fallback[0];
-
-                // TODO: THIS IS WRONG
-                if (currentEffect?.type === "attribute") {
-                  const continuousEffect: ContinuousEffect = {
-                    type: "continuous",
-                    id: createId(),
-                    source: this.source.instanceId,
-                    target: target.instanceId,
-                    duration: {
-                      turn: currentEffect.duration === "turn" ? turn : turn + 1,
-                    },
-                    effect: currentEffect,
-                  };
-
-                  this.rootStore.continuousEffectStore.startContinuousEffect(
-                    continuousEffect
-                  );
-                } else if (currentEffect?.type === "exert") {
-                  target.updateCardMeta({ exerted: currentEffect.exert });
-                }
-              }
-            });
-          });
-          break;
-        }
-        default: {
-          exhaustiveCheck(effect);
-        }
+        break;
       }
-    });
+      // TODO: This is not well implemented, everythign about it was done in a rush. We need to re do it
+      case "conditional": {
+        const target = params.targetId
+          ? this.rootStore.cardStore.getCard(params.targetId)
+          : undefined;
+
+        if (target && conditionEffectPredicate(effect)) {
+          effect.effects.forEach((conditionalEffect) => {
+            const effectTarget = conditionalEffect.target || {};
+            const filters: TargetFilter[] =
+              "filters" in effectTarget
+                ? (effectTarget.filters as TargetFilter[])
+                : [];
+            const metConditions = target.isValidTarget(filters);
+
+            if (metConditions) {
+              this.resolveEffect(conditionalEffect, params);
+            }
+
+            if (!metConditions && effect.fallback) {
+              effect.fallback.forEach((fallbackEffect) => {
+                this.resolveEffect(fallbackEffect, params);
+              });
+            }
+          });
+        }
+        break;
+      }
+      default: {
+        exhaustiveCheck(effect);
+      }
+    }
   }
 }

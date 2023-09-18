@@ -36,6 +36,8 @@ export type Ability =
       name?: string;
     };
 
+// An ability is a property of an object that influences the game by generating
+// effects or by creating a layer on the stack that resolves and generates effects
 export interface BaseAbility {
   // Following https://storage.googleapis.com/fabmaster/media/documents/FaB_Comprehensive_Rules_v2.1.0_access.pdf
   // as lorcana doesn't have a rules document
@@ -45,23 +47,22 @@ export interface BaseAbility {
   // When undefined, we take name/text from card
   text?: string;
   name?: string;
+  costs?: Cost[];
 }
 
 export interface ResolutionAbility extends BaseAbility {
   type: "resolution";
   name?: string;
   effects: Effect[];
-  targets?: EffectTargets;
+  // targets?: EffectTargets;
   optional?: boolean;
+  costs?: Cost[];
 }
 
 export interface ActivatedAbility extends BaseAbility {
   type: "activated";
-  name: string;
   effects: Effect[];
-  targets?: EffectTargets;
   conditions?: Condition[];
-  costs?: Cost[];
   optional?: boolean;
 }
 
@@ -71,14 +72,18 @@ export interface StaticAbility extends BaseAbility {
   effect?: never;
 }
 
-export type Trigger = "quest" | "play" | "banish";
+export type OnTrigger = "quest" | "play" | "banish";
+export type Trigger = {
+  on: OnTrigger;
+  target: EffectTargets;
+};
 
 export interface StaticTriggeredAbility extends BaseAbility {
   type: "static-triggered";
   trigger: Trigger;
-  effects: Effect[];
-  targets: EffectTargets;
   optional?: boolean;
+  effects?: never;
+  layer: ResolutionAbility;
 }
 
 export interface SingerAbility extends StaticAbility {
@@ -166,12 +171,12 @@ export const bodyguardAbility: BodyGuardAbility = {
 
 export const whenPlayAndWheneverQuests = (params: {
   effects: Effect[];
-  targets: EffectTargets;
+  target?: EffectTargets;
   name?: string;
   text?: string;
   optional?: boolean;
 }): Ability[] => {
-  const { optional, effects, targets, name, text } = params;
+  const { optional, effects, target, name, text } = params;
   return [
     {
       type: "resolution",
@@ -179,30 +184,35 @@ export const whenPlayAndWheneverQuests = (params: {
       name,
       text,
       effects,
-      targets,
-    },
+    } as ResolutionAbility,
     {
       type: "static-triggered",
-      trigger: "quest",
-      optional,
-      name,
-      text,
-      effects,
-      targets,
-    },
+      trigger: {
+        on: "quest",
+      },
+      layer: {
+        type: "resolution",
+        optional,
+        name,
+        text,
+        effects,
+      } as ResolutionAbility,
+    } as StaticTriggeredAbility,
   ];
 };
 
-export const readyAndCantQuest = () => {
+export const readyAndCantQuest = (target?: EffectTargets) => {
   return [
     {
       type: "exert",
       exert: false,
+      target,
     } as ExertEffect,
     {
       type: "restriction",
       restriction: "quest",
       duration: "turn",
+      target,
     } as RestrictionEffect,
   ];
 };

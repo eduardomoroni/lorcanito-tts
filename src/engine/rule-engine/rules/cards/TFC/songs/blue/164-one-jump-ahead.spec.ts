@@ -24,7 +24,7 @@ describe("One Jump Ahead", () => {
     if (effect) {
       const target = testStore.getByZoneAndId("hand", dingleHopper.id);
 
-      store.stackLayerStore.resolveAbility(effect.id, {
+      store.stackLayerStore.resolveLayer(effect.id, {
         targetId: target.instanceId,
       });
     }

@@ -57,7 +57,7 @@ describe("Tamatoa - So Shiny!", () => {
       expect(aTarget.zone).toBe("discard");
 
       cardUnderTest.playFromHand();
-      testStore.resolveTopOfStack({ targetId: undefined });
+      testStore.resolveTopOfStack({ skip: true });
       expect(aTarget.zone).toBe("discard");
       expect(testStore.store.stackLayerStore.layers).toHaveLength(0);
     });

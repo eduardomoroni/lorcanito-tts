@@ -7,7 +7,7 @@ import { sebastianCourtComposer } from "~/engine/cards/TFC";
 import { friendsOnTheOtherSide } from "~/engine/cards/TFC/songs";
 
 describe("Singer keywords", () => {
-  it.only("sings a song cheaper", () => {
+  it("sings a song cheaper", () => {
     const testStore = new TestStore({
       deck: [TestStore.aCard, TestStore.aCard],
       play: [sebastianCourtComposer],

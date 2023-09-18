@@ -8,7 +8,6 @@ import { CardModel } from "~/store/models/CardModel";
 import { useYesOrNoModal } from "~/providers/YesOrNoModalProvider";
 import { useScryModal } from "~/providers/ScryModalProvider";
 import { scryEffectPredicate } from "~/engine/effectTypes";
-import { toJS } from "mobx";
 import { staticTriggeredAbilityPredicate } from "~/engine/abilities";
 
 // The game does not have a stack, but I want to add one.
@@ -41,15 +40,12 @@ export const EffectStackZoneArena: FC = () => {
 
     const title = ability.name || topOfStack.source.fullName;
     const subtitle = ability.text || topOfStack.source.lorcanitoCard.text || "";
-    const filters =
-      ability.targets?.type === "card" ? ability.targets.filters : [];
+    const filters = topOfStack.effectCardFilters();
 
     // Musketeer tabard, coconut
     const musk = ability.optional;
     // Ursula's cauldron
-    const scryEffect = ability?.effects.find(scryEffectPredicate);
-
-    console.log(toJS(ability));
+    const scryEffect = ability?.effects?.find(scryEffectPredicate);
 
     if (scryEffect) {
       // TODO: THIS IS NOT IDEAL, it breaks encapsulation
@@ -63,8 +59,9 @@ export const EffectStackZoneArena: FC = () => {
         text: subtitle,
         onYes: () => {
           // musketeer tabard
-          if (ability?.effects.filter((e) => e.type === "draw")) {
+          if (ability?.effects?.filter((e) => e.type === "draw")) {
             topOfStack.resolve({ player: "self" });
+            return;
           }
 
           // THERE ARE EFFECTS THAT TARGET ALL CARDS: jasmine for instance

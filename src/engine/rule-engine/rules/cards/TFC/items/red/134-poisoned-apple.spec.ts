@@ -11,6 +11,7 @@ describe("Poisoned Apple", () => {
   describe("**TAKE A BITE . . . ** 1 ⬡, Banish this item − Exert chosen character. If a Princess character is chosen, banish her instead.", () => {
     it("Princess", () => {
       const testStore = new TestStore({
+        inkwell: 1,
         play: [poisonedApple, jasmineQueenOfAgrabah],
       });
 
@@ -26,6 +27,7 @@ describe("Poisoned Apple", () => {
 
     it("Non-Princess", () => {
       const testStore = new TestStore({
+        inkwell: 1,
         play: [poisonedApple, heiheiBoatSnack],
       });
 

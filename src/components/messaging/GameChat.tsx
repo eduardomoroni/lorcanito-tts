@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Channel,
   Chat,
@@ -21,13 +22,14 @@ const CustomHeader = () => {
   );
 };
 
-const GameChat = ({
+const GameChat: React.FC<{ isLogEnabled?: boolean }> = ({
   theme = "str-chat__theme-dark",
   isLogEnabled = true,
 }: {
   theme?: "str-chat__theme-dark" | "str-chat__theme-light";
   isLogEnabled?: boolean;
 }) => {
+  // return null;
   const { client, channel, isEnabled } = useStreamChat();
 
   if (!client || !channel) {

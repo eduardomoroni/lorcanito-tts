@@ -14,8 +14,10 @@ export class CardMetaModel implements MetaModel {
   shifted?: string | null = undefined;
   revealed?: boolean | null = undefined;
 
-  constructor(meta: Meta | undefined | null) {
-    makeAutoObservable(this);
+  constructor(meta: Meta | undefined | null, observable: boolean) {
+    if (observable) {
+      makeAutoObservable(this);
+    }
 
     this.sync(meta);
   }

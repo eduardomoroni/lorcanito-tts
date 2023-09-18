@@ -33,15 +33,18 @@ export class CardModel {
     cardId: string,
     meta: Meta | null | undefined,
     ownerId: string,
-    rootStore: MobXRootStore
+    rootStore: MobXRootStore,
+    observable: boolean
   ) {
-    makeAutoObservable<CardModel, "rootStore">(this, {
-      rootStore: false,
-    });
+    if (observable) {
+      makeAutoObservable<CardModel, "rootStore">(this, {
+        rootStore: false,
+      });
+    }
 
     this.instanceId = instanceId;
     this.cardId = cardId;
-    this.meta = new CardMetaModel(meta);
+    this.meta = new CardMetaModel(meta, observable);
     this.ownerId = ownerId;
 
     this.rootStore = rootStore;
@@ -95,14 +98,12 @@ export class CardModel {
   }
 
   isValidTarget(filters: TargetFilter[], expectedOwner: string = "") {
-    return (
-      this.rootStore.cardStore
-        // TODO: Revisit this expected owner
-        .getCardsByFilter(filters, expectedOwner || this.ownerId)
-        .find((card) => {
-          return card.instanceId === this.instanceId;
-        })
-    );
+    return !!this.rootStore.cardStore
+      // TODO: Revisit this expected owner
+      .getCardsByFilter(filters, expectedOwner || this.ownerId)
+      .find((card) => {
+        return card.instanceId === this.instanceId;
+      });
   }
 
   get zone(): Zones {
@@ -135,11 +136,9 @@ export class CardModel {
   get cost(): number {
     const costReduction =
       this.rootStore.continuousEffectStore.continuousEffects.filter(
-        (continuous) =>
-          continuous.effect.type === "replacement" &&
-          continuous.effect.replacement === "cost" &&
-          this.isValidTarget(continuous.filters || [])
+        (continuous) => continuous.isCostReplacementEffect(this)
       ).length;
+
     return (this.lorcanitoCard?.cost || 0) - costReduction;
   }
 
@@ -294,40 +293,7 @@ export class CardModel {
       this.updateCardMeta({ exerted: true });
     }
 
-    const supportAbility = card?.abilities?.find(supportAbilityPredicate);
-    if (supportAbility) {
-      // I think this should be called effect, not ability
-      const supportEffect: ResolutionAbility = {
-        type: "resolution",
-        name: "Support",
-        text: supportAbility.text,
-        effects: [
-          {
-            type: "attribute",
-            attribute: "strength",
-            amount: this.strength,
-            modifier: "add",
-            duration: "turn",
-            target: {
-              type: "cardModel",
-              // TODO: This is wrong
-              card: this,
-            },
-          },
-        ],
-        targets: {
-          type: "card",
-          value: 1,
-          filters: [
-            { filter: "zone", value: "play" },
-            { filter: "type", value: "character" },
-          ],
-        },
-        optional: true,
-      };
-      this.rootStore.stackLayerStore.addAbilityToStack(supportEffect, this);
-    }
-
+    this.rootStore.stackLayerStore.onQuest(this);
     this.rootStore.staticTriggeredStore.onQuest(this);
   }
 
@@ -358,7 +324,12 @@ export class CardModel {
   private play(params?: { bodyguard?: boolean }) {
     const lorcanitoCard = this.lorcanitoCard;
 
-    if (!lorcanitoCard?.characteristics?.includes("action")) {
+    if (
+      lorcanitoCard?.implemented &&
+      lorcanitoCard?.characteristics?.includes("action")
+    ) {
+      this.moveTo("discard");
+    } else {
       this.moveTo("play");
     }
 
@@ -368,24 +339,9 @@ export class CardModel {
       });
     }
 
-    const resolutionAbilities = this.resolutionAbilities;
-
-    resolutionAbilities?.forEach((ability) => {
-      if (resolutionAbilityPredicate(ability)) {
-        this.rootStore.stackLayerStore.addAbilityToStack(ability, this);
-      } else {
-        console.error("Ability not found", ability);
-      }
-    });
-
-    if (
-      lorcanitoCard?.implemented &&
-      lorcanitoCard?.characteristics?.includes("action")
-    ) {
-      this.moveTo("discard");
-    }
-
+    this.rootStore.stackLayerStore.onPlay(this);
     this.rootStore.staticTriggeredStore.onPlay(this);
+    this.rootStore.continuousEffectStore.onPlay(this);
   }
 
   playFromHand(params?: { bodyguard?: boolean }) {
@@ -443,7 +399,7 @@ export class CardModel {
       return false;
     }
 
-    return this.lorcanitoCard.cost >= song?.lorcanitoCard.cost;
+    return this.cost >= song?.cost;
   }
 
   sing(song?: CardModel) {
@@ -533,11 +489,10 @@ export class CardModel {
   activate(abilityName?: string) {
     // Todo: solve this
     const ability = this.getAbility(abilityName) as ActivatedAbility;
-
     const payed = this.payCosts(ability.costs);
 
     if (payed) {
-      this.rootStore.stackLayerStore.addAbilityToStack(ability, this);
+      this.rootStore.stackLayerStore.onActivateAbility(this, ability);
     } else {
       this.rootStore.sendNotification({
         type: "icon",

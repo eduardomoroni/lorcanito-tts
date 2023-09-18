@@ -13,7 +13,7 @@ import {
   musketeerTabard,
   plasmaBlaster,
   poisonedApple,
-  scepterOfArendel,
+  scepterOfArendelle,
   shieldOfVirtue,
   stolenScimitar,
   swordOfTruth,
@@ -316,13 +316,13 @@ export const magicBroomBucketBrigade: LorcanitoCharacterCard = {
       effects: [
         {
           type: "shuffle",
+          target: {
+            type: "card",
+            value: 1,
+            filters: [{ filter: "zone", value: "discard" }],
+          },
         },
       ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [{ filter: "zone", value: "discard" }],
-      },
     } as ResolutionAbility,
   ],
   flavour:
@@ -729,17 +729,17 @@ export const johnSilverAlienPirate: LorcanitoCharacterCard = {
         ability: "reckless",
         modifier: "add",
         duration: "next_turn",
+        target: {
+          type: "card",
+          value: 1,
+          filters: [
+            { filter: "zone", value: "play" },
+            { filter: "owner", value: "opponent" },
+            { filter: "type", value: "character" },
+          ],
+        },
       } as AbilityEffect,
     ],
-    targets: {
-      type: "card",
-      value: 1,
-      filters: [
-        { filter: "zone", value: "play" },
-        { filter: "owner", value: "opponent" },
-        { filter: "type", value: "character" },
-      ],
-    },
   }),
   flavour: "“Don't be too put off by this . . . hunk of hardware.”",
   inkwell: true,
@@ -775,6 +775,7 @@ export const jasmineQueenOfAgrabah: LorcanitoCharacterCard = {
     ...whenPlayAndWheneverQuests({
       name: "Caretaker",
       text: "When you play this character and whenever she quests, you may remove up to 2 damage from each of your characters.",
+      optional: true,
       effects: [
         {
           type: "heal",
@@ -790,15 +791,6 @@ export const jasmineQueenOfAgrabah: LorcanitoCharacterCard = {
           },
         } as HealEffect,
       ],
-      targets: {
-        type: "card",
-        value: "all",
-        filters: [
-          { filter: "zone", value: "play" },
-          { filter: "owner", value: "self" },
-          { filter: "type", value: "character" },
-        ],
-      },
     }),
   ],
   inkwell: true,
@@ -836,17 +828,17 @@ export const tamatoaSoShiny: LorcanitoCharacterCard = {
         {
           type: "move",
           to: "hand",
+          target: {
+            type: "card",
+            value: 1,
+            filters: [
+              { filter: "type", value: "item" },
+              { filter: "owner", value: "self" },
+              { filter: "zone", value: "discard" },
+            ],
+          },
         } as MoveCardEffect,
       ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "type", value: "item" },
-          { filter: "owner", value: "self" },
-          { filter: "zone", value: "discard" },
-        ],
-      },
     }),
   ],
   flavour: "“Watch me dazzle like a diamond in the rough!”",
@@ -3726,7 +3718,7 @@ export const allTFCCards: LorcanitoCard[] = [
   eyeOfTheFate,
   fishboneQuill,
   magicGoldenFlower,
-  scepterOfArendel,
+  scepterOfArendelle,
   {
     implemented: true,
     id: "895b6866d01b794a64b3284ec8f809b829e6076a",

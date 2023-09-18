@@ -1,5 +1,5 @@
 import { Dependencies } from "~/store/types";
-import { Meta, TableCard, Zones } from "~/providers/TabletopProvider";
+import { Meta, Zones } from "~/providers/TabletopProvider";
 import { type MobXRootStore } from "~/store/RootStore";
 import { Game } from "~/libs/game";
 import { makeAutoObservable, toJS } from "mobx";
@@ -19,7 +19,8 @@ export class CardStore {
   constructor(
     initialState: Game["cards"] = {},
     dependencies: Dependencies,
-    rootStore: MobXRootStore
+    rootStore: MobXRootStore,
+    observable: boolean
   ) {
     this.rootStore = rootStore;
     this.dependencies = dependencies;
@@ -35,12 +36,15 @@ export class CardStore {
           card.meta,
           card.ownerId,
           // I'm not sure if this is a good idea
-          this.rootStore
+          this.rootStore,
+          observable
         );
       }
     });
 
-    makeAutoObservable(this, { rootStore: false, dependencies: false });
+    if (observable) {
+      makeAutoObservable(this, { rootStore: false, dependencies: false });
+    }
   }
 
   // TODO: should we sync each individual card?
@@ -308,7 +312,10 @@ export class CardStore {
     this.rootStore.tableStore.moveCard(instanceId, from, "deck", "last");
     this.rootStore.tableStore.shuffleDeck(card.ownerId);
 
-    // logger.log({ type: "SHUFFLE_CARD_INTO_DECK" });
-    // logAnalyticsEvent("shuffle_deck");
+    // this.rootStore.log({ type: "SHUFFLE_CARD_INTO_DECK" });
+    this.rootStore.log({
+      type: "SHUFFLE_CARD",
+      instanceId: instanceId,
+    });
   }
 }

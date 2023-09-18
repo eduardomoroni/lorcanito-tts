@@ -1,6 +1,7 @@
 import type { LorcanitoItemCard } from "~/engine/cardTypes";
 import type {
   ActivatedAbility,
+  ResolutionAbility,
   StaticTriggeredAbility,
 } from "~/engine/abilities";
 import type {
@@ -18,7 +19,8 @@ import type {
   ReplacementEffect,
   RestrictionEffect,
 } from "~/engine/effectTypes";
-import { readyAndCantQuest } from "~/engine/abilities";
+import { readyAndCantQuest, Trigger } from "~/engine/abilities";
+import { Effect } from "~/engine/effectTypes";
 
 export const dingleHopper: LorcanitoItemCard = {
   implemented: true,
@@ -34,23 +36,23 @@ export const dingleHopper: LorcanitoItemCard = {
       type: "activated",
       name: "Straighten Hair",
       text: "↷ - Remove up to 1 damage from chosen character.",
+      optional: false,
+      costs: [{ type: "exert" }],
       effects: [
         {
           type: "heal",
           amount: 1,
+          target: {
+            type: "card",
+            value: 1,
+            filters: [
+              { filter: "owner", value: "self" },
+              { filter: "type", value: "character" },
+              { filter: "zone", value: "play" },
+            ],
+          },
         },
       ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "owner", value: "self" },
-          { filter: "type", value: "character" },
-          { filter: "zone", value: "play" },
-        ],
-      },
-      optional: false,
-      costs: [{ type: "exert" }],
     } as ActivatedAbility,
   ],
   flavour: "Enjoy the finest of human hairstyles.",
@@ -77,6 +79,8 @@ export const lantern: LorcanitoItemCard = {
       type: "activated",
       name: "Birthday Lights",
       text: "↷ - You pay 1 ⬡ less for the next character you play this turn.",
+      optional: false,
+      costs: [{ type: "exert" }],
       effects: [
         {
           type: "replacement",
@@ -86,8 +90,6 @@ export const lantern: LorcanitoItemCard = {
           filters: [{ filter: "type", value: "character" }],
         } as ReplacementEffect,
       ],
-      optional: false,
-      costs: [{ type: "exert" }],
     } as ActivatedAbility,
   ],
   flavour:
@@ -112,30 +114,35 @@ export const ursulaShellNecklace: LorcanitoItemCard = {
   abilities: [
     {
       type: "static-triggered",
-      name: "Now, Sing!",
-      text: "Whenever you play a song, you may pay 1 **⬡** to draw a card.",
-      trigger: "play",
-      optional: true,
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "type", value: "action" },
-          { filter: "characteristics", value: ["song"] },
-          { filter: "owner", value: "self" },
+      optional: false,
+      trigger: {
+        on: "play",
+        target: {
+          type: "card",
+          value: 1,
+          filters: [
+            { filter: "type", value: "action" },
+            { filter: "characteristics", value: ["song"] },
+            { filter: "owner", value: "self" },
+          ],
+        },
+      },
+      layer: {
+        type: "resolution",
+        optional: true,
+        costs: [{ type: "ink", amount: 1 }],
+        effects: [
+          {
+            type: "draw",
+            amount: 1,
+            target: {
+              type: "player",
+              value: "self",
+            },
+          } as DrawEffect,
         ],
       },
-      effects: [
-        {
-          type: "draw",
-          amount: 1,
-          target: {
-            type: "player",
-            value: "self",
-          },
-        } as DrawEffect,
-      ],
-    },
+    } as StaticTriggeredAbility,
   ],
   flavour:
     "“Singing is a lovely pastime . . . if you've got the voice for it.” −Ursula",
@@ -159,7 +166,9 @@ export const magicMirror: LorcanitoItemCard = {
   abilities: [
     {
       type: "activated",
+      costs: [{ type: "exert" }, { type: "ink", amount: 4 }],
       name: "Speak",
+      text: "↷, 4 ⬡ - Draw a card.",
       effects: [
         {
           type: "draw",
@@ -170,9 +179,6 @@ export const magicMirror: LorcanitoItemCard = {
           } as EffectTargets,
         },
       ],
-      optional: false,
-      costs: [{ type: "exert" }, { type: "ink", amount: 4 }],
-      text: "↷, 4 ⬡ - Draw a card.",
     } as ActivatedAbility,
   ],
   flavour: '"What wouldst thou know, my Queen?"',
@@ -207,14 +213,11 @@ export const ursulaCaldron: LorcanitoItemCard = {
             top: 1,
             bottom: 1,
           },
+          target: {
+            autoResolve: false,
+          },
         } as ScryEffect,
       ],
-      targets: {
-        type: "player",
-        value: "self",
-      },
-      optional: false,
-      costs: [{ type: "exert" }],
     } as ActivatedAbility,
   ],
   flavour: "Perfect for mixing potions and stealing voices.",
@@ -247,17 +250,16 @@ export const whiteRabbitPocketWatch: LorcanitoItemCard = {
           ability: "rush",
           modifier: "add",
           duration: "turn",
+          target: {
+            type: "card",
+            value: 1,
+            filters: [
+              { filter: "zone", value: "play" },
+              { filter: "type", value: "character" },
+            ],
+          },
         } as AbilityEffect,
       ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "zone", value: "play" },
-          { filter: "type", value: "character" },
-        ],
-      },
-      optional: false,
     } as ActivatedAbility,
   ],
   flavour:
@@ -285,6 +287,7 @@ export const drFacilierCards: LorcanitoItemCard = {
       type: "activated",
       name: "The Cards Will Tell",
       text: "You pay 1 ⬡ less for the next action you play this turn.",
+      costs: [{ type: "exert" }],
       effects: [
         {
           type: "replacement",
@@ -294,8 +297,6 @@ export const drFacilierCards: LorcanitoItemCard = {
           filters: [{ filter: "type", value: "action" }],
         } as ReplacementEffect,
       ],
-      optional: false,
-      costs: [{ type: "exert" }],
     } as ActivatedAbility,
   ],
   flavour: "“Take a little trip into your future with me!” \n−Dr. Facilier",
@@ -325,25 +326,28 @@ export const stolenScimitar: LorcanitoItemCard = {
       effects: [
         {
           type: "conditional",
+          autoResolve: false,
+          // move condition to a separate object, so the filter is the same
           effects: [
             {
-              target: [
-                { filter: "type", value: "character" },
-                { filter: "zone", value: "play" },
-                {
-                  filter: "attribute",
-                  value: "name",
-                  comparison: { operator: "eq", value: "aladdin" },
-                },
-              ],
-              effect: {
-                type: "attribute",
-                attribute: "strength",
-                amount: 2,
-                modifier: "add",
-                duration: "turn",
-              } as AttributeEffect,
-            },
+              type: "attribute",
+              attribute: "strength",
+              amount: 2,
+              modifier: "add",
+              duration: "turn",
+              target: {
+                type: "card",
+                filters: [
+                  { filter: "type", value: "character" },
+                  { filter: "zone", value: "play" },
+                  {
+                    filter: "attribute",
+                    value: "name",
+                    comparison: { operator: "eq", value: "aladdin" },
+                  },
+                ],
+              },
+            } as AttributeEffect,
           ],
           fallback: [
             {
@@ -352,19 +356,17 @@ export const stolenScimitar: LorcanitoItemCard = {
               amount: 1,
               modifier: "add",
               duration: "turn",
+              target: {
+                type: "card",
+                filters: [
+                  { filter: "type", value: "character" },
+                  { filter: "zone", value: "play" },
+                ],
+              },
             } as AttributeEffect,
           ],
         } as ConditionalEffect,
       ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "type", value: "character" },
-          { filter: "zone", value: "play" },
-        ],
-      },
-      optional: false,
     } as ActivatedAbility,
   ],
   flavour: "Sometimes you've got to take what you can get.",
@@ -391,39 +393,43 @@ export const poisonedApple: LorcanitoItemCard = {
       type: "activated",
       name: "Poisoned Apple",
       text: "Banish this item − Exert chosen character. If a Princess character is chosen, banish her instead.",
-      costs: [{ type: "banish", target: "self" }],
+      costs: [
+        { type: "banish", target: "self" },
+        { type: "ink", amount: 1 },
+      ],
       effects: [
         {
           type: "conditional",
+          autoResolve: false,
           effects: [
             {
-              effect: {
-                type: "banish",
-              } as BanishEffect,
-              target: [
-                { filter: "characteristics", value: ["princess"] },
-                { filter: "type", value: "character" },
-                { filter: "zone", value: "play" },
-              ],
+              type: "banish",
+              target: {
+                type: "card",
+                filters: [
+                  { filter: "characteristics", value: ["princess"] },
+                  { filter: "type", value: "character" },
+                  { filter: "zone", value: "play" },
+                ],
+              },
             },
           ],
           fallback: [
             {
               type: "exert",
               exert: true,
+              target: {
+                type: "card",
+                value: 1,
+                filters: [
+                  { filter: "type", value: "character" },
+                  { filter: "zone", value: "play" },
+                ],
+              },
             } as ExertEffect,
           ],
         } as ConditionalEffect,
       ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "type", value: "character" },
-          { filter: "zone", value: "play" },
-        ],
-      },
-      optional: false,
     } as ActivatedAbility,
   ],
   flavour:
@@ -450,17 +456,15 @@ export const shieldOfVirtue: LorcanitoItemCard = {
       type: "activated",
       name: "Fireproof",
       text: "Ready chosen character. They can't quest for the rest of this turn.",
-      optional: false,
       costs: [{ type: "exert" }, { type: "ink", amount: 3 }],
-      effects: readyAndCantQuest(),
-      targets: {
+      effects: readyAndCantQuest({
         type: "card",
         value: 1,
         filters: [
           { filter: "type", value: "character" },
           { filter: "zone", value: "play" },
         ],
-      },
+      }),
     } as ActivatedAbility,
   ],
   flavour:
@@ -492,18 +496,17 @@ export const swordOfTruth: LorcanitoItemCard = {
       effects: [
         {
           type: "banish",
+          target: {
+            type: "card",
+            value: 1,
+            filters: [
+              { filter: "type", value: "character" },
+              { filter: "characteristics", value: ["villain"] },
+              { filter: "zone", value: "play" },
+            ],
+          },
         },
       ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "type", value: "character" },
-          { filter: "characteristics", value: ["villain"] },
-          { filter: "zone", value: "play" },
-        ],
-      },
-      optional: false,
     } as ActivatedAbility,
   ],
   flavour: "Almost as powerful as True Love's Kiss.",
@@ -527,35 +530,38 @@ export const coconutbasket: LorcanitoItemCard = {
   abilities: [
     {
       type: "static-triggered",
+      optional: true,
       name: "Consider the Coconut",
       text: "Whenever you play a character, you may remove up to 2 damage from chosen character.",
-      trigger: "play",
-      optional: true,
-      effects: [
-        {
-          type: "heal",
-          amount: 2,
-          // TODO: Revisit this, this target is not being used
-          // target: {
-          //   type: "card",
-          //   value: 1,
-          //   filters: [
-          //     { filter: "zone", value: "play" },
-          //     { filter: "type", value: "character" },
-          //   ],
-          // },
-        } as HealEffect,
-      ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "owner", value: "self" },
-          { filter: "type", value: "character" },
-          { filter: "zone", value: "play" },
+      trigger: {
+        on: "play",
+        target: {
+          type: "card",
+          filters: [
+            { filter: "owner", value: "self" },
+            { filter: "type", value: "character" },
+            { filter: "zone", value: "play" },
+          ],
+        },
+      } as Trigger,
+      layer: {
+        type: "resolution",
+        effects: [
+          {
+            type: "heal",
+            amount: 2,
+            target: {
+              type: "card",
+              value: 1,
+              filters: [
+                { filter: "zone", value: "play" },
+                { filter: "type", value: "character" },
+              ],
+            },
+          } as HealEffect,
         ],
-      },
-    },
+      } as ResolutionAbility,
+    } as StaticTriggeredAbility,
   ],
   flavour:
     "The coconut is a versatile gift from the gods, used to make nearly everything - including baskets to carry more coconuts.",
@@ -582,7 +588,6 @@ export const eyeOfTheFate: LorcanitoItemCard = {
       type: "activated",
       name: "See the Future",
       text: "Chosen character gets +1 ◆ this turn.",
-      optional: false,
       costs: [{ type: "exert" }],
       effects: [
         {
@@ -591,16 +596,16 @@ export const eyeOfTheFate: LorcanitoItemCard = {
           amount: 1,
           modifier: "add",
           duration: "turn",
+          target: {
+            type: "card",
+            value: 1,
+            filters: [
+              { filter: "type", value: "character" },
+              { filter: "zone", value: "play" },
+            ],
+          },
         } as AttributeEffect,
       ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "type", value: "character" },
-          { filter: "zone", value: "play" },
-        ],
-      },
     } as ActivatedAbility,
   ],
   flavour: "You can change the future once you know what you're looking at.",
@@ -625,26 +630,24 @@ export const fishboneQuill: LorcanitoItemCard = {
   type: "item",
   abilities: [
     {
-      // This is same as One Jump Ahead
       type: "activated",
       name: "Go Ahead And Sign",
-      text: "↷ − Put any card from your hand into your inkwell facedown.",
+      text: "Put any card from your hand into your inkwell facedown.",
+      costs: [{ type: "exert" }],
       effects: [
         {
           type: "move",
           to: "inkwell",
+          target: {
+            type: "card",
+            value: 1,
+            filters: [
+              { filter: "owner", value: "self" },
+              { filter: "zone", value: "hand" },
+            ],
+          },
         },
       ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "owner", value: "self" },
-          { filter: "zone", value: "hand" },
-        ],
-      },
-      optional: false,
-      costs: [{ type: "exert" }],
     } as ActivatedAbility,
   ],
   flavour:
@@ -672,23 +675,22 @@ export const magicGoldenFlower: LorcanitoItemCard = {
       type: "activated",
       name: "Healing Pollen",
       text: "Banish this item - Remove up to 3 damage from chosen character.",
+      costs: [{ type: "banish", target: "self" }],
       effects: [
         {
           type: "heal",
           amount: 3,
+          target: {
+            type: "card",
+            value: 1,
+            filters: [
+              { filter: "owner", value: "self" },
+              { filter: "type", value: "character" },
+              { filter: "zone", value: "play" },
+            ],
+          },
         },
       ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "owner", value: "self" },
-          { filter: "type", value: "character" },
-          { filter: "zone", value: "play" },
-        ],
-      },
-      optional: false,
-      costs: [{ type: "banish", target: "self" }],
     } as ActivatedAbility,
   ],
   flavour:
@@ -702,7 +704,7 @@ export const magicGoldenFlower: LorcanitoItemCard = {
   set: "TFC",
   rarity: "common",
 };
-export const scepterOfArendel: LorcanitoItemCard = {
+export const scepterOfArendelle: LorcanitoItemCard = {
   implemented: true,
   id: "a11f384d67f1a51bc742dd7ce95276ba603f19bf",
   url: "https://static.lorcanito.com/images/cards/TFC/170.webp",
@@ -723,17 +725,16 @@ export const scepterOfArendel: LorcanitoItemCard = {
           ability: "support",
           modifier: "add",
           duration: "turn",
+          target: {
+            type: "card",
+            value: 1,
+            filters: [
+              { filter: "zone", value: "play" },
+              { filter: "type", value: "character" },
+            ],
+          },
         } as AbilityEffect,
       ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "zone", value: "play" },
-          { filter: "type", value: "character" },
-        ],
-      },
-      optional: false,
     } as ActivatedAbility,
   ],
   inkwell: true,
@@ -758,7 +759,8 @@ export const beastMirror: LorcanitoItemCard = {
     {
       type: "activated",
       name: "Show Me",
-      text: "↷, 3 ⬡ - If you have no cards in your hand, draw a card.",
+      text: "If you have no cards in your hand, draw a card.",
+      costs: [{ type: "exert" }, { type: "ink", amount: 3 }],
       effects: [
         {
           type: "draw",
@@ -769,14 +771,12 @@ export const beastMirror: LorcanitoItemCard = {
           } as EffectTargets,
         },
       ],
-      optional: false,
       conditions: [
         {
           type: "hand",
           amount: 0,
         },
       ],
-      costs: [{ type: "exert" }, { type: "ink", amount: 3 }],
     } as ActivatedAbility,
   ],
   flavour:
@@ -809,16 +809,16 @@ export const fryingPan: LorcanitoItemCard = {
           type: "restriction",
           restriction: "challenge",
           duration: "next_turn",
+          target: {
+            type: "card",
+            value: 1,
+            filters: [
+              { filter: "type", value: "character" },
+              { filter: "zone", value: "play" },
+            ],
+          },
         } as RestrictionEffect,
       ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "type", value: "character" },
-          { filter: "zone", value: "play" },
-        ],
-      },
     } as ActivatedAbility,
   ],
   flavour:
@@ -844,29 +844,34 @@ export const musketeerTabard: LorcanitoItemCard = {
   abilities: [
     {
       type: "static-triggered",
-      trigger: "banish",
-      optional: true,
-      targets: {
-        type: "card",
-        value: 1,
-        // This is the trigger target
-        filters: [
-          { filter: "owner", value: "self" },
-          { filter: "type", value: "character" },
-          // TODO: This should have been ability
-          { filter: "ability", value: "bodyguard" },
-        ],
+      optional: false,
+      trigger: {
+        on: "banish",
+        target: {
+          type: "card",
+          value: 1,
+          // This is the trigger target
+          filters: [
+            { filter: "owner", value: "self" },
+            { filter: "type", value: "character" },
+            { filter: "ability", value: "bodyguard" },
+          ],
+        },
       },
-      effects: [
-        {
-          type: "draw",
-          amount: 1,
-          target: {
-            type: "player",
-            value: "self",
-          },
-        } as DrawEffect,
-      ],
+      layer: {
+        type: "resolution",
+        optional: true,
+        effects: [
+          {
+            type: "draw",
+            amount: 1,
+            target: {
+              type: "player",
+              value: "self",
+            },
+          } as DrawEffect,
+        ],
+      } as ResolutionAbility,
     } as StaticTriggeredAbility,
   ],
   flavour: "There's no such thing as a lone musketeer.",
@@ -891,23 +896,23 @@ export const plasmaBlaster: LorcanitoItemCard = {
     {
       type: "activated",
       name: "Quick Shot",
-      text: "↷, 2 ⬡ − Deal 1 damage to chosen character.",
+      text: "Deal 1 damage to chosen character.",
+      optional: false,
       effects: [
         {
           type: "damage",
           amount: 1,
+          target: {
+            type: "card",
+            value: 1,
+            filters: [
+              { filter: "type", value: "character" },
+              { filter: "zone", value: "play" },
+            ],
+          },
         },
       ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "type", value: "character" },
-          { filter: "zone", value: "play" },
-        ],
-      },
       costs: [{ type: "exert" }, { type: "ink", amount: 2 }],
-      optional: false,
     } as ActivatedAbility,
   ],
   flavour:

@@ -5,11 +5,14 @@
 import { describe, expect, it } from "@jest/globals";
 import { createRuleEngine } from "~/engine/rule-engine/engine";
 import {
+  captainColonelsLieutenant,
+  heiheiBoatSnack,
   magicBroomBucketBrigade,
   mickeyMouseTrueFriend,
   moanaOfMotunui,
 } from "~/engine/cards/TFC";
 import { createMockGame } from "~/engine/rule-engine/__mocks__/createGameMock";
+import { TestStore } from "~/engine/rule-engine/rules/testStore";
 const testPlayer = "player_one";
 const opponent = "player_two";
 
@@ -76,36 +79,38 @@ describe("Magic Broom - Bucket Brigade", () => {
   });
 
   it("Weep effect - Skipping", () => {
-    const engine = createRuleEngine(
-      createMockGame(
-        {
-          inkwell: [magicBroomBucketBrigade, magicBroomBucketBrigade],
-          discard: [mickeyMouseTrueFriend, moanaOfMotunui],
-          hand: [magicBroomBucketBrigade],
-        },
-        {
-          discard: [mickeyMouseTrueFriend, moanaOfMotunui],
-        }
-      )
+    const testStore = new TestStore(
+      {
+        inkwell: 2,
+        discard: [heiheiBoatSnack, captainColonelsLieutenant],
+        hand: [magicBroomBucketBrigade],
+      },
+      {
+        discard: [mickeyMouseTrueFriend, moanaOfMotunui],
+      }
     );
 
-    const cardUnderTest = engine.get.byZoneAndId({
-      zone: "hand",
-      lorcanitoId: magicBroomBucketBrigade.id,
-      owner: testPlayer,
-    });
+    const cardUnderTest = testStore.getByZoneAndId(
+      "hand",
+      magicBroomBucketBrigade.id
+    );
 
-    engine.moves.playCardFromHand(cardUnderTest);
+    expect(testStore.getZonesCardCount("player_one").discard).toEqual(2);
+    expect(testStore.getZonesCardCount("player_two").discard).toEqual(2);
 
-    expect(engine.get.zoneCards("discard", opponent)).toHaveLength(2);
-    expect(engine.get.zoneCards("discard", testPlayer)).toHaveLength(2);
+    cardUnderTest.playFromHand();
 
-    const effect = engine.get.effects()[0];
-    if (effect) {
-      engine.moves.resolveEffect(effect?.id);
-    }
+    expect(testStore.store.stackLayerStore.layers).toHaveLength(1);
 
-    expect(engine.get.zoneCards("discard", opponent)).toHaveLength(2);
-    expect(engine.get.zoneCards("discard", testPlayer)).toHaveLength(2);
+    testStore.resolveTopOfStack({ skip: true });
+
+    expect(testStore.store.stackLayerStore.layers).toHaveLength(0);
+    expect(testStore.getZonesCardCount("player_two").discard).toEqual(2);
+    expect(testStore.getZonesCardCount("player_one")).toEqual(
+      expect.objectContaining({
+        discard: 2,
+        play: 1,
+      })
+    );
   });
 });

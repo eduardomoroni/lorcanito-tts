@@ -13,6 +13,8 @@ import {
   ResolutionAbility,
   resolutionAbilityPredicate,
   staticTriggeredAbilityPredicate,
+  supportAbility,
+  supportAbilityPredicate,
 } from "~/engine/abilities";
 
 export type ResolvingParam = {
@@ -20,19 +22,25 @@ export type ResolvingParam = {
   targets?: CardModel[];
   player?: string;
   scry?: ScryEffectPayload;
+  skip?: boolean;
 };
 
 export class StackLayerStore {
   dependencies: Dependencies;
   layers: StackLayerModel[];
-  rootStore: MobXRootStore;
+  readonly rootStore: MobXRootStore;
+  readonly observable: boolean;
 
   constructor(
     initialState: GameEffect[] = [],
     dependencies: Dependencies,
-    rootStore: MobXRootStore
+    rootStore: MobXRootStore,
+    observable: boolean
   ) {
-    makeAutoObservable(this, { rootStore: false, dependencies: false });
+    if (observable) {
+      makeAutoObservable(this, { rootStore: false, dependencies: false });
+    }
+    this.observable = observable;
     this.dependencies = dependencies;
     this.rootStore = rootStore;
 
@@ -52,7 +60,8 @@ export class StackLayerStore {
         effect.id,
         effect.responder,
         effect.ability as ResolutionAbility | ActivatedAbility,
-        this.rootStore
+        this.rootStore,
+        this.observable
       );
     });
   }
@@ -66,7 +75,10 @@ export class StackLayerStore {
   }
 
   // TODO: mudar Ability para AbilityModel
-  addAbilityToStack(ability: Ability, card: CardModel) {
+  addAbilityToStack(
+    ability: ResolutionAbility | ActivatedAbility,
+    card: CardModel
+  ) {
     const isResolution = resolutionAbilityPredicate(ability);
     const isActivated = activatedAbilityPredicate(ability);
     const isStaticTriggered = staticTriggeredAbilityPredicate(ability);
@@ -76,31 +88,81 @@ export class StackLayerStore {
         ability.responder === "opponent"
           ? this.rootStore.opponentPlayer
           : this.rootStore.activePlayer;
+
       const layer = new StackLayerModel(
         card.instanceId,
         createId(),
         responder,
         ability,
-        this.rootStore
+        this.rootStore,
+        this.observable
       );
       this.layers.push(layer);
 
       this.rootStore.log({ type: "EFFECT", effect: layer.toJSON() });
+
       if (layer.autoResolve) {
         layer.resolve();
+      } else {
+        // console.log("Not auto resolving, player has to choose a target");
       }
     } else {
       console.log("Static abilities are not supported yet");
     }
   }
 
-  resolveAbility(effectId: string, params?: ResolvingParam) {
+  resolveLayer(effectId: string, params?: ResolvingParam) {
     const ability = this.getAbility(effectId);
 
     if (!ability) {
-      console.error("Effect not found", effectId);
+      console.error("Layer not found", effectId);
     } else {
       ability.resolve(params);
+    }
+  }
+
+  onPlay(card: CardModel) {
+    const resolutionAbilities = card.resolutionAbilities;
+
+    resolutionAbilities?.forEach((ability) => {
+      if (resolutionAbilityPredicate(ability)) {
+        this.addAbilityToStack(ability, card);
+      } else {
+        console.error("Ability not found", ability);
+      }
+    });
+  }
+
+  onActivateAbility(card: CardModel, ability: ActivatedAbility) {
+    this.addAbilityToStack(ability, card);
+  }
+
+  onQuest(card: CardModel) {
+    if (card.hasSupport) {
+      const supportEffect: ResolutionAbility = {
+        type: "resolution",
+        name: supportAbility.name,
+        text: supportAbility.text,
+        optional: true,
+        effects: [
+          {
+            type: "attribute",
+            attribute: "strength",
+            amount: card.strength,
+            modifier: "add",
+            duration: "turn",
+            target: {
+              type: "card",
+              filters: [
+                { filter: "zone", value: "play" },
+                { filter: "type", value: "character" },
+              ],
+            },
+          },
+        ],
+      };
+
+      this.addAbilityToStack(supportEffect, card);
     }
   }
 

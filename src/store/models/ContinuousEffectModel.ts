@@ -3,6 +3,7 @@ import type { MobXRootStore } from "~/store/RootStore";
 import { CardModel } from "~/store/models/CardModel";
 import type { ContinuousEffect, Effect } from "~/engine/effectTypes";
 import { TargetFilter } from "~/components/modals/target/filters";
+import { createId } from "@paralleldrive/cuid2";
 
 // Continuous effects are effects that last for a duration of time.
 // They don't exist in the JSON structure that we call LorcanitoCard
@@ -13,7 +14,7 @@ export class ContinuousEffectModel
   type: "continuous" = "continuous";
   id: string;
   // This should not be optional
-  source?: CardModel;
+  source: CardModel;
   target?: CardModel;
   filters?: TargetFilter[];
   duration?: {
@@ -24,23 +25,50 @@ export class ContinuousEffectModel
   effect: Effect;
   private rootStore: MobXRootStore;
 
-  constructor(effect: ContinuousEffect, rootStore: MobXRootStore) {
-    makeAutoObservable<ContinuousEffectModel, "rootStore">(this, {
-      rootStore: false,
-    });
+  constructor(
+    id: string,
+    source: CardModel,
+    target?: CardModel,
+    // @ts-ignore
+    duration: ContinuousEffect["duration"],
+    effect: Effect,
+    rootStore: MobXRootStore,
+    observable: boolean
+  ) {
+    if (observable) {
+      makeAutoObservable<ContinuousEffectModel, "rootStore">(this, {
+        rootStore: false,
+      });
+    }
 
-    this.id = effect.id;
-    this.source = effect.source
-      ? rootStore.cardStore.getCard(effect.source)
-      : undefined;
-    this.target = effect.target
-      ? rootStore.cardStore.getCard(effect.target)
-      : undefined;
-    this.filters = effect.filters;
-    this.duration = effect.duration;
-    this.effect = effect.effect;
+    this.id = id;
+    this.source = source;
+    this.target = target;
+    this.duration = duration;
+    this.effect = effect;
 
     this.rootStore = rootStore;
+  }
+
+  isCostReplacementEffect(card: CardModel): boolean {
+    const effect = this.effect;
+
+    return (
+      effect.type === "replacement" &&
+      effect.replacement === "cost" &&
+      card.isValidTarget(effect.filters || [])
+    );
+  }
+
+  cardPlayed(card: CardModel) {
+    const effect = this.effect;
+    if (
+      this.isCostReplacementEffect(card) &&
+      effect.type === "replacement" &&
+      effect.duration === "next"
+    ) {
+      this.rootStore.continuousEffectStore.stopContinuousEffect(this);
+    }
   }
 
   sync(effect: ContinuousEffect) {

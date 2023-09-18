@@ -8,33 +8,63 @@ import { TestStore } from "~/engine/rule-engine/rules/testStore";
 import { lantern } from "~/engine/cards/TFC/items";
 
 describe("Lantern", () => {
-  it("Birthday Lights - You pay 1 ⬡ less for the next character you play this turn.", () => {
-    const testStore = new TestStore({
-      inkwell: 3, // Lilo costs 0 and peter pan costs 3
-      hand: [peterPanNeverLanding, liloMakingAWish],
-      play: [lantern],
+  describe("Birthday Lights - You pay 1 ⬡ less for the next character you play this turn.", () => {
+    it("First character gets a discount.", () => {
+      const testStore = new TestStore({
+        inkwell: 0, // Lilo costs 0 and peter pan costs 3
+        hand: [liloMakingAWish],
+        play: [lantern],
+      });
+
+      const reducedCostChar = testStore.getByZoneAndId(
+        "hand",
+        liloMakingAWish.id
+      );
+
+      const cardUnderTest = testStore.getByZoneAndId("play", lantern.id);
+      cardUnderTest.activate();
+
+      reducedCostChar.playFromHand();
+
+      expect(testStore.store.tableStore.getTable().inkAvailable()).toEqual(0);
+      expect(reducedCostChar.zone).toEqual("play");
     });
 
-    const reducedCostChar = testStore.getByZoneAndId(
-      "hand",
-      liloMakingAWish.id
-    );
-    const normalCost = testStore.getByZoneAndId(
-      "hand",
-      peterPanNeverLanding.id
-    );
+    it("Second Character doesn't get a discount", () => {
+      const testStore = new TestStore({
+        inkwell: 3, // Lilo costs 0 and peter pan costs 3
+        hand: [peterPanNeverLanding, liloMakingAWish],
+        play: [lantern],
+      });
 
-    const cardUnderTest = testStore.getByZoneAndId("play", lantern.id);
-    cardUnderTest.activate();
+      const reducedCostChar = testStore.getByZoneAndId(
+        "hand",
+        liloMakingAWish.id
+      );
+      const normalCost = testStore.getByZoneAndId(
+        "hand",
+        peterPanNeverLanding.id
+      );
 
-    reducedCostChar.playFromHand();
+      const cardUnderTest = testStore.getByZoneAndId("play", lantern.id);
+      cardUnderTest.activate();
 
-    expect(testStore.store.tableStore.getTable().inkAvailable()).toEqual(3);
-    expect(reducedCostChar.zone).toEqual("play");
+      reducedCostChar.playFromHand();
 
-    normalCost.playFromHand();
+      expect(testStore.store.tableStore.getTable().inkAvailable()).toEqual(3);
+      expect(reducedCostChar.zone).toEqual("play");
 
-    expect(testStore.store.tableStore.getTable().inkAvailable()).toEqual(0);
-    expect(reducedCostChar.zone).toEqual("play");
+      normalCost.playFromHand();
+
+      expect(testStore.store.tableStore.getTable().inkAvailable()).toEqual(0);
+      expect(reducedCostChar.zone).toEqual("play");
+    });
+
+    it.failing("shift", () => {
+      expect(1).toEqual(2);
+    });
+    it.failing("shift second", () => {
+      expect(1).toEqual(2);
+    });
   });
 });

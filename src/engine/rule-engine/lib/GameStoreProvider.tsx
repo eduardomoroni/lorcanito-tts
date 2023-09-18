@@ -7,7 +7,12 @@ import React, {
   useContext,
   useMemo,
 } from "react";
-import { useDatabase, useDatabaseObjectData, useFirestore } from "reactfire";
+import {
+  useDatabase,
+  useDatabaseObjectData,
+  useFirestore,
+  useFirestoreDocData,
+} from "reactfire";
 import { useGameLogger } from "~/spaces/Log/game-log/GameLogProvider";
 import type { Game } from "~/libs/game";
 import { useNotification } from "~/providers/NotificationProvider";
@@ -16,6 +21,7 @@ import { ref } from "firebase/database";
 import { useYesOrNoModal } from "~/providers/YesOrNoModalProvider";
 import { MobXRootStore } from "~/store/RootStore";
 import { useFirebaseSync } from "~/engine/rule-engine/lib/useFirebaseSync";
+import { doc } from "firebase/firestore";
 
 type ContextType = {
   playerId: string;
@@ -61,9 +67,13 @@ export const GameStoreProvider: FC<{
       initialData: ssrGame,
     }
   );
+  // const gameRef = doc(useFirestore(), "games", gameId);
+  // const { data } = useFirestoreDocData<Game>(gameRef, {
+  //   initialData: ssrGame,
+  // });
   // TODO: THIS can make things out of sync
   const store = useMemo(() => {
-    return new MobXRootStore(data || ssrGame, args);
+    return new MobXRootStore(data || ssrGame, args, true);
   }, []);
 
   useFirebaseSync(store, database, firestore, data);

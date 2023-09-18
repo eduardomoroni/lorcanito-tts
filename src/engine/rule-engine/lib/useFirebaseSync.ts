@@ -19,7 +19,11 @@ export const useFirebaseSync = (
 ) => {
   useEffect(() => {
     const storeState = rootStore.toJSON();
-    const firebaseState = new MobXRootStore(data, {} as Dependencies).toJSON();
+    const firebaseState = new MobXRootStore(
+      data,
+      {} as Dependencies,
+      false
+    ).toJSON();
 
     const diff = getDiff(storeState, firebaseState);
 
@@ -44,16 +48,14 @@ export const useFirebaseSync = (
     return autorun(() => {
       try {
         const nextState: Game = rootStore.toJSON();
+        const difference = getDiff(prevState, nextState);
 
         // If we have just synced, we don't have to update firebase with the same data;
-        if (getDiff(data, nextState).length === 0) {
+        if (!difference || difference.length === 0) {
           console.log("Skipping firebase sync, no changes");
           prevState = nextState;
           return;
         }
-
-        // const nextState: Game = data;
-        const difference = getDiff(prevState, nextState);
 
         if (difference && prevState) {
           const updates = convertDiffToRealTimeUpdates(difference, nextState);

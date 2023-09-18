@@ -35,7 +35,7 @@ describe("Plasma Blaster", () => {
 
     const effect = testStore.store.stackLayerStore.layers[0];
     if (effect) {
-      testStore.store.stackLayerStore.resolveAbility(effect.id, {
+      testStore.store.stackLayerStore.resolveLayer(effect.id, {
         targetId: damagedChar.instanceId,
       });
     }

@@ -18,11 +18,14 @@ export class TableModel {
     ownerId: string,
     lore: number,
     readyToStart: boolean = false,
-    rootStore: MobXRootStore
+    rootStore: MobXRootStore,
+    observable: boolean
   ) {
-    makeAutoObservable<TableModel, "rootStore">(this, {
-      rootStore: false,
-    });
+    if (observable) {
+      makeAutoObservable<TableModel, "rootStore">(this, {
+        rootStore: false,
+      });
+    }
 
     this.zones = zones;
     this.ownerId = ownerId;
@@ -42,7 +45,8 @@ export class TableModel {
     table: Table,
     ownerId: string,
     cardStore: CardStore,
-    rootStore: MobXRootStore
+    rootStore: MobXRootStore,
+    observable = false
   ): TableModel {
     const zones: Record<Zones, ZoneModel> = {
       hand: new ZoneModel(
@@ -51,7 +55,8 @@ export class TableModel {
           ?.map((cardId) => cardStore.cards[cardId])
           .filter(Boolean) as CardModel[]) ?? [],
         ownerId,
-        rootStore
+        rootStore,
+        observable
       ),
       play: new ZoneModel(
         "play",
@@ -59,7 +64,8 @@ export class TableModel {
           ?.map((cardId) => cardStore.cards[cardId])
           .filter(Boolean) as CardModel[]) ?? [],
         ownerId,
-        rootStore
+        rootStore,
+        observable
       ),
       discard: new ZoneModel(
         "discard",
@@ -67,7 +73,8 @@ export class TableModel {
           ?.map((cardId) => cardStore.cards[cardId])
           .filter(Boolean) as CardModel[]) ?? [],
         ownerId,
-        rootStore
+        rootStore,
+        observable
       ),
       deck: new ZoneModel(
         "deck",
@@ -75,7 +82,8 @@ export class TableModel {
           ?.map((cardId) => cardStore.cards[cardId])
           .filter(Boolean) as CardModel[]) ?? [],
         ownerId,
-        rootStore
+        rootStore,
+        observable
       ),
       inkwell: new ZoneModel(
         "inkwell",
@@ -83,7 +91,8 @@ export class TableModel {
           ?.map((cardId) => cardStore.cards[cardId])
           .filter(Boolean) as CardModel[]) ?? [],
         ownerId,
-        rootStore
+        rootStore,
+        observable
       ),
     };
 
@@ -92,7 +101,8 @@ export class TableModel {
       ownerId,
       table.lore,
       table.readyToStart,
-      rootStore
+      rootStore,
+      observable
     );
   }
 
@@ -127,7 +137,7 @@ export class TableModel {
     params: { shift?: number; byPass?: number } = {}
   ) {
     // TODO: this is complete garbage, fix this
-    const cost = params.byPass || params.shift || card.lorcanitoCard.cost;
+    const cost = params.byPass || params.shift || card.cost;
     const inkAvailable = this.zones.inkwell.cards.filter(
       (card) => !card.meta?.exerted
     );

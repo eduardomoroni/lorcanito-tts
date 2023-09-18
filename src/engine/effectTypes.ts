@@ -19,18 +19,23 @@ export type Effect =
   | DiscardEffect
   | ConditionalEffect;
 
+export type CardEffectTarget = {
+  type: "card";
+  value?: "all" | number;
+  filters: TargetFilter[];
+};
+
+export type PlayerEffectTarget = {
+  type: "player";
+  autoResolve?: false;
+  value: "self" | "opponent" | "all";
+};
+
+export type IdEffectTarget = { type: "instanceId"; instanceId: string };
 export type EffectTargets =
-  | {
-      type: "card";
-      value?: "all" | number;
-      filters: TargetFilter[];
-    }
-  | {
-      type: "player";
-      value: "self" | "opponent" | "all";
-    }
-  // TODO: this is wrong, we're using this type to type card JSON
-  | { type: "cardModel"; card: CardModel };
+  | CardEffectTarget
+  | PlayerEffectTarget
+  | IdEffectTarget;
 
 export type ScryEffectPayload = {
   top?: CardModel[];
@@ -54,7 +59,8 @@ interface BaseEffect {
     | "exert"
     | "move"
     | "attribute";
-  target: EffectTargets;
+  target?: EffectTargets;
+  autoResolve?: boolean;
 }
 
 export interface RestrictionEffect extends BaseEffect {
@@ -72,15 +78,13 @@ export interface ReplacementEffect extends BaseEffect {
   replacement: "cost";
   duration: "next";
   amount: number;
+  target?: never;
   filters: TargetFilter[];
 }
 
 export interface ConditionalEffect extends BaseEffect {
   type: "conditional";
-  effects: Array<{
-    effect: Exclude<Effect, ConditionalEffect>;
-    target: TargetFilter[];
-  }>;
+  effects: Array<Exclude<Effect, ConditionalEffect>>;
   fallback?: Array<Exclude<Effect, ConditionalEffect>>;
 }
 
@@ -109,12 +113,12 @@ export interface HealEffect extends BaseEffect {
   amount: number;
 }
 
-interface DamageEffect extends BaseEffect {
+export interface DamageEffect extends BaseEffect {
   type: "damage";
   amount: number;
 }
 export interface DrawEffect extends BaseEffect {
-  type: "draw";
+  type: "draw" | "discard";
   amount: number;
 }
 interface DiscardEffect extends BaseEffect {
@@ -169,5 +173,21 @@ export const loreEffectPredicate = (
 ): effect is AttributeEffect =>
   attributeEffectPredicate(effect) && effect.attribute === "lore";
 
+export const conditionEffectPredicate = (
+  effect?: Effect
+): effect is ConditionalEffect => effect?.type === "conditional";
+
 export const scryEffectPredicate = (effect?: Effect): effect is ScryEffect =>
   effect?.type === "scry";
+
+export const replacementEffectPredicate = (
+  effect?: Effect
+): effect is ReplacementEffect => effect?.type === "replacement";
+
+export const cardEffectTargetPredicate = (
+  target?: EffectTargets
+): target is CardEffectTarget => target?.type === "card";
+
+export const playerEffectTargetPredicate = (
+  target?: EffectTargets
+): target is PlayerEffectTarget => target?.type === "player";

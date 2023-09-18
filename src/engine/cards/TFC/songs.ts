@@ -105,12 +105,11 @@ export const beOurGuest: LorcanitoActionCard = {
             { filter: "type", value: "character" },
             { filter: "zone", value: "deck" },
           ],
+          target: {
+            autoResolve: false,
+          },
         },
       ],
-      targets: {
-        type: "player",
-        value: "self",
-      },
     } as ResolutionAbility,
   ],
   inkwell: true,
@@ -141,18 +140,17 @@ export const partOfOurWorld: LorcanitoActionCard = {
         {
           type: "move",
           to: "hand",
+          target: {
+            type: "card",
+            value: 1,
+            filters: [
+              { filter: "owner", value: "self" },
+              { filter: "type", value: "character" },
+              { filter: "zone", value: "discard" },
+            ],
+          },
         },
       ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "owner", value: "self" },
-          { filter: "type", value: "character" },
-          { filter: "zone", value: "discard" },
-        ],
-      },
-      optional: false,
     } as ResolutionAbility,
   ],
   flavour: "What would I give\nIf I could live out of these waters?",
@@ -184,13 +182,13 @@ export const reflection: LorcanitoActionCard = {
           type: "scry",
           amount: 3,
           mode: "top",
+          target: {
+            type: "player",
+            autoResolve: false,
+            value: "self",
+          },
         },
       ],
-      targets: {
-        type: "player",
-        value: "self",
-      },
-      optional: false,
     } as ResolutionAbility,
   ],
   flavour: "When will my reflection show \nWho I am inside?",
@@ -222,17 +220,16 @@ export const motherKnowsBest: LorcanitoActionCard = {
         {
           type: "move",
           to: "hand",
+          target: {
+            type: "card",
+            value: 1,
+            filters: [
+              { filter: "type", value: "character" },
+              { filter: "zone", value: "play" },
+            ],
+          },
         },
       ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "type", value: "character" },
-          { filter: "zone", value: "play" },
-        ],
-      },
-      optional: false,
     } as ResolutionAbility,
   ],
   flavour: "One way or another \nSomething will go wrong, I swear",
@@ -264,17 +261,17 @@ export const suddenChill: LorcanitoActionCard = {
         {
           type: "move",
           to: "discard",
+          target: {
+            type: "card",
+            value: 1,
+            filters: [
+              { filter: "type", value: "character" },
+              { filter: "zone", value: "hand" },
+              { filter: "owner", value: "self" },
+            ],
+          },
         },
       ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "type", value: "character" },
-          { filter: "zone", value: "hand" },
-          { filter: "owner", value: "self" },
-        ],
-      },
       responder: "opponent",
     } as ResolutionAbility,
   ],
@@ -347,21 +344,28 @@ export const letItGo: LorcanitoActionCard = {
         {
           type: "move",
           to: "inkwell",
+          target: {
+            type: "card",
+            value: 1,
+            filters: [
+              { filter: "type", value: "character" },
+              { filter: "zone", value: "play" },
+            ],
+          },
         },
         {
           type: "exert",
           exert: true,
+          target: {
+            type: "card",
+            value: 1,
+            filters: [
+              { filter: "type", value: "character" },
+              { filter: "zone", value: "play" },
+            ],
+          },
         },
       ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "type", value: "character" },
-          { filter: "zone", value: "play" },
-        ],
-      },
-      optional: false,
     } as ResolutionAbility,
   ],
   flavour:
@@ -387,7 +391,6 @@ export const oneJumpAhead: LorcanitoActionCard = {
   type: "action",
   abilities: [
     {
-      // This is same as Fishbone Quill
       type: "resolution",
       name: "One Jump Ahead",
       text: "Put the top card of your deck into your inkwell facedown and exerted.",
@@ -395,17 +398,16 @@ export const oneJumpAhead: LorcanitoActionCard = {
         {
           type: "move",
           to: "inkwell",
+          target: {
+            type: "card",
+            value: 1,
+            filters: [
+              { filter: "owner", value: "self" },
+              { filter: "zone", value: "hand" },
+            ],
+          },
         },
       ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "owner", value: "self" },
-          { filter: "zone", value: "hand" },
-        ],
-      },
-      optional: false,
     } as ResolutionAbility,
   ],
   flavour:

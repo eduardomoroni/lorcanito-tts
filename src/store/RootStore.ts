@@ -32,8 +32,14 @@ export class MobXRootStore {
   staticTriggeredStore: StaticTriggeredStore;
   continuousEffectStore: ContinuousEffectStore;
 
-  constructor(initialState: Game, dependencies: Dependencies) {
-    makeAutoObservable(this, { dependencies: false });
+  constructor(
+    initialState: Game,
+    dependencies: Dependencies,
+    observable = true
+  ) {
+    if (observable) {
+      makeAutoObservable(this, { dependencies: false });
+    }
 
     this.dependencies = dependencies;
 
@@ -49,22 +55,30 @@ export class MobXRootStore {
 
     // stores
 
-    this.cardStore = new CardStore(initialState.cards, dependencies, this);
+    this.cardStore = new CardStore(
+      initialState.cards,
+      dependencies,
+      this,
+      observable
+    );
     this.tableStore = TableStore.fromTable(
       initialState.tables,
       dependencies,
       this.cardStore,
-      this
+      this,
+      observable
     );
     this.stackLayerStore = new StackLayerStore(
       initialState.effects,
       dependencies,
-      this
+      this,
+      observable
     );
-    this.staticTriggeredStore = new StaticTriggeredStore(this);
+    this.staticTriggeredStore = new StaticTriggeredStore(this, observable);
     this.continuousEffectStore = new ContinuousEffectStore(
       initialState.continuousEffects,
-      this
+      this,
+      observable
     );
   }
 
@@ -268,7 +282,11 @@ export class MobXRootStore {
   }
 
   log(entry: LogEntry) {
-    const { logger } = this.dependencies;
-    logger.log(entry);
+    try {
+      const { logger } = this.dependencies;
+      logger.log(entry);
+    } catch (e) {
+      console.error(e);
+    }
   }
 }

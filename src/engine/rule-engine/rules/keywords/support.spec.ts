@@ -6,6 +6,7 @@ import { chiefTui, heiheiBoatSnack, moanaOfMotunui } from "~/engine/cards/TFC";
 import { describe, expect } from "@jest/globals";
 
 describe("Support keyword", () => {
+  // TODO: Fix this
   it("**Support** _(Whenever this character quests, you may add their ※ to another chosen character‘s ※ this turn.)", () => {
     const testStore = new TestStore({
       play: [chiefTui, moanaOfMotunui],

@@ -1,9 +1,10 @@
 import type { LorcanitoActionCard } from "~/engine/cardTypes";
-import { ResolutionAbility } from "~/engine/abilities";
+import { readyAndCantQuest, ResolutionAbility } from "~/engine/abilities";
 import {
   AbilityEffect,
   AttributeEffect,
   ConditionalEffect,
+  DamageEffect,
   DrawEffect,
   MoveCardEffect,
 } from "~/engine/effectTypes";
@@ -27,17 +28,16 @@ export const controlYourTemper: LorcanitoActionCard = {
           attribute: "strength",
           amount: 2,
           modifier: "subtract",
+          target: {
+            type: "card",
+            value: 1,
+            filters: [
+              { filter: "type", value: "character" },
+              { filter: "zone", value: "play" },
+            ],
+          },
         } as AttributeEffect,
       ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "type", value: "character" },
-          { filter: "zone", value: "play" },
-        ],
-      },
-      optional: false,
     } as ResolutionAbility,
   ],
   inkwell: true,
@@ -68,18 +68,16 @@ export const healingGlow: LorcanitoActionCard = {
         {
           type: "heal",
           amount: 2,
-          // TODO: heal effect not using target
+          target: {
+            type: "card",
+            value: 1,
+            filters: [
+              { filter: "type", value: "character" },
+              { filter: "zone", value: "play" },
+            ],
+          },
         },
       ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "type", value: "character" },
-          { filter: "zone", value: "play" },
-        ],
-      },
-      optional: false,
     } as ResolutionAbility,
   ],
   flavour: "“Don't freak out!” Rapunzel",
@@ -106,26 +104,26 @@ export const justInTime: LorcanitoActionCard = {
   abilities: [
     {
       type: "resolution",
+      optional: true,
       effects: [
         {
           type: "move",
           to: "play",
+          target: {
+            type: "card",
+            value: 1,
+            filters: [
+              { filter: "owner", value: "self" },
+              { filter: "zone", value: "hand" },
+              {
+                filter: "attribute",
+                value: "cost",
+                comparison: { operator: "lte", value: 5 },
+              },
+            ],
+          },
         },
       ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "owner", value: "self" },
-          { filter: "zone", value: "hand" },
-          {
-            filter: "attribute",
-            value: "cost",
-            comparison: { operator: "lte", value: 5 },
-          },
-        ],
-      },
-      optional: false,
     } as ResolutionAbility,
   ],
   flavour:
@@ -158,17 +156,17 @@ export const youHaveForgottenMe: LorcanitoActionCard = {
         {
           type: "move",
           to: "discard",
+          target: {
+            type: "card",
+            value: 2,
+            filters: [
+              { filter: "type", value: "character" },
+              { filter: "zone", value: "hand" },
+              { filter: "owner", value: "self" },
+            ],
+          },
         },
       ],
-      targets: {
-        type: "card",
-        value: 2,
-        filters: [
-          { filter: "type", value: "character" },
-          { filter: "zone", value: "hand" },
-          { filter: "owner", value: "self" },
-        ],
-      },
       responder: "opponent",
     } as ResolutionAbility,
   ],
@@ -201,22 +199,21 @@ export const befuddle: LorcanitoActionCard = {
         {
           type: "move",
           to: "hand",
+          target: {
+            type: "card",
+            value: 1,
+            filters: [
+              { filter: "type", value: ["character", "item"] },
+              { filter: "zone", value: "play" },
+              {
+                filter: "attribute",
+                value: "cost",
+                comparison: { operator: "lte", value: 2 },
+              },
+            ],
+          },
         },
       ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "type", value: ["character", "item"] },
-          { filter: "zone", value: "play" },
-          {
-            filter: "attribute",
-            value: "cost",
-            comparison: { operator: "lte", value: 2 },
-          },
-        ],
-      },
-      optional: false,
     } as ResolutionAbility,
   ],
   flavour: "Never be afraid to have your mind boggled now and then.",
@@ -247,18 +244,17 @@ export const freeze: LorcanitoActionCard = {
         {
           type: "exert",
           exert: true,
+          target: {
+            type: "card",
+            value: 1,
+            filters: [
+              { filter: "type", value: "character" },
+              { filter: "zone", value: "play" },
+              { filter: "owner", value: "opponent" },
+            ],
+          },
         },
       ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "type", value: "character" },
-          { filter: "zone", value: "play" },
-          { filter: "owner", value: "opponent" },
-        ],
-      },
-      optional: false,
     } as ResolutionAbility,
   ],
   flavour: "It's time for you to chill.",
@@ -289,18 +285,17 @@ export const doItAgain: LorcanitoActionCard = {
         {
           type: "move",
           to: "hand",
+          target: {
+            type: "card",
+            value: 1,
+            filters: [
+              { filter: "owner", value: "self" },
+              { filter: "type", value: ["action"] },
+              { filter: "zone", value: "discard" },
+            ],
+          },
         },
       ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "owner", value: "self" },
-          { filter: "type", value: ["action"] },
-          { filter: "zone", value: "discard" },
-        ],
-      },
-      optional: false,
     } as ResolutionAbility,
   ],
   flavour:
@@ -323,7 +318,6 @@ export const stampede: LorcanitoActionCard = {
   characteristics: ["action"],
   text: "Deal 2 damage to chosen damaged character.",
   type: "action",
-  // THIS ONE we have to add another value to type StatusFilterValue
   abilities: [
     {
       type: "resolution",
@@ -401,17 +395,16 @@ export const theBeastIsMine: LorcanitoActionCard = {
           ability: "reckless",
           modifier: "add",
           duration: "next_turn",
+          target: {
+            type: "card",
+            value: 1,
+            filters: [
+              { filter: "zone", value: "play" },
+              { filter: "type", value: "character" },
+            ],
+          },
         } as AbilityEffect,
       ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "zone", value: "play" },
-          { filter: "type", value: "character" },
-        ],
-      },
-      optional: false,
     } as ResolutionAbility,
   ],
   flavour:
@@ -422,6 +415,7 @@ export const theBeastIsMine: LorcanitoActionCard = {
   language: "EN",
   illustrator: "\tMatthew Robert Davies",
   number: 99,
+
   set: "TFC",
   rarity: "uncommon",
 };
@@ -441,20 +435,23 @@ export const viciousBetrayal: LorcanitoActionCard = {
       effects: [
         {
           type: "conditional",
+          autoResolve: false,
           effects: [
             {
-              target: [
-                { filter: "type", value: "character" },
-                { filter: "zone", value: "play" },
-                { filter: "characteristics", value: ["villain"] },
-              ],
-              effect: {
-                type: "attribute",
-                attribute: "strength",
-                amount: 3,
-                modifier: "add",
-                duration: "turn",
-              } as AttributeEffect,
+              type: "attribute",
+              attribute: "strength",
+              amount: 3,
+              modifier: "add",
+              duration: "turn",
+              target: {
+                type: "card",
+                value: 1,
+                filters: [
+                  { filter: "type", value: "character" },
+                  { filter: "zone", value: "play" },
+                  { filter: "characteristics", value: ["villain"] },
+                ],
+              },
             },
           ],
           fallback: [
@@ -464,19 +461,18 @@ export const viciousBetrayal: LorcanitoActionCard = {
               amount: 2,
               modifier: "add",
               duration: "turn",
+              target: {
+                type: "card",
+                value: 1,
+                filters: [
+                  { filter: "type", value: "character" },
+                  { filter: "zone", value: "play" },
+                ],
+              },
             } as AttributeEffect,
           ],
         } as ConditionalEffect,
       ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "type", value: "character" },
-          { filter: "zone", value: "play" },
-        ],
-      },
-      optional: false,
     } as ResolutionAbility,
   ],
   flavour: "“A true king takes matters into his own claws.” −Scar",
@@ -510,17 +506,16 @@ export const cutToTheChase: LorcanitoActionCard = {
           ability: "rush",
           modifier: "add",
           duration: "turn",
+          target: {
+            type: "card",
+            value: 1,
+            filters: [
+              { filter: "zone", value: "play" },
+              { filter: "type", value: "character" },
+            ],
+          },
         } as AbilityEffect,
       ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "zone", value: "play" },
-          { filter: "type", value: "character" },
-        ],
-      },
-      optional: false,
     } as ResolutionAbility,
   ],
   flavour: "“Surprise!”",
@@ -551,17 +546,16 @@ export const dragonFire: LorcanitoActionCard = {
       effects: [
         {
           type: "banish",
+          target: {
+            type: "card",
+            value: 1,
+            filters: [
+              { filter: "type", value: "character" },
+              { filter: "zone", value: "play" },
+            ],
+          },
         },
       ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "type", value: "character" },
-          { filter: "zone", value: "play" },
-        ],
-      },
-      optional: false,
     } as ResolutionAbility,
   ],
   flavour: "Rare is the hero who can withstand a dragon's wrath.",
@@ -588,27 +582,14 @@ export const fanTheFlames: LorcanitoActionCard = {
       type: "resolution",
       name: "Fan The Flames",
       text: "Ready chosen character. They can't quest for the rest of this turn.",
-      effects: [
-        {
-          type: "exert",
-          exert: false,
-        },
-        {
-          type: "restriction",
-          restriction: "quest",
-          duration: "turn",
-        },
-      ],
-      targets: {
+      effects: readyAndCantQuest({
         type: "card",
         value: 1,
         filters: [
           { filter: "type", value: "character" },
           { filter: "zone", value: "play" },
-          { filter: "owner", value: "self" },
         ],
-      },
-      optional: false,
+      }),
     } as ResolutionAbility,
   ],
   flavour: "Pretty words can move a crowd, but so can ugly ones.",
@@ -640,17 +621,16 @@ export const hesGotASword: LorcanitoActionCard = {
           attribute: "strength",
           amount: 2,
           modifier: "add",
+          target: {
+            type: "card",
+            value: 1,
+            filters: [
+              { filter: "type", value: "character" },
+              { filter: "zone", value: "play" },
+            ],
+          },
         } as AttributeEffect,
       ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "type", value: "character" },
-          { filter: "zone", value: "play" },
-        ],
-      },
-      optional: false,
     } as ResolutionAbility,
   ],
   flavour: "“We've all got swords!” \n−Razoul",
@@ -706,17 +686,16 @@ export const developYourBrain: LorcanitoActionCard = {
           type: "scry",
           amount: 2,
           mode: "top",
+          target: {
+            type: "player",
+            value: "self",
+          },
           tutorFilters: [
             { filter: "owner", value: "self" },
             { filter: "zone", value: "deck" },
           ],
         },
       ],
-      targets: {
-        type: "player",
-        value: "self",
-      },
-      optional: false,
     } as ResolutionAbility,
   ],
   flavour:
@@ -743,24 +722,21 @@ export const ifItsNotBaroque: LorcanitoActionCard = {
   abilities: [
     {
       type: "resolution",
-      name: "If It's Not Baroque",
-      text: "Return an item card from your discard to your hand.",
       effects: [
         {
           type: "move",
           to: "hand",
+          target: {
+            type: "card",
+            value: 1,
+            filters: [
+              { filter: "type", value: "item" },
+              { filter: "owner", value: "self" },
+              { filter: "zone", value: "discard" },
+            ],
+          },
         },
       ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "type", value: "item" },
-          { filter: "owner", value: "self" },
-          { filter: "zone", value: "discard" },
-        ],
-      },
-      optional: false,
     } as ResolutionAbility,
   ],
   flavour: "“. . . Don't fix it.”",
@@ -793,17 +769,16 @@ export const workTogether: LorcanitoActionCard = {
           ability: "support",
           modifier: "add",
           duration: "turn",
+          target: {
+            type: "card",
+            value: 1,
+            filters: [
+              { filter: "zone", value: "play" },
+              { filter: "type", value: "character" },
+            ],
+          },
         } as AbilityEffect,
       ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "zone", value: "play" },
-          { filter: "type", value: "character" },
-        ],
-      },
-      optional: false,
     } as ResolutionAbility,
   ],
   flavour:
@@ -829,22 +804,19 @@ export const breakAction: LorcanitoActionCard = {
   abilities: [
     {
       type: "resolution",
-      name: "Break",
-      text: "Banish chosen item.",
       effects: [
         {
           type: "banish",
+          target: {
+            type: "card",
+            value: 1,
+            filters: [
+              { filter: "type", value: "item" },
+              { filter: "zone", value: "play" },
+            ],
+          },
         },
       ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "type", value: "item" },
-          { filter: "zone", value: "play" },
-        ],
-      },
-      optional: false,
     } as ResolutionAbility,
   ],
   flavour: "No one throws a tantrum like a beast.",
@@ -876,16 +848,16 @@ export const fireTheCannons: LorcanitoActionCard = {
         {
           type: "damage",
           amount: 2,
+          target: {
+            type: "card",
+            value: 1,
+            filters: [
+              { filter: "type", value: "character" },
+              { filter: "zone", value: "play" },
+            ],
+          },
         },
       ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "type", value: "character" },
-          { filter: "zone", value: "play" },
-        ],
-      },
     } as ResolutionAbility,
   ],
   flavour:
@@ -923,21 +895,14 @@ export const ransack: LorcanitoActionCard = {
           },
         } as DrawEffect,
         {
-          type: "move",
-          to: "discard",
-          // TODO: THIS LOOKS WEIRD, there's not amount in discard effect, but there's in draw
-        } as MoveCardEffect,
+          type: "draw",
+          amount: 2,
+          target: {
+            type: "player",
+            value: "self",
+          },
+        } as DrawEffect,
       ],
-      targets: {
-        type: "card",
-        // TODO: is target correct?
-        value: 2,
-        filters: [
-          { filter: "type", value: "character" },
-          { filter: "zone", value: "hand" },
-          { filter: "owner", value: "self" },
-        ],
-      },
     } as ResolutionAbility,
   ],
   flavour: "Who has time to read labels?",
@@ -968,16 +933,16 @@ export const smash: LorcanitoActionCard = {
         {
           type: "damage",
           amount: 3,
-        },
+          target: {
+            type: "card",
+            value: 1,
+            filters: [
+              { filter: "type", value: "character" },
+              { filter: "zone", value: "play" },
+            ],
+          },
+        } as DamageEffect,
       ],
-      targets: {
-        type: "card",
-        value: 1,
-        filters: [
-          { filter: "type", value: "character" },
-          { filter: "zone", value: "play" },
-        ],
-      },
     } as ResolutionAbility,
   ],
   flavour: '"Go away!"',

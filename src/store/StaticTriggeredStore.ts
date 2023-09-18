@@ -1,18 +1,22 @@
-import { makeAutoObservable, toJS } from "mobx";
+import { makeAutoObservable } from "mobx";
 import type { MobXRootStore } from "~/store/RootStore";
 import type { CardModel } from "~/store/models/CardModel";
-import type { Trigger } from "~/engine/abilities";
-import { staticTriggeredAbilityPredicate } from "~/engine/abilities";
+import { OnTrigger, staticTriggeredAbilityPredicate } from "~/engine/abilities";
 import { exhaustiveCheck } from "~/libs/exhaustiveCheck";
 import { StaticTriggeredAbilityModel } from "~/store/models/StaticTriggeredAbilityModel";
 
 export class StaticTriggeredStore {
   private readonly rootStore: MobXRootStore;
+  private readonly observable: boolean;
 
-  constructor(rootStore: MobXRootStore) {
-    makeAutoObservable<StaticTriggeredStore, "rootStore">(this, {
-      rootStore: false,
-    });
+  constructor(rootStore: MobXRootStore, observable: boolean) {
+    if (observable) {
+      makeAutoObservable<StaticTriggeredStore, "rootStore">(this, {
+        rootStore: false,
+      });
+    }
+
+    this.observable = observable;
     this.rootStore = rootStore;
   }
 
@@ -25,7 +29,9 @@ export class StaticTriggeredStore {
       .forEach((card) => {
         card.abilities.forEach((ability) => {
           if (staticTriggeredAbilityPredicate(ability)) {
-            triggers.push(new StaticTriggeredAbilityModel(ability, card));
+            triggers.push(
+              new StaticTriggeredAbilityModel(ability, card, this.observable)
+            );
           }
         });
       });
@@ -33,21 +39,21 @@ export class StaticTriggeredStore {
     return triggers;
   }
 
-  getTriggers(trigger: Trigger): StaticTriggeredAbilityModel[] {
+  getTriggers(trigger: OnTrigger): StaticTriggeredAbilityModel[] {
     switch (trigger) {
       case "quest": {
         return this.triggers.filter((ability) => {
-          return ability.trigger === "quest";
+          return ability.trigger.on === "quest";
         });
       }
       case "play": {
         return this.triggers.filter((ability) => {
-          return ability.trigger === "play";
+          return ability.trigger.on === "play";
         });
       }
       case "banish": {
         return this.triggers.filter((ability) => {
-          return ability.trigger === "banish";
+          return ability.trigger.on === "banish";
         });
       }
       default: {
@@ -57,33 +63,29 @@ export class StaticTriggeredStore {
     }
   }
 
-  trigger(trigger: Trigger, card: CardModel) {
+  trigger(trigger: OnTrigger, card: CardModel) {
     const triggers = this.getTriggers(trigger);
-
     triggers.forEach((ability) => {
-      const filters =
-        (ability.targets?.type === "card" && ability.targets?.filters) || [];
+      const filters = ability.filters;
       const expectedOwner = ability.source.ownerId;
 
       // This is only valid to play and banish
-      if (ability.trigger === "play" || ability.trigger === "banish") {
+      if (ability.trigger.on === "play" || ability.trigger.on === "banish") {
         if (!card.isValidTarget(filters, expectedOwner)) {
           return;
         }
       }
 
-      switch (ability.trigger) {
+      switch (ability.trigger.on) {
         case "play": {
           if (filters && card.isValidTarget(filters)) {
             this.rootStore.stackLayerStore.addAbilityToStack(
-              ability,
+              ability.layer,
               ability.source
             );
-          }
-
-          if (filters.length === 0) {
+          } else if (filters.length === 0) {
             this.rootStore.stackLayerStore.addAbilityToStack(
-              ability,
+              ability.layer,
               ability.source
             );
           }
@@ -92,13 +94,13 @@ export class StaticTriggeredStore {
         case "banish":
         case "quest": {
           this.rootStore.stackLayerStore.addAbilityToStack(
-            ability,
+            ability.layer,
             ability.source
           );
           break;
         }
         default: {
-          exhaustiveCheck(ability.trigger);
+          exhaustiveCheck(ability.trigger.on);
         }
       }
     });
@@ -120,19 +122,5 @@ export class StaticTriggeredStore {
 
   onPlay(card: CardModel) {
     this.trigger("play", card);
-    this.rootStore.continuousEffectStore.continuousEffects
-      .filter((continuous) => {
-        // This should be Model's responsibily, we should only trigger the effect
-        const effect = continuous.effect;
-        return (
-          effect.type === "replacement" &&
-          effect.replacement === "cost" &&
-          effect.duration === "next" &&
-          card.isValidTarget(continuous.filters || [])
-        );
-      })
-      .forEach((continuous) =>
-        this.rootStore.continuousEffectStore.stopContinuousEffect(continuous)
-      );
   }
 }

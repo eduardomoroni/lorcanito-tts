@@ -29,7 +29,7 @@ it("Does NOT let player choose an invalid target for an effect", () => {
     const target = testStore.getByZoneAndId("play", dingleHopper.id);
 
     // Fishbone quill requires a target from hand, but we're passing a target from play
-    store.stackLayerStore.resolveAbility(effect.id, {
+    store.stackLayerStore.resolveLayer(effect.id, {
       targetId: target.instanceId,
     });
   }

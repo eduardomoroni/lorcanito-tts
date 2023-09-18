@@ -133,7 +133,7 @@ export function createRuleEngine(
           targetId?: string;
         }
       ) => {
-        mobxStore.stackLayerStore.resolveAbility(effectId, params);
+        mobxStore.stackLayerStore.resolveLayer(effectId, params);
       },
       drawCard(player: string) {
         mobxStore.drawCard(player);
