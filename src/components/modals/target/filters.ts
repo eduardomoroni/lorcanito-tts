@@ -35,7 +35,30 @@ export type Keywords =
   | "support"
   | "ward";
 
-export type StatusFilterValue = "ready" | "exerted" | "dry";
+interface BaseStatusFilter {
+  filter: "status"
+  value: StatusFilterValues
+}
+interface ReadyStatusFilter extends BaseStatusFilter {
+  value: StatusFilterValues.READY
+}
+interface ExertedStatusFilter extends BaseStatusFilter {
+  value: StatusFilterValues.EXERTED
+}
+interface DryStatusFilter extends BaseStatusFilter {
+  value: StatusFilterValues.DRY
+}
+interface DamageStatusFilter extends BaseStatusFilter {
+  value: StatusFilterValues.DAMAGE
+  comparison: NumericComparison
+}
+export type StatusFilter = | ReadyStatusFilter | ExertedStatusFilter | DryStatusFilter | DamageStatusFilter
+export enum StatusFilterValues {
+  READY = "ready",
+  EXERTED = "exerted",
+  DRY = "dry",
+  DAMAGE = "damage",
+}
 export type OwnerFilterValue = "self" | "opponent" | string;
 export type AttributeFilterValue = "cost" | "name";
 
@@ -49,10 +72,7 @@ export type TargetFilter =
       filter: "owner";
       value: OwnerFilterValue;
     }
-  | {
-      filter: "status";
-      value: StatusFilterValue;
-    }
+  | StatusFilter
   | {
       filter: "zone";
       value: Zones;
@@ -137,7 +157,7 @@ export const filters: Array<{
 
 export const challengeOpponentsCardsFilter: TargetFilter[] = [
   { filter: "owner", value: "opponent" },
-  { filter: "status", value: "exerted" },
+  { filter: "status", value: StatusFilterValues.EXERTED },
   { filter: "type", value: "character" },
   { filter: "zone", value: "play" },
 ];
@@ -155,10 +175,10 @@ export function canSingFilter(song: LorcanitoCard): TargetFilter[] {
   //TODO: ADD singer ability to filter, this should be an OR filter
   return [
     { filter: "owner", value: "self" },
-    { filter: "status", value: "ready" },
+    { filter: "status", value: StatusFilterValues.READY },
     { filter: "type", value: "character" },
     { filter: "zone", value: "play" },
-    { filter: "status", value: "dry" },
+    { filter: "status", value: StatusFilterValues.DRY },
     {
       filter: "attribute",
       value: "cost",

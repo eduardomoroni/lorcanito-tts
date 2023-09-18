@@ -137,7 +137,7 @@ export const justInTime: LorcanitoActionCard = {
   rarity: "rare",
 };
 export const youHaveForgottenMe: LorcanitoActionCard = {
-  implemented: false,
+  implemented: true,
   id: "e14c1754f2cdbfd07f620d4aa1e7ec6b110a95be",
   url: "https://static.lorcanito.com/images/cards/TFC/31.webp",
   alternativeUrl:
@@ -154,18 +154,13 @@ export const youHaveForgottenMe: LorcanitoActionCard = {
       optional: false,
       effects: [
         {
-          type: "move",
-          to: "discard",
+          type: "discard",
+          amount: 2,
           target: {
-            type: "card",
-            value: 2,
-            filters: [
-              { filter: "type", value: "character" },
-              { filter: "zone", value: "hand" },
-              { filter: "owner", value: "self" },
-            ],
+            type: "player",
+            value: "opponent",
           },
-        },
+        } as DrawEffect,
       ],
       responder: "opponent",
     } as ResolutionAbility,
@@ -309,7 +304,7 @@ export const doItAgain: LorcanitoActionCard = {
   rarity: "rare",
 };
 export const stampede: LorcanitoActionCard = {
-  implemented: false,
+  implemented: true,
   id: "35bdb36f1579e326476e096dd05830dbfd02b45b",
   url: "https://static.lorcanito.com/images/cards/TFC/96.webp",
   alternativeUrl:
@@ -321,17 +316,22 @@ export const stampede: LorcanitoActionCard = {
   abilities: [
     {
       type: "resolution",
-      name: "Grab Your Sword",
-      text: "Deal 2 damage to each opposing character.",
+      name: "Stampede",
+      text: "Deal 2 damage to chosen damaged character.",
       effects: [
         {
           type: "damage",
           amount: 2,
           target: {
             type: "card",
-            value: "all",
+            value: 1,
+            filters: [
+              { filter: "type", value: "character" },
+              { filter: "zone", value: "play" },
+              { filter: "status", value: "damage", comparison: { operator: "gte", value: 1 } },
+            ],
           },
-        },
+        } as DamageEffect,
       ],
     } as ResolutionAbility,
   ],
@@ -667,7 +667,7 @@ export const tangle: LorcanitoActionCard = {
   rarity: "common",
 };
 export const developYourBrain: LorcanitoActionCard = {
-  implemented: false,
+  implemented: true,
   id: "a7f2dc6604f4409d80252bb3d4140046f336d2ed",
   url: "https://static.lorcanito.com/images/cards/TFC/161.webp",
   alternativeUrl:
@@ -679,16 +679,21 @@ export const developYourBrain: LorcanitoActionCard = {
   abilities: [
     {
       type: "resolution",
-      name: "Reflection",
-      text: "Look at the top 3 cards of your deck. Put them back on the top of your deck in any order.",
+      name: "Develop Your Brain",
+      text: "Look at the top 2 cards of your deck. Put one into your hand and the other on the bottom of the deck.",
       effects: [
         {
+          autoResolve: true,
           type: "scry",
           amount: 2,
-          mode: "top",
+          mode: "bottom",
           target: {
             type: "player",
             value: "self",
+          },
+          limits: {
+            bottom: 1,
+            top: 0
           },
           tutorFilters: [
             { filter: "owner", value: "self" },
@@ -871,7 +876,7 @@ export const fireTheCannons: LorcanitoActionCard = {
   rarity: "common",
 };
 export const ransack: LorcanitoActionCard = {
-  implemented: false,
+  implemented: true,
   id: "6ea078ad44c30a1b22a0f293c097af3e1efbbd69",
   url: "https://static.lorcanito.com/images/cards/TFC/199.webp",
   alternativeUrl:
@@ -895,7 +900,7 @@ export const ransack: LorcanitoActionCard = {
           },
         } as DrawEffect,
         {
-          type: "draw",
+          type: "discard",
           amount: 2,
           target: {
             type: "player",

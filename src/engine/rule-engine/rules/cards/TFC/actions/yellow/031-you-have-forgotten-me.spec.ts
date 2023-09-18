@@ -30,6 +30,9 @@ describe.skip("You Have Forgotten Me", () => {
 
     cardUnderTest.playFromHand();
 
+    expect(testStore.getZonesCardCount()).toEqual(
+        expect.objectContaining({ hand: 0, deck: 0, discard: 1, play: 1 })
+    );
     expect(testStore.getZonesCardCount("player_two")).toEqual(
       expect.objectContaining({ hand: 0, deck: 0, discard: 2 })
     );

@@ -1,23 +1,47 @@
-import type { TableCard } from "~/providers/TabletopProvider";
-import type {
-  NumericComparison,
-  StringComparison,
-  TargetFilter,
-} from "~/components/modals/target/filters";
-import { exhaustiveCheck } from "~/libs/exhaustiveCheck";
-import { Characteristics, LorcanitoCard } from "~/engine/cardTypes";
+import type {NumericComparison, StringComparison, TargetFilter,} from "~/components/modals/target/filters";
 import {
-  OwnerFilterValue,
-  StatusFilterValue,
+  Abilities,
+  AttributeFilterValue,
   isNumericComparison,
   isStringComparison,
   Keywords,
-  AttributeFilterValue,
+  OwnerFilterValue,
+  StatusFilter,
+  StatusFilterValues,
 } from "~/components/modals/target/filters";
-import { MobXRootStore } from "~/store/RootStore";
-import { CardModel } from "~/store/models/CardModel";
-import { keys } from "mobx";
-import { Zones } from "~/providers/TabletopProvider";
+import {exhaustiveCheck} from "~/libs/exhaustiveCheck";
+import {Characteristics, LorcanitoCard} from "~/engine/cardTypes";
+import {MobXRootStore} from "~/store/RootStore";
+import {CardModel} from "~/store/models/CardModel";
+import {keys} from "mobx";
+import {Zones} from "~/providers/TabletopProvider";
+
+const computeNumericOperator = (
+    numericComparison: NumericComparison,
+    numericValueToCompare: number): boolean => {
+  const operator = numericComparison.operator;
+  switch (operator) {
+    case "eq": {
+      return numericValueToCompare === numericComparison.value;
+    }
+    case "gt": {
+      return numericValueToCompare > numericComparison.value;
+    }
+    case "gte": {
+      return numericValueToCompare >= numericComparison.value;
+    }
+    case "lt": {
+      return numericValueToCompare < numericComparison.value;
+    }
+    case "lte": {
+      return numericValueToCompare <= numericComparison.value;
+    }
+    default: {
+      exhaustiveCheck(operator);
+      return false;
+    }
+  }
+}
 
 export function applyAllCardFilters(
   activeFilters: TargetFilter[],
@@ -61,7 +85,7 @@ export function applyAllCardFilters(
           );
         }
         case "status": {
-          return filterByStatus(filter.value as StatusFilterValue, card);
+          return filterByStatus(filter as StatusFilter, card);
         }
         case "type": {
           if (Array.isArray(filter.value)) {
@@ -87,7 +111,7 @@ export function applyAllCardFilters(
           );
         }
         case "ability": {
-          return card.hasAbility(filter.value);
+          return card.hasAbility(filter.value as Abilities);
         }
         default: {
           exhaustiveCheck(activeFilter);
@@ -115,19 +139,23 @@ export function filterByOwner(
 }
 
 export function filterByStatus(
-  value: StatusFilterValue,
-  card: CardModel
+  filter: StatusFilter,
+  card: CardModel,
 ): boolean {
-  if (value === "ready") {
+  if (filter.value === StatusFilterValues.READY) {
     return !card.meta?.exerted;
   }
 
-  if (value === "exerted") {
+  if (filter.value === StatusFilterValues.EXERTED) {
     return !!card.meta?.exerted;
   }
 
-  if (value === "dry") {
+  if (filter.value === StatusFilterValues.DRY) {
     return !card.meta?.playedThisTurn;
+  }
+
+  if (filter.value === StatusFilterValues.DAMAGE && typeof card.meta.damage === "number") {
+    return computeNumericOperator(filter.comparison, card.meta.damage)
   }
 
   return false;
@@ -156,28 +184,7 @@ export function filterByAttribute(
   }
 
   if (isNumericComparison(comparison) && typeof attribute === "number") {
-    const operator = comparison.operator;
-    switch (operator) {
-      case "eq": {
-        return attribute === comparison.value;
-      }
-      case "gt": {
-        return attribute > comparison.value;
-      }
-      case "gte": {
-        return attribute >= comparison.value;
-      }
-      case "lt": {
-        return attribute < comparison.value;
-      }
-      case "lte": {
-        return attribute <= comparison.value;
-      }
-      default: {
-        exhaustiveCheck(operator);
-        return false;
-      }
-    }
+    return computeNumericOperator(comparison, attribute)
   }
 
   return false;
