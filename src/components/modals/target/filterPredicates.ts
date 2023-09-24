@@ -1,4 +1,8 @@
-import type {NumericComparison, StringComparison, TargetFilter,} from "~/components/modals/target/filters";
+import type {
+  NumericComparison,
+  StringComparison,
+  TargetFilter,
+} from "~/components/modals/target/filters";
 import {
   Abilities,
   AttributeFilterValue,
@@ -9,16 +13,17 @@ import {
   StatusFilter,
   StatusFilterValues,
 } from "~/components/modals/target/filters";
-import {exhaustiveCheck} from "~/libs/exhaustiveCheck";
-import {Characteristics, LorcanitoCard} from "~/engine/cardTypes";
-import {MobXRootStore} from "~/store/RootStore";
-import {CardModel} from "~/store/models/CardModel";
-import {keys} from "mobx";
-import {Zones} from "~/providers/TabletopProvider";
+import { exhaustiveCheck } from "~/libs/exhaustiveCheck";
+import { Characteristics, LorcanitoCard } from "~/engine/cards/cardTypes";
+import { MobXRootStore } from "~/store/RootStore";
+import { CardModel } from "~/store/models/CardModel";
+import { keys } from "mobx";
+import { Zones } from "~/providers/TabletopProvider";
 
 const computeNumericOperator = (
-    numericComparison: NumericComparison,
-    numericValueToCompare: number): boolean => {
+  numericComparison: NumericComparison,
+  numericValueToCompare: number,
+): boolean => {
   const operator = numericComparison.operator;
   switch (operator) {
     case "eq": {
@@ -41,12 +46,12 @@ const computeNumericOperator = (
       return false;
     }
   }
-}
+};
 
 export function applyAllCardFilters(
   activeFilters: TargetFilter[],
   player: string,
-  store: MobXRootStore
+  store: MobXRootStore,
 ) {
   const playerId = player || store.activePlayer;
 
@@ -69,7 +74,7 @@ export function applyAllCardFilters(
           players.forEach((player) => {
             const playerZone = store.tableStore.getPlayerZone(
               player,
-              filter.value as Zones
+              filter.value as Zones,
             );
             if (playerZone?.hasCard(card)) {
               includes = true;
@@ -81,7 +86,7 @@ export function applyAllCardFilters(
           return filterByOwner(
             filter.value as OwnerFilterValue,
             playerId,
-            card
+            card,
           );
         }
         case "status": {
@@ -98,7 +103,7 @@ export function applyAllCardFilters(
           return filterByAttribute(
             filter.value as AttributeFilterValue,
             filter.comparison,
-            lorcanitoCard
+            lorcanitoCard,
           );
         }
         case "keyword": {
@@ -107,7 +112,7 @@ export function applyAllCardFilters(
         case "characteristics": {
           return filterByCharacteristics(
             filter.value as Characteristics[],
-            card
+            card,
           );
         }
         case "ability": {
@@ -127,7 +132,7 @@ export function applyAllCardFilters(
 export function filterByOwner(
   value: OwnerFilterValue,
   playerId: string,
-  card: CardModel
+  card: CardModel,
 ): boolean {
   if (value === "opponent") {
     return card.ownerId !== playerId;
@@ -138,10 +143,7 @@ export function filterByOwner(
   }
 }
 
-export function filterByStatus(
-  filter: StatusFilter,
-  card: CardModel,
-): boolean {
+export function filterByStatus(filter: StatusFilter, card: CardModel): boolean {
   if (filter.value === StatusFilterValues.READY) {
     return !card.meta?.exerted;
   }
@@ -154,8 +156,11 @@ export function filterByStatus(
     return !card.meta?.playedThisTurn;
   }
 
-  if (filter.value === StatusFilterValues.DAMAGE && typeof card.meta.damage === "number") {
-    return computeNumericOperator(filter.comparison, card.meta.damage)
+  if (
+    filter.value === StatusFilterValues.DAMAGE &&
+    typeof card.meta.damage === "number"
+  ) {
+    return computeNumericOperator(filter.comparison, card.meta.damage);
   }
 
   return false;
@@ -164,7 +169,7 @@ export function filterByStatus(
 export function filterByAttribute(
   value: AttributeFilterValue,
   comparison: NumericComparison | StringComparison,
-  card?: LorcanitoCard
+  card?: LorcanitoCard,
 ): boolean {
   if (!card) {
     return false;
@@ -184,7 +189,7 @@ export function filterByAttribute(
   }
 
   if (isNumericComparison(comparison) && typeof attribute === "number") {
-    return computeNumericOperator(comparison, attribute)
+    return computeNumericOperator(comparison, attribute);
   }
 
   return false;
@@ -223,6 +228,9 @@ function filterByKeyword(value: Keywords, card?: CardModel): boolean {
     case "support": {
       return card.hasSupport;
     }
+    case "voiceless": {
+      return card.hasVoiceless;
+    }
     default: {
       exhaustiveCheck(value);
       return false;
@@ -232,7 +240,7 @@ function filterByKeyword(value: Keywords, card?: CardModel): boolean {
 
 function filterByCharacteristics(
   value: Characteristics[],
-  card?: CardModel
+  card?: CardModel,
 ): boolean {
   if (!card) {
     return false;

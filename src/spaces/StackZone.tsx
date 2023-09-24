@@ -5,7 +5,7 @@ import { LorcanaCardImage } from "~/components/card/LorcanaCardImage";
 import { useCardPreview } from "~/providers/CardPreviewProvider";
 import { useHotkeys, useHotkeysContext } from "react-hotkeys-hook";
 import { logAnalyticsEvent } from "~/3rd-party/firebase/FirebaseAnalyticsProvider";
-import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { useGameStore } from "~/engine/lib/GameStoreProvider";
 import { CardModel } from "~/store/models/CardModel";
 
 // The game does not have a stack, but I want to add one.

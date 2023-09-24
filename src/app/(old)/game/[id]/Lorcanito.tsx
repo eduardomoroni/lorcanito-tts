@@ -12,7 +12,7 @@ import { PreGameProvider } from "~/providers/PreGameProvider";
 import { WelcomeModal } from "~/components/modals/WelcomeModal";
 import { PresenceProvider } from "~/providers/presence/PresenceProvider";
 import { GameLobbyProvider } from "~/providers/lobby/GameLobbyProvider";
-import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { useGameStore } from "~/engine/lib/GameStoreProvider";
 
 export const Lorcanito: FC<{
   game: Game;

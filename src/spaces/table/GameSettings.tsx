@@ -11,7 +11,7 @@ import { useDebounce } from "~/libs/useDebounce";
 import { ref, set } from "firebase/database";
 import { useIsPresent } from "~/providers/presence/PresenceProvider";
 import { useGameLobby } from "~/providers/lobby/GameLobbyProvider";
-import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { useGameStore } from "~/engine/lib/GameStoreProvider";
 import { usePlayerNickname } from "~/engine/GameProvider";
 
 /**

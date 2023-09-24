@@ -1,10 +1,12 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 import { ScryModal } from "~/components/modals/ScryModal";
-import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
-import { ScryEffect } from "~/engine/effectTypes";
+import { useGameStore } from "~/engine/lib/GameStoreProvider";
+import { ScryEffect } from "~/engine/rules/effects/effectTypes";
 import type { ResolvingParam } from "~/store/StackLayerStore";
 export type ScryModalParams = Omit<ScryEffect, "type" | "target"> & {
+  title?: string;
+  subtitle?: string;
   callback?: (param?: ResolvingParam["scry"]) => void;
 };
 
@@ -16,15 +18,6 @@ const Context = createContext<{
 export function ScryModalProvider({ children }: { children: JSX.Element }) {
   const mobXRootStore = useGameStore();
   const [params, setParams] = useState<ScryModalParams | undefined>(undefined);
-
-  useEffect(() => {
-    if (params?.amount) {
-      mobXRootStore.log({
-        type: "LOOKING_AT_TOP_CARDS",
-        amount: params.amount,
-      });
-    }
-  }, [params]);
 
   useEffect(() => {
     //TODO: THIS IS HACKY, I NEED TO FIX THIS
@@ -40,6 +33,10 @@ export function ScryModalProvider({ children }: { children: JSX.Element }) {
           scryCount={params.amount}
           mode={params.mode}
           limits={params.limits}
+          tutorFilters={params.tutorFilters}
+          title={params.title}
+          subtitle={params.subtitle}
+          shouldReveal={params.shouldRevealTutored}
           onClose={() => {
             if (params.callback) {
               // TODO: This is lazy work, I need to fix this

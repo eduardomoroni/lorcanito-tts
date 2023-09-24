@@ -4,7 +4,6 @@ import { DragNDropOverlay } from "~/components/DragNDropOverlay";
 import { CardImage } from "~/components/card/CardImage";
 import React, { FC } from "react";
 import { useUser } from "reactfire";
-import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
 import { observer } from "mobx-react-lite";
 import type { CardModel } from "~/store/models/CardModel";
 
@@ -14,7 +13,6 @@ const PlayAreaItemComponent: FC<{
   playerId: string;
   position: "top" | "bottom";
 }> = ({ cards, playerId, hotkeyOffset, position }) => {
-  const store = useGameStore();
   const { dropZoneRef, isActive, isOver } = useDropCardInZone(playerId, "play");
   const { data: user } = useUser();
 
@@ -35,7 +33,6 @@ const PlayAreaItemComponent: FC<{
         <span>{`Items count: ${cards.length}`}</span>
       </div>
       <div className="grid grid-cols-1 gap-y-2 overflow-auto">
-        {/*@ts-expect-error: toReservedNot being found*/}
         {cards.toReversed().map((cardModel: CardModel, index: number) => {
           return (
             <CardImage

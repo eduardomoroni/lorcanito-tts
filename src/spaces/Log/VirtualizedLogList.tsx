@@ -4,7 +4,7 @@ import { Log } from "~/spaces/Log/LogEntry";
 import { ref } from "firebase/database";
 import { useDatabase, useDatabaseListData } from "reactfire";
 import type { InternalLogEntry } from "~/spaces/Log/types";
-import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { useGameStore } from "~/engine/lib/GameStoreProvider";
 
 export function VirtualizedLogList(props: {
   size: { width: number; height: number };

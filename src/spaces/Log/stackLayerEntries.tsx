@@ -32,6 +32,15 @@ export function resolveStackLayerEntries(
 
     effects.forEach((effect) => {
       switch (effect.type) {
+        case "lore": {
+          const { amount, modifier } = effect;
+          elements.push(
+            `, ${
+              modifier === "add" ? "adding" : "reducing"
+            } its lore by ${amount}`
+          );
+          break;
+        }
         case "replacement":
           break;
         case "attribute":
@@ -47,31 +56,39 @@ export function resolveStackLayerEntries(
               effect.duration === "turn" ? "this turn" : "until next turn"
             }.`
           );
-
           break;
         case "ability":
           elements.push(`, gaining the ability ${effect.ability}.`);
           break;
         case "conditional":
+          elements.push(`, gaining the ability ${effect}.`);
           break;
-        // Already has logs when the effect is resolved
         case "move":
+          elements.push(`, gaining the ability ${effect}.`);
           break;
         case "heal":
+          elements.push(`, gaining the ability ${effect}.`);
           break;
         case "scry":
+          elements.push(`, gaining the ability ${effect}.`);
           break;
         case "exert":
+          elements.push(`, gaining the ability ${effect}.`);
           break;
         case "damage":
+          elements.push(`, gaining the ability ${effect}.`);
           break;
         case "draw":
+          elements.push(`, gaining the ability ${effect}.`);
           break;
         case "banish":
+          elements.push(`, gaining the ability ${effect}.`);
           break;
         case "discard":
+          elements.push(`, gaining the ability ${effect}.`);
           break;
         case "shuffle":
+          elements.push(`, gaining the ability ${effect}.`);
           break;
         default: {
           exhaustiveCheck(effect);

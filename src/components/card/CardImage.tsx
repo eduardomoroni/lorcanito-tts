@@ -14,6 +14,18 @@ import { useTurn } from "~/engine/GameProvider";
 import { observer } from "mobx-react-lite";
 import { CardModel } from "~/store/models/CardModel";
 import { CardIcons } from "~/components/card-icons/CardIcons";
+import { Popover, Button } from "antd";
+import {
+  CardPopOver,
+  CardPopOverContent,
+} from "~/components/card/CardPopOverContent";
+
+const content = (
+  <div>
+    <Button className={"mr-2"}>Challenge</Button>
+    <Button>Quest</Button>
+  </div>
+);
 
 function CardImageComponent(props: {
   card?: CardModel;
@@ -71,72 +83,79 @@ function CardImageComponent(props: {
 
   return (
     <div
-      ref={(ref) => {
-        if (draggable) {
-          dragRef(ref);
-        }
-        if (zone === "play") {
-          dropZoneRef(ref);
-        }
-      }}
-      draggable={draggable}
-      data-id-card={card.instanceId}
-      onClick={onClick}
-      onMouseEnter={() => {
-        if (!isFaceDown) {
-          setCardPreview({ instanceId: card.instanceId, tableId: ownerId });
-        }
-      }}
-      onMouseLeave={() => setCardPreview(undefined)}
-      onContextMenu={(event) => openContextMenu(card, event, "top")}
-      className={`${showHotKey ? hotKeyBorder : ""} ${
-        grow === "horizontal" ? "h-full" : "w-full"
-      } ${className || ""} ${
-        tapped ? "-translate-x-full rotate-90" : "rotate-0"
-      } ${isOpponentsCard ? "cursor-not-allowed" : "cursor-pointer"} ${
-        isDead ? "grayscale" : ""
-      } ${hovered ? "scale-110" : ""} ${highlighted ? "z-20" : ""} ${
+      className={`${tapped ? "-translate-x-full rotate-90" : "rotate-0"} ${
         image === "full" ? "aspect-card" : "aspect-card-image-name"
-      } group relative flex origin-bottom-right select-none rounded-lg transition-all ease-linear hover:z-10 hover:border-indigo-500`}
+      } group relative flex origin-bottom-right select-none rounded-lg transition-all ease-linear`}
     >
-      {zone === "play" && !isOpponentsCard && (
+      <CardPopOver card={card} owner={user?.uid}>
         <div
-          className={`absolute left-0 top-0 m-2 opacity-0 group-hover:opacity-100`}
-          onClick={(event: MouseEvent<HTMLDivElement>) => {
-            event.stopPropagation();
-            openContextMenu(card, event, "bottom");
+          ref={(ref) => {
+            if (draggable) {
+              dragRef(ref);
+            }
+            if (zone === "play") {
+              dropZoneRef(ref);
+            }
           }}
+          draggable={draggable}
+          data-id-card={card.instanceId}
+          onClick={onClick}
+          onMouseEnter={() => {
+            if (!isFaceDown) {
+              setCardPreview({ instanceId: card.instanceId, tableId: ownerId });
+            }
+          }}
+          onMouseLeave={() => setCardPreview(undefined)}
+          onContextMenu={(event) => openContextMenu(card, event, "top")}
+          className={`${showHotKey ? hotKeyBorder : ""} ${
+            grow === "horizontal" ? "h-full" : "w-full"
+          } ${className || ""} 
+          } ${isOpponentsCard ? "cursor-not-allowed" : "cursor-pointer"} ${
+            isDead ? "grayscale" : ""
+          } ${hovered ? "scale-110" : ""} ${highlighted ? "z-20" : ""} ${
+            image === "full" ? "aspect-card" : "aspect-card-image-name"
+          } group relative flex origin-bottom-right select-none rounded-lg transition-all ease-linear hover:z-10 hover:border-indigo-500`}
         >
-          <CardContextMenuTrigger />
-        </div>
-      )}
-      {highlighted ? (
-        <CardImageOverlay isActive={highlighted} isOver={hovered}>
-          {canShift ? "SHIFT" : ""}
-          {canChallenge ? "CHALLENGE" : ""}
-          {canSing ? "SING" : ""}
-        </CardImageOverlay>
-      ) : null}
+          {zone === "play" && !isOpponentsCard && (
+            <div
+              className={`absolute left-0 top-0 m-2 opacity-0 group-hover:opacity-100`}
+              onClick={(event: MouseEvent<HTMLDivElement>) => {
+                event.stopPropagation();
+                openContextMenu(card, event, "bottom");
+              }}
+            >
+              <CardContextMenuTrigger />
+            </div>
+          )}
+          {highlighted ? (
+            <CardImageOverlay isActive={highlighted} isOver={hovered}>
+              {canShift ? "SHIFT" : ""}
+              {canChallenge ? "CHALLENGE" : ""}
+              {canSing ? "SING" : ""}
+            </CardImageOverlay>
+          ) : null}
 
-      {zone === "play" && card.type === "character" && (
-        <CardImageDamageOverlay
-          card={card}
-          zone={zone}
-          className="group-hover:opacity-100"
-        />
-      )}
-      {showHotKey && (
-        <CardHotKeyOverlay card={card} zone={zone} index={index ?? -1} />
-      )}
-      {zone === "play" && card.type === "character" ? (
-        <CardIcons card={card} />
-      ) : null}
-      <LorcanaCardImage
-        isFaceDown={isFaceDown}
-        style={{ opacity }}
-        card={lorcanitoCard}
-        hideCardText={image === "image"}
-      />
+          {zone === "play" && card.type === "character" && (
+            <CardImageDamageOverlay
+              card={card}
+              zone={zone}
+              className="group-hover:opacity-100"
+            />
+          )}
+          {showHotKey && (
+            <CardHotKeyOverlay card={card} zone={zone} index={index ?? -1} />
+          )}
+          {zone === "play" && card.type === "character" ? (
+            <CardIcons card={card} />
+          ) : null}
+          <LorcanaCardImage
+            isFaceDown={isFaceDown}
+            style={{ opacity }}
+            card={lorcanitoCard}
+            hideCardText={image === "image"}
+          />
+        </div>
+      </CardPopOver>
     </div>
   );
 }

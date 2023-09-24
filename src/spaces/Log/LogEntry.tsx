@@ -1,6 +1,6 @@
 import React, { memo } from "react";
 import type { InternalLogEntry } from "~/spaces/Log/types";
-import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { useGameStore } from "~/engine/lib/GameStoreProvider";
 
 import { mapLogEntries } from "~/spaces/Log/game-log/allEntries";
 

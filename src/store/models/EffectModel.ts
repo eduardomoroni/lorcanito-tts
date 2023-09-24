@@ -2,12 +2,19 @@ import { makeAutoObservable } from "mobx";
 import type { MobXRootStore } from "~/store/RootStore";
 import { CardModel } from "~/store/models/CardModel";
 import { createId } from "@paralleldrive/cuid2";
-import type { AttributeEffect, Effect } from "~/engine/effectTypes";
+import type {
+  AttributeEffect,
+  Effect,
+} from "~/engine/rules/effects/effectTypes";
 import { exhaustiveCheck } from "~/libs/exhaustiveCheck";
-import { conditionEffectPredicate, EffectTargets } from "~/engine/effectTypes";
+import {
+  conditionEffectPredicate,
+  EffectTargets,
+} from "~/engine/rules/effects/effectTypes";
 import { ResolvingParam } from "~/store/StackLayerStore";
 import { ContinuousEffectModel } from "~/store/models/ContinuousEffectModel";
 import { TargetFilter } from "~/components/modals/target/filters";
+import { notEmptyPredicate } from "~/engine/rules/abilities/abilities";
 
 export type EffectOutput = {
   source: string;
@@ -24,7 +31,7 @@ export class EffectModel {
     effects: Effect | Effect[],
     source: CardModel,
     rootStore: MobXRootStore,
-    observable: boolean
+    observable: boolean,
   ) {
     if (observable) {
       makeAutoObservable<EffectModel, "rootStore" | "observable">(this, {
@@ -57,15 +64,17 @@ export class EffectModel {
     }
 
     if (targets.type === "player") {
+      const ownerId = this.source.ownerId;
+      const opponentPlayer = this.rootStore.opponentPlayer(ownerId);
       switch (targets.value) {
         case "self": {
-          return [this.rootStore.turnPlayer];
+          return [ownerId];
         }
         case "opponent": {
-          return [this.rootStore.opponentPlayer];
+          return [opponentPlayer];
         }
         case "all": {
-          return [this.rootStore.turnPlayer, this.rootStore.opponentPlayer];
+          return [opponentPlayer, ownerId];
         }
         default: {
           exhaustiveCheck(targets);
@@ -81,8 +90,14 @@ export class EffectModel {
     params: {
       targetId?: string;
       targets?: CardModel[] | CardModel;
-    } = {}
+    } = {},
+    playerId?: string,
   ): CardModel[] {
+    if (targets?.type === "trigger") {
+      console.log("This value should have been replaced by the trigger");
+      return [];
+    }
+
     if (params.targets) {
       return Array.isArray(params.targets) ? params.targets : [params.targets];
     }
@@ -96,11 +111,21 @@ export class EffectModel {
       return [];
     }
 
+    if (targets.type === "top-deck" && playerId) {
+      return [this.rootStore.topDeckCard(playerId)].filter(notEmptyPredicate);
+    }
+
     switch (targets.type) {
       case "card": {
         const cards = this.rootStore.cardStore.getCardsByFilter(
-          targets.filters
+          targets.filters,
         );
+
+        if (targets.excludeSelf) {
+          return cards.filter(
+            (card) => card.instanceId !== this.source.instanceId,
+          );
+        }
 
         if (targets.value === "all") {
           return cards;
@@ -126,7 +151,11 @@ export class EffectModel {
   }
 
   private resolveEffect(effect: Effect, params: ResolvingParam = {}) {
-    const cardTargets = this.resolveCardTargets(effect.target, params);
+    const cardTargets = this.resolveCardTargets(
+      effect.target,
+      params,
+      this.source.ownerId,
+    );
     const turn = this.rootStore.turnCount;
 
     switch (effect.type) {
@@ -140,19 +169,18 @@ export class EffectModel {
               { turn: effect.duration === "turn" ? turn : turn + 1 },
               effect,
               this.rootStore,
-              this.observable
-            )
+              this.observable,
+            ),
           );
         });
 
         break;
       }
       case "shuffle": {
-        console.log("shuffle not implemented");
         cardTargets.forEach((target) => {
           this.rootStore.cardStore.shuffleCardIntoDeck(
             target.instanceId,
-            "discard"
+            "discard",
           );
         });
         break;
@@ -161,7 +189,16 @@ export class EffectModel {
         const healAmount = effect.amount;
 
         cardTargets.forEach((card) => {
+          const damageBefore = card.meta.damage || 0;
           card.updateCardDamage(healAmount, "remove");
+          const damageAfter = card.meta.damage || 0;
+
+          if (effect?.subEffect?.type === "draw") {
+            this.rootStore.tableStore.drawCards(
+              this.source.ownerId,
+              damageBefore - damageAfter,
+            );
+          }
         });
 
         break;
@@ -171,6 +208,10 @@ export class EffectModel {
 
         cardTargets.forEach((card) => {
           card.updateCardDamage(damage, "add");
+
+          if (card.isDead) {
+            card.moveTo("discard");
+          }
         });
 
         break;
@@ -181,14 +222,35 @@ export class EffectModel {
         });
         break;
       }
-      case "discard": {
-        console.log("discard not implemented");
+      case "lore": {
+        this.resolvePlayerTargets(effect.target).forEach((playerId) => {
+          if (effect.modifier === "add") {
+            this.rootStore.tableStore.getTable(playerId).lore += effect.amount;
+          }
 
+          if (effect.modifier === "subtract") {
+            this.rootStore.tableStore.getTable(playerId).lore -= effect.amount;
+
+            if (this.rootStore.tableStore.getTable(playerId).lore < 0) {
+              this.rootStore.tableStore.getTable(playerId).lore = 0;
+            }
+          }
+        });
+        break;
+      }
+      case "discard": {
+        cardTargets.forEach((card) => {
+          card.discard();
+        });
         break;
       }
       case "move": {
         cardTargets.forEach((card) => {
           card.moveTo(effect.to);
+
+          if (effect.exerted) {
+            card.updateCardMeta({ exerted: effect.exerted });
+          }
         });
         break;
       }
@@ -213,7 +275,8 @@ export class EffectModel {
             bottom,
             hand,
             effect.tutorFilters,
-            effect.limits
+            effect.limits,
+            effect.shouldRevealTutored,
           );
         } else {
           console.error("Invalid scry params");
@@ -230,8 +293,8 @@ export class EffectModel {
               { turn: effect.duration === "turn" ? turn : turn + 1 },
               effect,
               this.rootStore,
-              this.observable
-            )
+              this.observable,
+            ),
           );
         });
 
@@ -249,8 +312,8 @@ export class EffectModel {
             { turn: turn, times: effect.duration === "next" ? 1 : 0 },
             effect,
             this.rootStore,
-            this.observable
-          )
+            this.observable,
+          ),
         );
 
         break;
@@ -278,8 +341,8 @@ export class EffectModel {
                 },
               } as AttributeEffect,
               this.rootStore,
-              this.observable
-            )
+              this.observable,
+            ),
           );
         });
 

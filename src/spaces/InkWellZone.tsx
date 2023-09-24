@@ -4,7 +4,7 @@ import { DragNDropOverlay } from "~/components/DragNDropOverlay";
 import { CardImage } from "~/components/card/CardImage";
 import React, { FC } from "react";
 import type { CardModel } from "~/store/models/CardModel";
-import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { useGameStore } from "~/engine/lib/GameStoreProvider";
 import { observer } from "mobx-react-lite";
 
 const InkWellComponent: FC<{
@@ -23,7 +23,7 @@ const InkWellComponent: FC<{
   return (
     <div
       ref={dropZoneRef}
-      className="relative z-20 m-1 mt-0 flex h-full grow overflow-y-auto p-1"
+      className="relative z-20 m-1 mt-2 flex h-full w-full overflow-auto p-1"
     >
       <ZoneOverlay>Ink Well</ZoneOverlay>
       <DragNDropOverlay isOver={isOver} isActive={isActive}>
@@ -40,7 +40,6 @@ const InkWellComponent: FC<{
         return (
           <CardImage
             key={`${index}-${card}`}
-            style={{ transform: `translateX(-${index * 25}%)` }}
             className={`${card.meta.playedThisTurn ? "grayscale" : ""}`}
             card={card}
             zone="inkwell"

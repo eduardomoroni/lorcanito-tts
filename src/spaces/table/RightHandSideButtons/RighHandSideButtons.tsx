@@ -3,7 +3,7 @@ import React from "react";
 import { usePreGame } from "~/providers/PreGameProvider";
 import { useTurn } from "~/engine/GameProvider";
 import { useHotkeys } from "react-hotkeys-hook";
-import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { useGameStore } from "~/engine/lib/GameStoreProvider";
 
 type Props = {
   playerHand: string[];

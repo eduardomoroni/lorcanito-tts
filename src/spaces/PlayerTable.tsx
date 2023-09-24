@@ -7,7 +7,7 @@ import { HandZone } from "~/spaces/HandZone";
 import { TableOverlay } from "~/spaces/table/TableOverlay";
 import { PlayerOfflineBanner } from "~/components/banners/PlayerOfflineBanner";
 import { observer } from "mobx-react-lite";
-import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { useGameStore } from "~/engine/lib/GameStoreProvider";
 import { CardModel } from "~/store/models/CardModel";
 import { LoreCounter } from "~/spaces/table/lore/LoreCounter";
 import { ItemArea } from "~/spaces/ItemArea";
@@ -72,7 +72,7 @@ const PlayerTableComponent: React.FC<{
             cardsOnStack={cardsOnStack}
           />
         </div>
-        <div className="z-0 flex h-2/6 w-full">
+        <div className="z-0 flex h-2/6 w-full overflow-x-auto">
           <InkWell
             playerId={tableOwner}
             cards={zones?.inkwell.cards || []}
@@ -97,7 +97,7 @@ const PlayerTableComponent: React.FC<{
       <div
         className={`${position === "top" ? "-top-44" : "-bottom-44"} ${
           isStackZoneOpen ? "-translate-y-3/4" : ""
-        } absolute left-1/2 z-10 flex h-44 w-auto min-w-1/2 max-w-full -translate-x-1/2 justify-center overflow-y-visible transition-all duration-700 hover:scale-125`}
+        } absolute left-1/2 z-10 flex h-44 w-auto min-w-1/2 max-w-full -translate-x-1/2 justify-center overflow-y-visible duration-700 transition-all hover:scale-125`}
       >
         <HandZone
           playerId={tableOwner}

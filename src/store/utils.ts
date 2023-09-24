@@ -1,4 +1,3 @@
-import type { ContinuousEffect } from "~/engine/effectTypes";
 import {
   bodyguardAbility,
   bodyguardAbilityPredicate,
@@ -13,15 +12,17 @@ import {
   singerAbilityPredicate,
   supportAbility,
   supportAbilityPredicate,
+  voicelessAbility,
+  voicelessAbilityPredicate,
   wardAbility,
   wardAbilityPredicate,
-} from "~/engine/abilities";
+} from "~/engine/rules/abilities/abilities";
 import { exhaustiveCheck } from "~/libs/exhaustiveCheck";
 import { Abilities } from "~/components/modals/target/filters";
 import type { ContinuousEffectModel } from "~/store/models/ContinuousEffectModel";
 
 export const mapContinuousEffectToAbility = (
-  element: ContinuousEffectModel
+  element: ContinuousEffectModel,
 ) => {
   const effect = element.effect;
 
@@ -60,7 +61,9 @@ export const mapContinuousEffectToAbility = (
     case "ward": {
       return wardAbility;
     }
-
+    case "voiceless": {
+      return voicelessAbility;
+    }
     default: {
       exhaustiveCheck(effect.ability);
     }
@@ -107,6 +110,10 @@ export const keywordToAbilityPredicate = (keyword: Abilities) => {
     }
     case "shift": {
       predicate = shiftAbilityPredicate;
+      break;
+    }
+    case "voiceless": {
+      predicate = voicelessAbilityPredicate;
       break;
     }
     default: {

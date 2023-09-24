@@ -2,8 +2,12 @@ import type { Deck, Table, TableCard } from "~/providers/TabletopProvider";
 import { createId } from "@paralleldrive/cuid2";
 import { shuffleDeck } from "~/libs/shuffle";
 
-import { Ability } from "~/engine/abilities";
-import { ContinuousEffect } from "~/engine/effectTypes";
+import {
+  Ability,
+  DelayedTriggeredAbility,
+  StaticTriggeredAbility,
+} from "~/engine/rules/abilities/abilities";
+import { ContinuousEffect } from "~/engine/rules/effects/effectTypes";
 
 export type GameEffect = {
   instanceId: string;
@@ -25,6 +29,7 @@ export type Game = {
   cards: Record<string, TableCard>;
   effects: GameEffect[];
   continuousEffects: ContinuousEffect[];
+  triggeredAbilities: DelayedTriggeredAbility[];
 };
 
 export type GameLobby = {
@@ -49,7 +54,7 @@ function createTableCard(cardId: string, ownerId: string) {
 
 export const createCards = (
   deck: Deck,
-  ownerId: string
+  ownerId: string,
 ): Record<string, TableCard> => {
   const cards: Record<string, TableCard> = {};
 
@@ -111,7 +116,7 @@ export function recreateTable(sourceTable?: Table): Table {
     }
 
     newTable.zones.deck = newTable.zones.deck.concat(
-      newTable.zones[zone] || []
+      newTable.zones[zone] || [],
     );
     newTable.zones[zone] = [];
   });
@@ -139,9 +144,9 @@ export function createTable(): Table {
 
 export function createEmptyGame(
   gameId: string,
-  lastActivity: unknown = null
+  lastActivity: unknown = null,
 ): Game {
-  return {
+  const game: Game = {
     id: gameId,
     lastActionId: 0,
     visibility: "public",
@@ -155,7 +160,10 @@ export function createEmptyGame(
     cards: {},
     effects: [],
     continuousEffects: [],
+    triggeredAbilities: [],
   };
+
+  return game;
 }
 
 export function createEmptyGameLobby(
@@ -163,7 +171,7 @@ export function createEmptyGameLobby(
   gameId: string,
   userId: string,
   name: string,
-  lastActivity?: string
+  lastActivity?: string,
 ): GameLobby {
   return {
     id: id,

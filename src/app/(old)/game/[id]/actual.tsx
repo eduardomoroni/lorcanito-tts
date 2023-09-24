@@ -5,7 +5,7 @@ import { useFirebaseUserId } from "~/3rd-party/firebase/FirebaseSessionProvider"
 import { useSigninCheck } from "reactfire";
 import type { Game } from "~/libs/game";
 import { Lorcanito } from "./Lorcanito";
-import { GameStoreProvider } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { GameStoreProvider } from "~/engine/lib/GameStoreProvider";
 import { GameProvider } from "~/engine/GameProvider";
 import { StreamChatProvider } from "~/providers/stream-chat-provider/StreamChatProvider";
 import { GameLogProvider } from "~/spaces/Log/game-log/GameLogProvider";

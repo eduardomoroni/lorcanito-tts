@@ -6,7 +6,7 @@ import { XMarkIcon } from "@heroicons/react/24/outline";
 import { IconDiscord } from "~/components/DiscorIcon";
 import { api } from "~/utils/api";
 import { logAnalyticsEvent } from "~/3rd-party/firebase/FirebaseAnalyticsProvider";
-import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { useGameStore } from "~/engine/lib/GameStoreProvider";
 
 type Props = {
   setOpen: (open: boolean) => void;

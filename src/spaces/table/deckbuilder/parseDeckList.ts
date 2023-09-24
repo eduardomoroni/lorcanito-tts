@@ -1,6 +1,6 @@
 import { type Deck, type DeckCard } from "~/providers/TabletopProvider";
 import { allCards } from "~/engine/cards/cards";
-import { LorcanitoCard } from "~/engine/cardTypes";
+import { LorcanitoCard } from "~/engine/cards/cardTypes";
 
 export function getCardFullName(card: LorcanitoCard) {
   if (!card.title) {
@@ -64,7 +64,7 @@ export function parseDeckList(deckList: string): Deck {
       .filter((line) => !line.startsWith("//"))
       .map(parseLine);
     const deck: Deck = parsedResult.filter(
-      (item) => !("invalid" in item)
+      (item) => !("invalid" in item),
     ) as Deck; // TODO: filter undefined in types
 
     return deck;

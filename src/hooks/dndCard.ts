@@ -5,7 +5,7 @@ import {
   canSingFilter,
   challengeOpponentsCardsFilter,
 } from "~/components/modals/target/filters";
-import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { useGameStore } from "~/engine/lib/GameStoreProvider";
 import { CardModel } from "~/store/models/CardModel";
 import { MobXRootStore } from "~/store/RootStore";
 

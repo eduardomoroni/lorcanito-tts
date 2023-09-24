@@ -2,7 +2,8 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import type { TargetFilter } from "~/components/modals/target/filters";
 import { TargetModal } from "~/components/modals/target/TargetModal";
 import type { CardModel } from "~/store/models/CardModel";
-import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { useGameStore } from "~/engine/lib/GameStoreProvider";
+import { Ability } from "~/engine/rules/abilities/abilities";
 
 export type OpenTargetModalParams = {
   title?: string;
@@ -10,7 +11,7 @@ export type OpenTargetModalParams = {
   filters: TargetFilter[];
   callback: (target?: CardModel) => void;
   onCancel?: () => void;
-  type?: "challenge" | "resolution" | "activated" | "static-triggered" | "";
+  type?: "challenge" | Ability["type"] | "";
 };
 const TargetModalContext = createContext<{
   openTargetModal: (args: OpenTargetModalParams) => void;

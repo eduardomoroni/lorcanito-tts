@@ -1,7 +1,10 @@
 import { makeAutoObservable, toJS } from "mobx";
 import type { MobXRootStore } from "~/store/RootStore";
 import { CardModel } from "~/store/models/CardModel";
-import type { ContinuousEffect, Effect } from "~/engine/effectTypes";
+import type {
+  ContinuousEffect,
+  Effect,
+} from "~/engine/rules/effects/effectTypes";
 import { TargetFilter } from "~/components/modals/target/filters";
 import { createId } from "@paralleldrive/cuid2";
 
@@ -33,7 +36,7 @@ export class ContinuousEffectModel
     duration: ContinuousEffect["duration"],
     effect: Effect,
     rootStore: MobXRootStore,
-    observable: boolean
+    observable: boolean,
   ) {
     if (observable) {
       makeAutoObservable<ContinuousEffectModel, "rootStore">(this, {

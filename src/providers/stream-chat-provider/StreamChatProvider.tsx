@@ -8,7 +8,6 @@ import type {
   UserResponse,
 } from "stream-chat";
 import { Message } from "stream-chat/src/types";
-import { StreamChatGenerics } from "stream-chat-react/dist/stories/utils";
 
 const Context = React.createContext<{
   client: StreamChat | undefined;
@@ -38,7 +37,7 @@ export class SingletonChat {
   }
 
   static async sendMessage(
-    message: Message<StreamChatGenerics>,
+    message: Message,
     options?: {
       force_moderation?: boolean;
       is_pending_message?: boolean;
@@ -47,7 +46,7 @@ export class SingletonChat {
       pending_message_metadata?: Record<string, string>;
       skip_enrich_url?: boolean;
       skip_push?: boolean;
-    }
+    },
   ) {
     if (!this.channel) {
       console.error("Channel not set");
@@ -73,7 +72,7 @@ export const StreamChatProvider: React.FC<{
     id: firebaseUser?.uid || "",
     name: (firebaseUser?.displayName || firebaseUser?.uid || "").substring(
       0,
-      10
+      10,
     ),
     userName: firebaseUser?.displayName,
     image: `https://getstream.io/random_png/?id=${playerId}&name=${playerId}`,
@@ -84,7 +83,7 @@ export const StreamChatProvider: React.FC<{
       cacheTime: 30 * 60 * 1000,
       refetchOnMount: false,
       refetchOnWindowFocus: false,
-    }
+    },
   );
 
   // https://getstream.io/chat/docs/node/authless_users/?language=javascript

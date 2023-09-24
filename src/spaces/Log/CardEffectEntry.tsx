@@ -1,7 +1,7 @@
 import React, { type FC } from "react";
 import { useCardPreview } from "~/providers/CardPreviewProvider";
 import { GameEffect } from "~/libs/game";
-import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { useGameStore } from "~/engine/lib/GameStoreProvider";
 
 const COLORS = {
   ruby: "text-ruby",

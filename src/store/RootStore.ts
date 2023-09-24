@@ -1,5 +1,5 @@
 import { get, keys, makeAutoObservable, toJS } from "mobx";
-import { selectNextTurnPlayer } from "~/engine/rule-engine/lorcana/selectors";
+import { selectNextTurnPlayer } from "~/engine/selectors";
 import { Meta, Zones } from "~/providers/TabletopProvider";
 
 import { TableStore } from "~/store/TableStore";
@@ -29,13 +29,13 @@ export class MobXRootStore {
   tableStore: TableStore;
   cardStore: CardStore;
   stackLayerStore: StackLayerStore;
-  staticTriggeredStore: StaticTriggeredStore;
+  triggeredStore: StaticTriggeredStore;
   continuousEffectStore: ContinuousEffectStore;
 
   constructor(
     initialState: Game,
     dependencies: Dependencies,
-    observable = true
+    observable = true,
   ) {
     if (observable) {
       makeAutoObservable(this, { dependencies: false });
@@ -54,31 +54,30 @@ export class MobXRootStore {
     this.players = initialState.players;
 
     // stores
-
     this.cardStore = new CardStore(
       initialState.cards,
       dependencies,
       this,
-      observable
+      observable,
     );
     this.tableStore = TableStore.fromTable(
       initialState.tables,
       dependencies,
       this.cardStore,
       this,
-      observable
+      observable,
     );
     this.stackLayerStore = new StackLayerStore(
       initialState.effects,
       dependencies,
       this,
-      observable
+      observable,
     );
-    this.staticTriggeredStore = new StaticTriggeredStore(this, observable);
+    this.triggeredStore = new StaticTriggeredStore(this, observable);
     this.continuousEffectStore = new ContinuousEffectStore(
       initialState.continuousEffects,
       this,
-      observable
+      observable,
     );
   }
 
@@ -96,8 +95,7 @@ export class MobXRootStore {
     this.tableStore.sync(game.tables);
     this.stackLayerStore.sync(game.effects);
     this.continuousEffectStore.sync(game.continuousEffects);
-    // No need to sync or persist static triggered effects, they are queries as events happen
-    // this.staticTriggeredStore = this.staticTriggeredStore
+    this.triggeredStore.sync(game.triggeredAbilities);
   }
 
   // This converts the observables into plain objects
@@ -115,6 +113,7 @@ export class MobXRootStore {
       cards: this.cardStore.toJSON(),
       effects: this.stackLayerStore.toJSON(),
       continuousEffects: this.continuousEffectStore.toJSON(),
+      triggeredAbilities: this.triggeredStore.toJSON(),
     });
   }
 
@@ -142,10 +141,10 @@ export class MobXRootStore {
     return this.dependencies.playerId;
   }
 
-  get opponentPlayer() {
+  opponentPlayer(playerId: string) {
     return selectNextTurnPlayer(
       keys(this.tableStore.tables) as string[],
-      this.activePlayer
+      playerId,
     );
   }
 
@@ -161,7 +160,7 @@ export class MobXRootStore {
     instanceId: string = "",
     from: Zones,
     to: Zones,
-    position: "first" | "last" = "last"
+    position: "first" | "last" = "last",
   ) {
     this.tableStore.moveCard(instanceId, from, to, position);
   }
@@ -173,7 +172,7 @@ export class MobXRootStore {
   passTurn(playerId: string, force: boolean = false) {
     const nextTurnPlayer = selectNextTurnPlayer(
       keys(this.tableStore.tables) as string[],
-      this.turnPlayer
+      this.turnPlayer,
     );
 
     const playArea = this.playerTable(this.turnPlayer)?.zones.play.cards || [];
@@ -184,7 +183,7 @@ export class MobXRootStore {
       ?.filter((card) => card.hasReckless)
       .some((recklessGlimmer) => {
         return opponentPlayArea.some((opponentCard) =>
-          recklessGlimmer.canChallenge(opponentCard)
+          recklessGlimmer.canChallenge(opponentCard),
         );
       });
 
@@ -215,30 +214,32 @@ export class MobXRootStore {
     this.turnCount++;
     this.turnPlayer = nextTurnPlayer;
 
+    this.continuousEffectStore.onTurnPassed(this.turnCount);
+    this.triggeredStore.onTurnPassed(this.turnCount);
+
+    // logAnalyticsEvent("pass_turn");
+
+    this.readySetDraw(nextTurnPlayer);
+  }
+
+  readySetDraw(playerId: string) {
     const zones: Zones[] = ["play", "inkwell"];
     zones.forEach((zone: Zones) => {
-      this.getPlayerZone(nextTurnPlayer, zone)?.cards.forEach((card) => {
-        card.updateCardMeta({
-          playedThisTurn: false,
-          exerted: false,
-        });
+      this.getPlayerZone(playerId, zone)?.cards.forEach((card) => {
+        const hasExertRestriction = card.hasExertRestriction;
+        if (!hasExertRestriction) {
+          card.updateCardMeta({
+            playedThisTurn: false,
+            exerted: false,
+          });
+        }
       });
     });
 
-    this.continuousEffectStore.continuousEffects.forEach((effect) => {
-      if (
-        // turn can be 0
-        effect.duration?.turn !== undefined &&
-        effect.duration?.turn < this.turnCount
-      ) {
-        this.continuousEffectStore.stopContinuousEffect(effect);
-      }
-    });
-
-    this.drawCard(nextTurnPlayer);
-    // logAnalyticsEvent("pass_turn");
+    this.drawCard(playerId);
   }
 
+  // TODO: Move this to cardModel
   shiftCard(shifter?: string, shifted?: string) {
     if (shifter && shifted) {
       this.cardStore.shiftCard(shifter, shifted);

@@ -6,7 +6,7 @@ import {
   ContextMenu,
   useContextMenu,
 } from "~/providers/card-context-menu/ContextMenuProvider";
-import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { useGameStore } from "~/engine/lib/GameStoreProvider";
 import { CardModel } from "~/store/models/CardModel";
 import { createContextMenuItems } from "~/providers/card-context-menu/createCardContextMenuItems";
 import { useTargetModal } from "~/providers/TargetModalProvider";
@@ -49,6 +49,10 @@ export const useDeckZoneContextMenu = () => {
     {
       text: "Scry 1",
       onClick: () => {
+        store.log({
+          type: "LOOKING_AT_TOP_CARDS",
+          amount: 1,
+        });
         openScryModal({
           amount: 1,
           mode: "both",
@@ -58,6 +62,10 @@ export const useDeckZoneContextMenu = () => {
     {
       text: "Scry 2",
       onClick: () => {
+        store.log({
+          type: "LOOKING_AT_TOP_CARDS",
+          amount: 2,
+        });
         openScryModal({
           amount: 2,
           mode: "both",
@@ -67,6 +75,10 @@ export const useDeckZoneContextMenu = () => {
     {
       text: "Scry 3",
       onClick: () => {
+        store.log({
+          type: "LOOKING_AT_TOP_CARDS",
+          amount: 3,
+        });
         openScryModal({
           amount: 3,
           mode: "both",
@@ -76,6 +88,10 @@ export const useDeckZoneContextMenu = () => {
     {
       text: "Scry 4",
       onClick: () => {
+        store.log({
+          type: "LOOKING_AT_TOP_CARDS",
+          amount: 4,
+        });
         openScryModal({
           amount: 4,
           mode: "both",
@@ -85,6 +101,10 @@ export const useDeckZoneContextMenu = () => {
     {
       text: "Scry 5",
       onClick: () => {
+        store.log({
+          type: "LOOKING_AT_TOP_CARDS",
+          amount: 5,
+        });
         openScryModal({
           amount: 5,
           mode: "both",

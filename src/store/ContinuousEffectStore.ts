@@ -1,15 +1,15 @@
 import { makeAutoObservable, toJS } from "mobx";
 import type { MobXRootStore } from "~/store/RootStore";
-import type { ContinuousEffect } from "~/engine/effectTypes";
+import type { ContinuousEffect } from "~/engine/rules/effects/effectTypes";
 import { ContinuousEffectModel } from "~/store/models/ContinuousEffectModel";
 import { CardModel } from "~/store/models/CardModel";
 import {
   loreEffectPredicate,
   replacementEffectPredicate,
   strengthEffectPredicate,
-} from "~/engine/effectTypes";
+} from "~/engine/rules/effects/effectTypes";
 import { mapContinuousEffectToAbility } from "~/store/utils";
-import { notEmptyPredicate } from "~/engine/abilities";
+import { notEmptyPredicate } from "~/engine/rules/abilities/abilities";
 
 export class ContinuousEffectStore {
   continuousEffects: ContinuousEffectModel[];
@@ -20,7 +20,7 @@ export class ContinuousEffectStore {
   constructor(
     initialState: ContinuousEffect[],
     rootStore: MobXRootStore,
-    observable: boolean
+    observable: boolean,
   ) {
     if (observable) {
       makeAutoObservable<ContinuousEffectStore, "dependencies" | "rootStore">(
@@ -28,7 +28,7 @@ export class ContinuousEffectStore {
         {
           rootStore: false,
           dependencies: false,
-        }
+        },
       );
     }
     this.observable = observable;
@@ -49,7 +49,7 @@ export class ContinuousEffectStore {
         duration,
         effect.effect,
         rootStore,
-        this.observable
+        this.observable,
       );
     });
   }
@@ -82,9 +82,24 @@ export class ContinuousEffectStore {
       .forEach((continuous) => continuous.cardPlayed(card));
   }
 
+  onTurnPassed(turn: number) {
+    // iterate the array in reverse order
+    // so we can remove items without breaking the loop
+    for (let i = this.continuousEffects.length - 1; i >= 0; i--) {
+      const effect = this.continuousEffects[i];
+      if (
+        // turn can be 0
+        effect?.duration?.turn !== undefined &&
+        effect?.duration?.turn < turn
+      ) {
+        this.stopContinuousEffect(effect);
+      }
+    }
+  }
+  onChallenge(attacker: CardModel, defender: CardModel) {}
   findContinuousEffectsByCard(card: CardModel): ContinuousEffectModel[] {
     return this.continuousEffects.filter(
-      (effect) => effect.target?.instanceId === card.instanceId
+      (effect) => effect.target?.instanceId === card.instanceId,
     );
   }
 
@@ -164,6 +179,19 @@ export class ContinuousEffectStore {
         return (
           continuous.effect.type === "restriction" &&
           continuous.effect.restriction === "challenge"
+        );
+      })
+      .filter((continuous) => {
+        return continuous.target?.instanceId === card.instanceId;
+      });
+  }
+
+  getExertRestriction(card: CardModel) {
+    return this.rootStore.continuousEffectStore.continuousEffects
+      .filter((continuous) => {
+        return (
+          continuous.effect.type === "restriction" &&
+          continuous.effect.restriction === "exert"
         );
       })
       .filter((continuous) => {

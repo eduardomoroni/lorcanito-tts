@@ -1,14 +1,17 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { MobileFilterDialog } from "~/components/modals/target/MobileFilter";
 import { TargetModalHeader } from "~/components/modals/target/TargetModalHeader";
 import { GenericModal } from "~/components/modals/generic/GenericModal";
 import { type TargetFilter } from "~/components/modals/target/filters";
 import { LorcanaCardImage } from "~/components/card/LorcanaCardImage";
-import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { useGameStore } from "~/engine/lib/GameStoreProvider";
 import { CardImageOverlay } from "~/components/card/CardImageOverlay";
 import { CardModel } from "~/store/models/CardModel";
 import { observer } from "mobx-react-lite";
-import { bodyguardAbilityPredicate } from "~/engine/abilities";
+import {
+  Ability,
+  bodyguardAbilityPredicate,
+} from "~/engine/rules/abilities/abilities";
 import { CardIcons } from "~/components/card-icons/CardIcons";
 
 function TargetModalComponent(props: {
@@ -16,7 +19,7 @@ function TargetModalComponent(props: {
   onClose: () => void;
   onCancel: () => void;
   onTargetChosen: (card?: CardModel) => void;
-  type: "challenge" | "resolution" | "activated" | "static-triggered" | "";
+  type: "challenge" | Ability["type"] | "";
   title?: string;
   subtitle?: string;
 }) {
@@ -34,6 +37,13 @@ function TargetModalComponent(props: {
   const filteredTableCards = store.cardStore.getCardsByFilter(activeFilters);
   const [selected, setSelected] = useState<CardModel | undefined>(undefined);
 
+  useEffect(() => {
+    if (selected) {
+      onTargetChosen(selected);
+      onClose();
+    }
+  }, [selected]);
+
   const bodyguardPresent =
     type === "challenge" &&
     filteredTableCards.some((card) => {
@@ -48,7 +58,7 @@ function TargetModalComponent(props: {
 
   const cardsYouOwn = filteredTableCards.filter(filterByOwner);
   const cardsYouDontOwn = filteredTableCards.filter(
-    (card) => !filterByOwner(card)
+    (card) => !filterByOwner(card),
   );
 
   const showSectionDescription =
@@ -89,15 +99,19 @@ function TargetModalComponent(props: {
               </h3>
             ) : null}
             <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
-              {cardsYouOwn.map((card) => (
-                <GridItem
-                  key={card.instanceId}
-                  card={card}
-                  setSelected={setSelected}
-                  selected={selected}
-                  bodyguardPresent={bodyguardPresent}
-                />
-              ))}
+              {cardsYouOwn
+                .sort((lhs, rhs) => {
+                  return lhs.lorcanitoCard.number - rhs.lorcanitoCard.number;
+                })
+                .map((card) => (
+                  <GridItem
+                    key={card.instanceId}
+                    card={card}
+                    setSelected={setSelected}
+                    selected={selected}
+                    bodyguardPresent={bodyguardPresent}
+                  />
+                ))}
             </div>
             {showSectionDescription ? (
               <h3 className="my-4 text-xl font-bold tracking-tight text-gray-900">
@@ -105,15 +119,19 @@ function TargetModalComponent(props: {
               </h3>
             ) : null}
             <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
-              {cardsYouDontOwn.map((card) => (
-                <GridItem
-                  key={card.instanceId}
-                  card={card}
-                  setSelected={setSelected}
-                  selected={selected}
-                  bodyguardPresent={bodyguardPresent}
-                />
-              ))}
+              {cardsYouDontOwn
+                .sort((lhs, rhs) => {
+                  return lhs.lorcanitoCard.number - rhs.lorcanitoCard.number;
+                })
+                .map((card) => (
+                  <GridItem
+                    key={card.instanceId}
+                    card={card}
+                    setSelected={setSelected}
+                    selected={selected}
+                    bodyguardPresent={bodyguardPresent}
+                  />
+                ))}
             </div>
           </div>
         </div>

@@ -4,8 +4,8 @@ import React, { createContext, useContext, useState } from "react";
 import Image from "next/image";
 import { cardLoader, createImgixUrl } from "~/components/card/LorcanaCardImage";
 import { getCardFullName } from "~/spaces/table/deckbuilder/parseDeckList";
-import { LorcanitoCard } from "~/engine/cardTypes";
-import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { LorcanitoCard } from "~/engine/cards/cardTypes";
+import { useGameStore } from "~/engine/lib/GameStoreProvider";
 
 // TODO: No longer needs lorcanito card
 type CardPreviewPayload =

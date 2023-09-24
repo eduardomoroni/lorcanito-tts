@@ -3,7 +3,7 @@ import React, { FC } from "react";
 import CardStack from "~/components/card-stack/cardStack";
 import { DragNDropOverlay } from "~/components/DragNDropOverlay";
 import { CardCounter } from "~/spaces/table/CardCounter";
-import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { useGameStore } from "~/engine/lib/GameStoreProvider";
 import { observer } from "mobx-react-lite";
 import type { CardModel } from "~/store/models/CardModel";
 import { useTargetModal } from "~/providers/TargetModalProvider";

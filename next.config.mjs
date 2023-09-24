@@ -3,7 +3,7 @@
  * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.
  * This is especially useful for Docker builds.
  */
-// import {withSentryConfig} from "@sentry/nextjs";
+import {withSentryConfig} from "@sentry/nextjs";
 
 !process.env.SKIP_ENV_VALIDATION && (await import("./src/env.mjs"));
 //import { withSentryConfig } from "@sentry/nextjs";
@@ -103,99 +103,42 @@ const nextConfig = {
       },
     ],
   },
+
+  // Optional build-time configuration options
+  sentry: {
+    // See the sections below for information on the following options:
+    //   'Configure Source Maps':
+    //     - disableServerWebpackPlugin
+    //     - disableClientWebpackPlugin
+    //     - hideSourceMaps
+    //     - widenClientFileUpload
+    //   'Configure Legacy Browser Support':
+    //     - transpileClientSDK
+    //   'Configure Serverside Auto-instrumentation':
+    //     - autoInstrumentServerFunctions
+    //     - excludeServerRoutes
+    //   'Configure Tunneling to avoid Ad-Blockers':
+    //     - tunnelRoute
+  },
+};
+
+const sentryWebpackPluginOptions = {
+  // Additional config options for the Sentry webpack plugin. Keep in mind that
+  // the following options are set automatically, and overriding them is not
+  // recommended:
+  //   release, url, configFile, stripPrefix, urlPrefix, include, ignore
+
+  org: "lorcanito",
+  project: "lorcanito-tts",
+
+  // An auth token is required for uploading source maps.
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+
+  silent: true, // Suppresses all logs
+
+  // For all available options, see:
+  // https://github.com/getsentry/sentry-webpack-plugin#options.
 };
 
 export default nextConfig;
-
-// const sentryWebpackPluginOptions = {
-//   // Additional config options for the Sentry Webpack plugin. Keep in mind that
-//   // the following options are set automatically, and overriding them is not
-//   // recommended:
-//   //   release, url, authToken, configFile, stripPrefix,
-//   //   urlPrefix, include, ignore
-//
-//   org: "lorcanito",
-//   project: "lorcanito-tts",
-//   sentry: {
-//     disableServerWebpackPlugin: true,
-//     disableClientWebpackPlugin: true,
-//     hideSourceMaps: true,
-//   },
-//   silent: false, // Suppresses all logs
-//
-//   // For all available options, see:
-//   // https://github.com/getsentry/sentry-webpack-plugin#options.
-// };
-//
-// export default withSentryConfig(config, sentryWebpackPluginOptions);
-
-// function remarkMDXLayout(source) {
-//   let parser = Parser.extend(jsx())
-//   let parseOptions = { ecmaVersion: 'latest', sourceType: 'module' }
-//
-//   return (tree, file) => {
-//     let filename = path.relative(file.cwd, file.history[0])
-//     let segments = filename.split(path.sep)
-//     let segmentsStr = JSON.stringify(segments)
-//
-//     let imp = `import _Layout from '${source}'`
-//     let exp = `export default function Layout(props) {
-//       return <_Layout {...props} _segments={${segmentsStr}} />
-//     }`
-//
-//     tree.children.push(
-//         {
-//           type: 'mdxjsEsm',
-//           value: imp,
-//           data: { estree: parser.parse(imp, parseOptions) },
-//         },
-//         {
-//           type: 'mdxjsEsm',
-//           value: exp,
-//           data: { estree: parser.parse(exp, parseOptions) },
-//         }
-//     )
-//   }
-// }
-
-// export default async function config() {
-//   let highlighter = await shiki.getHighlighter({
-//     theme: 'css-variables',
-//   })
-//
-//   let withMDX = nextMDX({
-//     extension: /\.mdx$/,
-//     options: {
-//       recmaPlugins: [recmaImportImages],
-//       rehypePlugins: [
-//         [rehypeShiki, { highlighter }],
-//         [
-//           remarkRehypeWrap,
-//           {
-//             node: { type: 'mdxJsxFlowElement', name: 'Typography' },
-//             start: ':root > :not(mdxJsxFlowElement)',
-//             end: ':root > mdxJsxFlowElement',
-//           },
-//         ],
-//       ],
-//       remarkPlugins: [
-//         remarkGfm,
-//         remarkUnwrapImages,
-//         [
-//           unifiedConditional,
-//           [
-//             new RegExp(`^${escapeStringRegexp(path.resolve('src/app/blog'))}`),
-//             [[remarkMDXLayout, '@/app/blog/wrapper']],
-//           ],
-//           [
-//             new RegExp(`^${escapeStringRegexp(path.resolve('src/app/work'))}`),
-//             [[remarkMDXLayout, '@/app/work/wrapper']],
-//           ],
-//         ],
-//       ],
-//     },
-//   })
-//
-//   return withMDX(nextConfig)
-// }
-
+// export default withSentryConfig(nextConfig, sentryWebpackPluginOptions);

@@ -1,7 +1,7 @@
 import React, { Fragment, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { CardImage } from "~/components/card/CardImage";
-import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { useGameStore } from "~/engine/lib/GameStoreProvider";
 import { observer } from "mobx-react-lite";
 
 type Props = {

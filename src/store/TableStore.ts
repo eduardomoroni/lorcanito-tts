@@ -4,7 +4,7 @@ import { Game } from "~/libs/game";
 import { Dependencies } from "~/store/types";
 import { TableModel } from "~/store/models/TableModel";
 import { CardStore } from "~/store/CardStore";
-import { Random } from "~/engine/redux/middleware/random";
+import { Random } from "~/engine/random";
 import { MobXRootStore } from "~/store/RootStore";
 import { CardModel } from "~/store/models/CardModel";
 import { logAnalyticsEvent } from "~/3rd-party/firebase/FirebaseAnalyticsProvider";
@@ -22,7 +22,7 @@ export class TableStore {
     dependencies: Dependencies,
     cardStore: CardStore,
     rootStore: MobXRootStore,
-    observable: boolean
+    observable: boolean,
   ) {
     this.dependencies = dependencies;
     this.tables = initialState;
@@ -39,7 +39,7 @@ export class TableStore {
     dependencies: Dependencies,
     cardStore: CardStore,
     rootStore: MobXRootStore,
-    observable: boolean
+    observable: boolean,
   ): TableStore {
     const tableModels: Record<string, TableModel> = {};
 
@@ -51,7 +51,7 @@ export class TableStore {
           playerId,
           cardStore,
           rootStore,
-          observable
+          observable,
         );
       }
     });
@@ -61,7 +61,7 @@ export class TableStore {
       dependencies,
       cardStore,
       rootStore,
-      observable
+      observable,
     );
   }
 
@@ -106,7 +106,7 @@ export class TableStore {
   payInk(
     table: TableModel,
     card: CardModel,
-    params: { shift?: number; byPass?: number } = {}
+    params: { shift?: number; byPass?: number } = {},
   ) {
     // TODO: remove this bypass
     const amount = params.byPass || params.shift || card.cost;
@@ -143,8 +143,8 @@ export class TableStore {
           cards: cardsToAlter,
           player: playerId,
         },
-        playerId
-      )
+        playerId,
+      ),
     );
     logAnalyticsEvent("mulligan", { cards: cardsToAlter.length });
   }
@@ -184,7 +184,7 @@ export class TableStore {
     instanceId: string = "",
     from: Zones,
     to: Zones,
-    position: "first" | "last" = "last"
+    position: "first" | "last" = "last",
   ) {
     const card = this.cardStore.cards[instanceId];
 
@@ -213,8 +213,8 @@ export class TableStore {
           position,
           owner,
         },
-        owner
-      )
+        owner,
+      ),
     );
     logAnalyticsEvent("move_card", { from, to });
   }
@@ -275,9 +275,13 @@ export class TableStore {
     limits: {
       top?: number;
       bottom?: number;
-    } = {}
+      hand?: number;
+    } = {},
+    shouldReveal?: boolean,
   ) {
-    hand.forEach((card) => {
+    const { top: topLimit, bottom: bottomLimit, hand: handLimit } = limits;
+
+    hand.slice(handLimit ? hand.length - handLimit : 0).forEach((card) => {
       if (card.isValidTarget(tutorFilters)) {
         card.moveTo("hand");
       } else {
@@ -291,21 +295,23 @@ export class TableStore {
       }
     });
 
-    const { top: topLimit, bottom: bottomLimit } = limits;
     top.slice(topLimit ? top.length - topLimit : 0).forEach((card) => {
-      this.moveCard(card.instanceId, "deck", "deck");
+      card.moveTo("deck");
     });
+
     bottom
       .reverse()
       .slice(bottomLimit ? bottom.length - bottomLimit : 0)
       .forEach((card) => {
-        this.moveCard(card.instanceId, "deck", "deck", "first");
+        card.moveTo("deck", "first");
       });
 
     this.rootStore.log({
       type: "SCRY",
       top: top.length,
       bottom: bottom.length,
+      hand: shouldReveal ? hand.map((card) => card.instanceId) : hand.length,
+      shouldReveal,
     });
     logAnalyticsEvent("scry");
   }

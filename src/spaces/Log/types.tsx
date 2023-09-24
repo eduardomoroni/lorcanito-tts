@@ -1,7 +1,7 @@
 import type { Zones } from "~/providers/TabletopProvider";
 import { GameEffect } from "~/libs/game";
 
-import { ResolutionAbility } from "~/engine/abilities";
+import { ResolutionAbility } from "~/engine/rules/abilities/abilities";
 
 export type InternalLogEntry = {
   id: string;
@@ -241,6 +241,8 @@ export interface ScryEntry extends LogEntryBase {
   type: "SCRY";
   bottom: number;
   top: number;
+  hand: number | string[];
+  shouldReveal?: boolean;
 }
 
 export interface ShiftEntry extends LogEntryBase {

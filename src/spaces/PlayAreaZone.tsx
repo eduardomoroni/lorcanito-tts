@@ -7,7 +7,7 @@ import { useUser } from "reactfire";
 import { useTurn } from "~/engine/GameProvider";
 import { useHotkeysContext } from "react-hotkeys-hook";
 import { LorcanaCardImage } from "~/components/card/LorcanaCardImage";
-import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { useGameStore } from "~/engine/lib/GameStoreProvider";
 import { observer } from "mobx-react-lite";
 import type { CardModel } from "~/store/models/CardModel";
 

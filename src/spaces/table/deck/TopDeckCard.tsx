@@ -1,5 +1,5 @@
 import { CardModel } from "~/store/models/CardModel";
-import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { useGameStore } from "~/engine/lib/GameStoreProvider";
 import { useHotkeysContext } from "react-hotkeys-hook";
 import React, { MouseEvent, useEffect, useRef } from "react";
 import { useUser } from "reactfire";

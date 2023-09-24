@@ -26,7 +26,7 @@ function CardIconsComponent(props: { card: CardModel }) {
 
   const strengthBonus = card.strength - (card.lorcanitoCard.strength || 0);
   return (
-    <div className={`absolute bottom-0 z-20 flex w-full`}>
+    <div className={`absolute bottom-0 z-20 flex`}>
       <DamageCounter damage={card?.meta?.damage} />
       {strengthBonus ? (
         <BonusStrength bonus={strengthBonus} className={className} />

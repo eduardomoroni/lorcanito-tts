@@ -13,7 +13,7 @@ export default function Layout({ children }) {
   return (
     <html
       lang="en"
-      className="h-screen max-h-screen bg-neutral-950 text-base antialiased"
+      className="h-screen max-h-screen bg-neutral-950 text-base antialiased dark"
     >
       <body className="flex h-screen max-h-screen flex-col">
         <RootLayout>{children}</RootLayout>

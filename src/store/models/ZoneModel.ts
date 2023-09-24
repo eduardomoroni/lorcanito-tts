@@ -2,7 +2,7 @@ import { CardModel } from "~/store/models/CardModel";
 import { Zones } from "~/providers/TabletopProvider";
 import { makeAutoObservable } from "mobx";
 import { MobXRootStore } from "~/store/RootStore";
-import { notEmptyPredicate } from "~/engine/abilities";
+import { notEmptyPredicate } from "~/engine/rules/abilities/abilities";
 
 export class ZoneModel {
   zone: Zones;
@@ -15,7 +15,7 @@ export class ZoneModel {
     cards: CardModel[],
     ownerId: string,
     rootStore: MobXRootStore,
-    observable: boolean
+    observable: boolean,
   ) {
     if (observable) {
       makeAutoObservable<ZoneModel, "rootStore">(this);
@@ -48,7 +48,7 @@ export class ZoneModel {
 
   hasCard(card: CardModel): boolean {
     return !!this.cards.find(
-      (c: CardModel) => c.instanceId === card.instanceId
+      (c: CardModel) => c.instanceId === card.instanceId,
     );
   }
 
@@ -70,7 +70,7 @@ export class ZoneModel {
 
   removeCard(card: CardModel) {
     const index = this.cards.findIndex(
-      (model) => model.instanceId === card.instanceId
+      (model) => model.instanceId === card.instanceId,
     );
     if (index !== -1) {
       this.cards.splice(index, 1);

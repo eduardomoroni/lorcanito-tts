@@ -9,7 +9,7 @@ import {
   challengeOpponentsCardsFilter,
   TargetFilter,
 } from "~/components/modals/target/filters";
-import { shiftAbilityPredicate } from "~/engine/abilities";
+import { shiftAbilityPredicate } from "~/engine/rules/abilities/abilities";
 
 export class CardStore {
   dependencies: Dependencies;
@@ -20,7 +20,7 @@ export class CardStore {
     initialState: Game["cards"] = {},
     dependencies: Dependencies,
     rootStore: MobXRootStore,
-    observable: boolean
+    observable: boolean,
   ) {
     this.rootStore = rootStore;
     this.dependencies = dependencies;
@@ -37,7 +37,7 @@ export class CardStore {
           card.ownerId,
           // I'm not sure if this is a good idea
           this.rootStore,
-          observable
+          observable,
         );
       }
     });
@@ -103,13 +103,14 @@ export class CardStore {
     if (!filters) {
       return [];
     }
+
     const cards = this.getAllCards();
     return cards.filter(
       applyAllCardFilters(
         filters,
         player || this.rootStore.activePlayer,
-        this.rootStore
-      )
+        this.rootStore,
+      ),
     );
   }
 
@@ -124,6 +125,7 @@ export class CardStore {
     card.updateCardMeta(meta);
   }
 
+  // todo: move this to cardModel
   shiftCard(shifter: string, shifted: string) {
     const {
       logger,
@@ -156,6 +158,11 @@ export class CardStore {
       card.updateCardMeta(combinedMeta);
       // logAnalyticsEvent("shift");
       logger.log({ type: "SHIFT", shifter, shifted });
+
+      // TODO: WE HAVE TO DO THIS PROPERLY
+      this.rootStore.stackLayerStore.onPlay(card);
+      this.rootStore.triggeredStore.onPlay(card);
+      this.rootStore.continuousEffectStore.onPlay(card);
     } else {
       sendNotification({
         type: "icon",
@@ -226,7 +233,7 @@ export class CardStore {
   updateCardDamage(
     instanceId: string,
     amount: number,
-    type: "add" | "remove" = "add"
+    type: "add" | "remove" = "add",
   ) {
     const card = this.cards[instanceId];
 
@@ -245,7 +252,7 @@ export class CardStore {
       toggle?: boolean;
       cardId?: string;
       inkwell?: boolean;
-    }
+    },
   ) {
     const { logger } = this.dependencies;
     const { exerted, toggle, cardId } = opts;

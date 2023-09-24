@@ -2,13 +2,13 @@ import { ZoneOverlay } from "~/components/ZoneOverlay";
 import React, { FC, useEffect } from "react";
 import { LorcanaCardImage } from "~/components/card/LorcanaCardImage";
 import { useCardPreview } from "~/providers/CardPreviewProvider";
-import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { useGameStore } from "~/engine/lib/GameStoreProvider";
 import { useTargetModal } from "~/providers/TargetModalProvider";
 import { CardModel } from "~/store/models/CardModel";
 import { useYesOrNoModal } from "~/providers/YesOrNoModalProvider";
 import { useScryModal } from "~/providers/ScryModalProvider";
-import { scryEffectPredicate } from "~/engine/effectTypes";
-import { staticTriggeredAbilityPredicate } from "~/engine/abilities";
+import { scryEffectPredicate } from "~/engine/rules/effects/effectTypes";
+import { staticTriggeredAbilityPredicate } from "~/engine/rules/abilities/abilities";
 
 // The game does not have a stack, but I want to add one.
 // This is a temporary step while not all cards are coded.
@@ -49,8 +49,11 @@ export const EffectStackZoneArena: FC = () => {
 
     if (scryEffect) {
       // TODO: THIS IS NOT IDEAL, it breaks encapsulation
+      console.log("scry effect", JSON.stringify(scryEffect));
       openScryModal({
         ...scryEffect,
+        title,
+        subtitle,
         callback: (params) => topOfStack.resolve({ scry: params }),
       });
     } else if (musk) {
@@ -103,7 +106,7 @@ export const EffectStackZoneArena: FC = () => {
 
   const clearEffect = () => {
     pendingEffects.forEach((effect) => {
-      effect.resolve({ targetId: undefined });
+      effect.cancel();
     });
   };
 

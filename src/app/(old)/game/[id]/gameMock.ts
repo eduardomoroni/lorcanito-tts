@@ -6,6 +6,7 @@ export const skipFirebase =
 export const gameMock: Game = {
   lastActionId: 0,
   effects: [],
+  triggeredAbilities: [],
   players: {
     player_one: true,
     player_two: true,

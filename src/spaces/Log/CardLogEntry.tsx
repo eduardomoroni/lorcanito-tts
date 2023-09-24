@@ -2,8 +2,9 @@ import React, { type FC } from "react";
 import { useCardPreview } from "~/providers/CardPreviewProvider";
 import { EyeSlashIcon } from "@heroicons/react/20/solid";
 import type { InternalLogEntry } from "~/spaces/Log/types";
-import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { useGameStore } from "~/engine/lib/GameStoreProvider";
 import type { CardModel } from "~/store/models/CardModel";
+import { Tooltip } from "antd";
 
 const COLORS = {
   ruby: "text-ruby",
@@ -48,12 +49,16 @@ export const CardLogEntry: FC<{
   return (
     <>
       {privateEntry && privateEntry[player] && (
-        <>
-          <EyeSlashIcon
-            title="This is only visible to you, your opponent can't see this."
-            className="inline h-4 w-4"
-          />{" "}
-        </>
+        <Tooltip
+          title={"This is only visible to you, your opponent can't see this."}
+        >
+          <>
+            <EyeSlashIcon
+              title="This is only visible to you, your opponent can't see this."
+              className="inline h-4 w-4"
+            />{" "}
+          </>
+        </Tooltip>
       )}
       <span
         key={card.instanceId}

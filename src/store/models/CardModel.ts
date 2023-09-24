@@ -1,7 +1,7 @@
 import type { Meta, TableCard, Zones } from "~/providers/TabletopProvider";
-import { makeAutoObservable, toJS } from "mobx";
+import { makeAutoObservable } from "mobx";
 import { allCardsById } from "~/engine/cards/cards";
-import { CardColor, LorcanitoCard } from "~/engine/cardTypes";
+import { CardColor, LorcanitoCard } from "~/engine/cards/cardTypes";
 import { CardMetaModel } from "~/store/models/CardMetaModel";
 import type { MobXRootStore } from "~/store/RootStore";
 import { exhaustiveCheck } from "~/libs/exhaustiveCheck";
@@ -11,14 +11,17 @@ import {
   challengerAbilityPredicate,
   Cost,
   notEmptyPredicate,
-  ResolutionAbility,
   resolutionAbilityPredicate,
   shiftAbilityPredicate,
   singerAbilityPredicate,
-  supportAbilityPredicate,
-} from "~/engine/abilities";
+  whileStaticAbilityPredicate,
+} from "~/engine/rules/abilities/abilities";
 import { createLogEntry } from "~/spaces/Log/game-log/GameLogProvider";
-import { Abilities, TargetFilter } from "~/components/modals/target/filters";
+import {
+  Abilities,
+  StatusFilterValues,
+  TargetFilter,
+} from "~/components/modals/target/filters";
 import { keywordToAbilityPredicate } from "~/store/utils";
 
 export class CardModel {
@@ -34,7 +37,7 @@ export class CardModel {
     meta: Meta | null | undefined,
     ownerId: string,
     rootStore: MobXRootStore,
-    observable: boolean
+    observable: boolean,
   ) {
     if (observable) {
       makeAutoObservable<CardModel, "rootStore">(this, {
@@ -55,6 +58,9 @@ export class CardModel {
   }
 
   get isDead() {
+    if (this.zone === "discard") {
+      return true;
+    }
     return (this.meta.damage || 0) >= (this.lorcanitoCard.willpower || 0);
   }
 
@@ -88,13 +94,19 @@ export class CardModel {
     this.rootStore.tableStore.addToInkwell(this.instanceId);
   }
 
+  banish(params: { attacker?: CardModel; defender?: CardModel } = {}) {
+    this.rootStore.triggeredStore.onBanish(this, params);
+
+    this.moveTo("discard");
+  }
+
   // Move will ignore restrictions
   moveTo(zone: Zones, position: "first" | "last" = "last") {
     this.rootStore.tableStore.move(this, zone, position);
 
-    if (zone === "discard") {
-      this.rootStore.staticTriggeredStore.onBanish(this);
-    }
+    // if (zone === "discard") {
+    //   this.rootStore.triggeredStore.onBanish(this);
+    // }
   }
 
   isValidTarget(filters: TargetFilter[], expectedOwner: string = "") {
@@ -134,10 +146,15 @@ export class CardModel {
   }
 
   get cost(): number {
-    const costReduction =
-      this.rootStore.continuousEffectStore.continuousEffects.filter(
-        (continuous) => continuous.isCostReplacementEffect(this)
-      ).length;
+    const costReduction = this.rootStore.continuousEffectStore.continuousEffects
+      .filter((continuous) => continuous.isCostReplacementEffect(this))
+      .reduce((acc, curr) => {
+        if (curr.effect?.type === "replacement") {
+          return acc + curr.effect.amount;
+        }
+
+        return acc;
+      }, 0);
 
     return (this.lorcanitoCard?.cost || 0) - costReduction;
   }
@@ -176,7 +193,27 @@ export class CardModel {
     const gainedAbilities: Ability[] =
       this.rootStore.continuousEffectStore.getAbilitiesModifier(this);
 
-    return [...nativeAbilities, ...gainedAbilities];
+    const whileStaticAbilities: Ability[] = nativeAbilities
+      .filter(whileStaticAbilityPredicate)
+      .map((ability) => {
+        const isConditionMet =
+          ability.whileCondition.value === "self"
+            ? this.ownerId === this.rootStore.turnPlayer
+            : this.ownerId !== this.rootStore.turnPlayer;
+
+        if (isConditionMet) {
+          return ability.ability;
+        } else {
+          return null;
+        }
+      })
+      .filter(notEmptyPredicate);
+
+    return [
+      ...nativeAbilities,
+      ...gainedAbilities,
+      ...whileStaticAbilities,
+    ].filter(notEmptyPredicate);
   }
 
   getAbility(abilityName?: string) {
@@ -185,7 +222,7 @@ export class CardModel {
     }
 
     return this.abilities.find(
-      (ability) => ability.name?.toLowerCase() === abilityName.toLowerCase()
+      (ability) => ability.name?.toLowerCase() === abilityName.toLowerCase(),
     );
   }
 
@@ -244,6 +281,10 @@ export class CardModel {
     return this.hasAbility("singer");
   }
 
+  get hasVoiceless() {
+    return this.hasAbility("voiceless");
+  }
+
   get ready() {
     return !this.meta.exerted;
   }
@@ -277,7 +318,18 @@ export class CardModel {
     }
     const table = this.rootStore.tableStore.getTable(this.ownerId);
 
-    if (this.hasQuestRestriction) {
+    if (!this.ready) {
+      this.rootStore.sendNotification({
+        type: "icon",
+        title: "Glimmer can't quest",
+        message: `Glimmer's exerted, you can use manual mode to simulate a quest`,
+        icon: "warning",
+        autoClear: true,
+      });
+      return;
+    }
+
+    if (this.hasQuestRestriction || this.meta.playedThisTurn) {
       this.rootStore.sendNotification({
         type: "icon",
         title: "Glimmer can't quest",
@@ -294,7 +346,7 @@ export class CardModel {
     }
 
     this.rootStore.stackLayerStore.onQuest(this);
-    this.rootStore.staticTriggeredStore.onQuest(this);
+    this.rootStore.triggeredStore.onQuest(this);
   }
 
   canPayCosts(costs: Cost[]) {
@@ -340,7 +392,7 @@ export class CardModel {
     }
 
     this.rootStore.stackLayerStore.onPlay(this);
-    this.rootStore.staticTriggeredStore.onPlay(this);
+    this.rootStore.triggeredStore.onPlay(this);
     this.rootStore.continuousEffectStore.onPlay(this);
   }
 
@@ -431,6 +483,17 @@ export class CardModel {
       return;
     }
 
+    if (this.hasVoiceless) {
+      this.rootStore.sendNotification({
+        type: "icon",
+        title: "Voiceless character can't sing",
+        message: `You can instead right click the card and select "Play Card" option and then exert the singer, if you want to skip this check.`,
+        icon: "warning",
+        autoClear: true,
+      });
+      return;
+    }
+
     if (song.cost > singValue) {
       this.rootStore.sendNotification({
         type: "icon",
@@ -504,13 +567,7 @@ export class CardModel {
     }
   }
 
-  banish() {
-    this.moveTo("discard");
-  }
-
   challenge(defender: CardModel) {
-    const attacker = this;
-
     if (this.hasChallengeRestriction) {
       this.rootStore.sendNotification({
         type: "icon",
@@ -522,7 +579,7 @@ export class CardModel {
       return;
     }
 
-    if (defender.hasEvasive && !attacker.hasEvasive) {
+    if (defender.hasEvasive && !this.hasEvasive) {
       this.rootStore.sendNotification({
         type: "icon",
         title:
@@ -534,7 +591,7 @@ export class CardModel {
       return;
     }
 
-    if (attacker.meta.playedThisTurn && !this.hasRush) {
+    if (this.meta.playedThisTurn && !this.hasRush) {
       this.rootStore.sendNotification({
         type: "icon",
         title: "Can't challenge when the ink is fresh",
@@ -545,19 +602,19 @@ export class CardModel {
       return;
     }
 
-    const playerId = attacker.ownerId;
+    const playerId = this.ownerId;
     const defenderPlayer = defender.ownerId;
     const defenderBodyGuards = this.rootStore.cardStore.getCardsByFilter([
       { filter: "owner", value: defenderPlayer },
       { filter: "zone", value: "play" },
-      { filter: "status", value: "exerted" },
+      { filter: "status", value: StatusFilterValues.EXERTED },
       { filter: "keyword", value: "bodyguard" },
     ]);
 
     if (
       defenderBodyGuards.length > 0 &&
       !defenderBodyGuards.find(
-        (card) => card.instanceId === defender.instanceId
+        (card) => card.instanceId === defender.instanceId,
       )
     ) {
       console.log("Can't challenge a body guarded card");
@@ -565,28 +622,33 @@ export class CardModel {
     }
 
     const defenderCard = defender.lorcanitoCard;
-    const attackerCard = attacker.lorcanitoCard;
+    const attackerCard = this.lorcanitoCard;
     let attackerStrength = attackerCard?.strength || 0;
     const challengerAbility = attackerCard?.abilities?.find(
-      challengerAbilityPredicate
+      challengerAbilityPredicate,
     );
     if (challengerAbility) {
       attackerStrength += challengerAbility.value;
     }
 
-    attacker.updateCardMeta({
+    this.updateCardMeta({
       exerted: true,
-      damage: (attacker.meta?.damage || 0) + (defenderCard?.strength || 0),
+      damage: (this.meta?.damage || 0) + (defenderCard?.strength || 0),
     });
     defender.updateCardMeta({
       damage: (defender.meta?.damage || 0) + attackerStrength,
     });
 
+    this.rootStore.stackLayerStore.onChallenge(this, defender);
+    this.rootStore.triggeredStore.onChallenge(this, defender);
+    this.rootStore.continuousEffectStore.onChallenge(this, defender);
+
+    // We're moving to discard after the triggers, so we can evaluate the triggers before discarding
     if (defender.isDead) {
-      defender.moveTo("discard");
+      defender.banish({ attacker: this, defender: defender });
     }
-    if (attacker.isDead) {
-      attacker.moveTo("discard");
+    if (this.isDead) {
+      this.banish({ attacker: this, defender: defender });
     }
 
     this.rootStore.log(
@@ -596,8 +658,8 @@ export class CardModel {
           attacker: this.instanceId,
           defender: defender.instanceId,
         },
-        playerId
-      )
+        playerId,
+      ),
     );
   }
 
@@ -648,6 +710,13 @@ export class CardModel {
       this.rootStore.continuousEffectStore.getChallengeRestriction(this);
 
     return challengeRestriction.length > 0;
+  }
+
+  get hasExertRestriction() {
+    const exertRestriction =
+      this.rootStore.continuousEffectStore.getExertRestriction(this);
+
+    return exertRestriction.length > 0;
   }
 
   // From upstream to Model

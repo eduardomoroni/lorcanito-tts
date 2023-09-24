@@ -52,12 +52,33 @@ export function mapLogEntries(store: MobXRootStore, entry: InternalLogEntry) {
       break;
     }
     case "SCRY": {
-      const { bottom, top } = entry;
-      elements.push(
-        `Looked at the top ${
-          bottom + top
-        } cards of the deck, putting ${bottom} on the bottom and ${top} on top.`
-      );
+      const { bottom, top, hand, shouldReveal } = entry;
+      const handCount = Array.isArray(hand) ? hand.length : hand;
+      const total = bottom + top + handCount;
+      elements.push(`Looked at the top ${total} cards of the deck, `);
+      if (bottom > 0) {
+        elements.push(`put ${bottom} on the bottom, `);
+      }
+      if (top > 0) {
+        elements.push(`put ${top} on the top, `);
+      }
+      if (handCount > 0) {
+        if (shouldReveal && Array.isArray(hand)) {
+          elements.push(`Putting: `);
+          hand.forEach((card) => {
+            elements.push(
+              <CardLogEntry
+                instanceId={card}
+                privateEntry={undefined}
+                player={activePlayer}
+              />
+            );
+          });
+          elements.push(` in hand.`);
+        } else {
+          elements.push(`put ${handCount} in hand, `);
+        }
+      }
       break;
     }
     case "NEW_GAME": {

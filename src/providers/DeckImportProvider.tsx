@@ -36,13 +36,19 @@ export function DeckImportProvider({
   gameId: string;
 }) {
   const [deckList, setDeckList] = useState<string>(
-    localStorage.getItem("deck-list") || sampleDeck
+    localStorage.getItem("deck-list") || sampleDeck,
   );
   const [deck, setDeck] = useState<Deck>(parseDeckList(deckList));
 
   useEffect(() => {
     setDeck(parseDeckList(deckList));
   }, [deckList]);
+
+  useEffect(() => {
+    if (deckList) {
+      setDeck(parseDeckList(deckList));
+    }
+  }, []);
 
   const { sendNotification, clearAllNotifications } = useNotification();
   const loadDeck = api.game.loadDeck.useMutation();
@@ -117,7 +123,15 @@ export function DeckImportProvider({
 
   return (
     <Context.Provider
-      value={{ deckList, setDeckList, parseAndUpdateDeck, deck }}
+      value={{
+        deckList,
+        setDeckList: (deckList: string) => {
+          localStorage.setItem("deck-list", deckList);
+          setDeckList(deckList);
+        },
+        parseAndUpdateDeck,
+        deck,
+      }}
     >
       {children}
     </Context.Provider>

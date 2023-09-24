@@ -6,7 +6,7 @@ import { logAnalyticsEvent } from "~/3rd-party/firebase/FirebaseAnalyticsProvide
 import { useConfirmationModal } from "~/providers/ConfirmationModalProvider";
 import { api } from "~/utils/api";
 import { PlusIcon, MinusIcon } from "@heroicons/react/24/outline";
-import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { useGameStore } from "~/engine/lib/GameStoreProvider";
 import { observer } from "mobx-react-lite";
 
 function clamp(x: number) {

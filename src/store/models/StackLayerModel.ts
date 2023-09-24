@@ -5,33 +5,45 @@ import type { CardModel } from "~/store/models/CardModel";
 import { logAnalyticsEvent } from "~/3rd-party/firebase/FirebaseAnalyticsProvider";
 import type {
   ActivatedAbility,
+  DelayedTriggeredAbility,
   ResolutionAbility,
   StaticTriggeredAbility,
-} from "~/engine/abilities";
+} from "~/engine/rules/abilities/abilities";
 import { EffectModel } from "~/store/models/EffectModel";
 import type { ResolvingParam } from "~/store/StackLayerStore";
-import { notEmptyPredicate } from "~/engine/abilities";
+import { notEmptyPredicate } from "~/engine/rules/abilities/abilities";
 import {
   cardEffectTargetPredicate,
+  conditionEffectPredicate,
   playerEffectTargetPredicate,
-} from "~/engine/effectTypes";
+  topDeckEffectTargetPredicate,
+} from "~/engine/rules/effects/effectTypes";
 
 export class StackLayerModel implements GameEffect {
   source: CardModel;
   instanceId: string;
   id: string;
   responder: string;
-  ability: ResolutionAbility | ActivatedAbility | StaticTriggeredAbility;
+  ability:
+    | ResolutionAbility
+    | ActivatedAbility
+    | StaticTriggeredAbility
+    | DelayedTriggeredAbility;
   private readonly observable: boolean;
   private readonly rootStore: MobXRootStore;
 
   constructor(
+    // TODO: This shoud be a card Model
     instanceId: string,
     id: string,
     responder: string,
-    ability: ResolutionAbility | ActivatedAbility | StaticTriggeredAbility,
+    ability:
+      | ResolutionAbility
+      | ActivatedAbility
+      | StaticTriggeredAbility
+      | DelayedTriggeredAbility,
     rootStore: MobXRootStore,
-    observable: boolean
+    observable: boolean,
   ) {
     if (observable) {
       makeAutoObservable<StackLayerModel, "rootStore" | "observable">(this, {
@@ -89,7 +101,18 @@ export class StackLayerModel implements GameEffect {
       return;
     }
 
-    if (!isValidTarget || !isConditionMet) {
+    if (!isConditionMet) {
+      // TODO: I will fix logs later
+      this.rootStore.log({
+        // @ts-ignore
+        type: "EFFECT_CONDITION_NOT_MET",
+        layer: this.toJSON(),
+      });
+      this.skipEffect();
+      return;
+    }
+
+    if (!isValidTarget) {
       console.log("invalid target", isValidTarget, isConditionMet);
       // this.cancel();
       return;
@@ -119,7 +142,7 @@ export class StackLayerModel implements GameEffect {
         effect,
         this.source,
         this.rootStore,
-        this.observable
+        this.observable,
       );
 
       effectModel.resolve(params);
@@ -134,12 +157,28 @@ export class StackLayerModel implements GameEffect {
       "conditions" in ability
         ? ability.conditions?.every((condition) => {
             if (condition.type === "hand") {
-              return (
-                this.rootStore.tableStore.getPlayerZone(
-                  this.source.ownerId,
-                  "hand"
-                )?.cards.length <= condition.amount
-              );
+              const playerId = this.source.ownerId;
+              if (typeof condition.amount === "number") {
+                return (
+                  this.rootStore.tableStore.getPlayerZone(playerId, "hand")
+                    ?.cards.length <= condition.amount
+                );
+              }
+
+              if (condition.amount === "less_than_opponent") {
+                const playerHand = this.rootStore.tableStore.getPlayerZone(
+                  playerId,
+                  "hand",
+                )?.cards.length;
+
+                const opponentPlayer = this.rootStore.opponentPlayer(playerId);
+                const opponentHand = this.rootStore.tableStore.getPlayerZone(
+                  opponentPlayer,
+                  "hand",
+                )?.cards.length;
+
+                return playerHand < opponentHand;
+              }
             }
 
             return false;
@@ -148,7 +187,7 @@ export class StackLayerModel implements GameEffect {
 
     if (!conditionMet) {
       // TODO: decide whether we cancel execution or undo it
-      console.log("Condition not met, cancelling effect");
+      console.log("Condition not met, skipping effect");
       return false;
     }
 
@@ -221,6 +260,18 @@ export class StackLayerModel implements GameEffect {
   }
 
   effectTargets() {
+    const conditionalEffect = this.ability.effects?.find(
+      conditionEffectPredicate,
+    );
+
+    if (conditionalEffect) {
+      return (
+        conditionalEffect.fallback
+          ?.map((effect) => effect.target)
+          .filter(notEmptyPredicate) || []
+      );
+    }
+
     return (
       this.ability.effects
         ?.map((effect) => effect.target)
@@ -230,7 +281,6 @@ export class StackLayerModel implements GameEffect {
 
   effectCardFilters() {
     const targets = this.effectTargets();
-
     return targets.find(cardEffectTargetPredicate)?.filters || [];
   }
 
@@ -242,11 +292,19 @@ export class StackLayerModel implements GameEffect {
         effect.autoResolve ||
         (effect.target &&
           "autoResolve" in effect?.target &&
-          effect.target.autoResolve === false)
+          effect.target.autoResolve === false),
     );
 
     if (this.ability.optional || hasAutoResolveFalse) {
       return false;
+    }
+
+    if (
+      this.ability.effects?.some(
+        (effect) => effect.target?.type === "instanceId",
+      )
+    ) {
+      return true;
     }
 
     if (this.ability.effects?.some((effect) => effect.type === "conditional")) {
@@ -259,16 +317,18 @@ export class StackLayerModel implements GameEffect {
       return true;
     }
 
+    const topDeck = targets.filter(topDeckEffectTargetPredicate);
+    if (topDeck.length > 0) {
+      return true;
+    }
+
     const cardTargets = targets.filter(cardEffectTargetPredicate);
     if (cardTargets.some((target) => target.value === "all")) {
       return true;
     }
 
     if (
-      this.ability.effects?.every(
-        (effect) =>
-          effect.target?.type === "player" && effect.target.value === "self"
-      )
+      this.ability.effects?.every((effect) => effect.target?.type === "player")
     ) {
       return true;
     }

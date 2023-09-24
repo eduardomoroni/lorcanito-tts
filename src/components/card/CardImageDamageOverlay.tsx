@@ -3,7 +3,7 @@ import { type Zones } from "~/providers/TabletopProvider";
 import { DamageCounter } from "~/spaces/table/DamageCounter";
 import { PlusCircleIcon, MinusCircleIcon } from "@heroicons/react/24/outline";
 import { logAnalyticsEvent } from "~/3rd-party/firebase/FirebaseAnalyticsProvider";
-import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { useGameStore } from "~/engine/lib/GameStoreProvider";
 import { Button } from "~/components/Button";
 import { observer } from "mobx-react-lite";
 import { CardModel } from "~/store/models/CardModel";

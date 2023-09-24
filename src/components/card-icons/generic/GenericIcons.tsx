@@ -1,5 +1,7 @@
+"use client";
+
 import Image from "next/image";
-import { Tooltip } from "@nextui-org/react";
+import { Tooltip } from "antd";
 
 export const GenericIcons = (props: {
   className?: string;
@@ -9,7 +11,7 @@ export const GenericIcons = (props: {
   const { className, src, title } = props;
 
   return (
-    <Tooltip content={title}>
+    <Tooltip title={title}>
       <Image
         src={src}
         width={36}

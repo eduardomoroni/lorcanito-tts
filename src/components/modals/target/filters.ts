@@ -1,5 +1,5 @@
 import type { Zones } from "~/providers/TabletopProvider";
-import { Characteristics, LorcanitoCard } from "~/engine/cardTypes";
+import { Characteristics, LorcanitoCard } from "~/engine/cards/cardTypes";
 
 export type NumericComparison = {
   operator: "gt" | "lt" | "eq" | "gte" | "lte";
@@ -22,6 +22,7 @@ export type Abilities =
   | "reckless"
   | "evasive"
   | "support"
+  | "voiceless"
   | "ward";
 
 export type Keywords =
@@ -33,26 +34,31 @@ export type Keywords =
   | "reckless"
   | "evasive"
   | "support"
+  | "voiceless"
   | "ward";
 
 interface BaseStatusFilter {
-  filter: "status"
-  value: StatusFilterValues
+  filter: "status";
+  value: StatusFilterValues;
 }
 interface ReadyStatusFilter extends BaseStatusFilter {
-  value: StatusFilterValues.READY
+  value: StatusFilterValues.READY;
 }
 interface ExertedStatusFilter extends BaseStatusFilter {
-  value: StatusFilterValues.EXERTED
+  value: StatusFilterValues.EXERTED;
 }
 interface DryStatusFilter extends BaseStatusFilter {
-  value: StatusFilterValues.DRY
+  value: StatusFilterValues.DRY;
 }
 interface DamageStatusFilter extends BaseStatusFilter {
-  value: StatusFilterValues.DAMAGE
-  comparison: NumericComparison
+  value: StatusFilterValues.DAMAGE;
+  comparison: NumericComparison;
 }
-export type StatusFilter = | ReadyStatusFilter | ExertedStatusFilter | DryStatusFilter | DamageStatusFilter
+export type StatusFilter =
+  | ReadyStatusFilter
+  | ExertedStatusFilter
+  | DryStatusFilter
+  | DamageStatusFilter;
 export enum StatusFilterValues {
   READY = "ready",
   EXERTED = "exerted",
@@ -60,7 +66,7 @@ export enum StatusFilterValues {
   DAMAGE = "damage",
 }
 export type OwnerFilterValue = "self" | "opponent" | string;
-export type AttributeFilterValue = "cost" | "name";
+export type AttributeFilterValue = "cost" | "name" | "title";
 
 export type TargetFilter =
   | {
@@ -188,13 +194,13 @@ export function canSingFilter(song: LorcanitoCard): TargetFilter[] {
 }
 
 export function isStringComparison(
-  comparison: NumericComparison | StringComparison
+  comparison: NumericComparison | StringComparison,
 ): comparison is StringComparison {
   return typeof comparison.value === "string";
 }
 
 export function isNumericComparison(
-  comparison: NumericComparison | StringComparison
+  comparison: NumericComparison | StringComparison,
 ): comparison is NumericComparison {
   return typeof comparison.value === "number";
 }

@@ -5,8 +5,8 @@ import Image, { type ImageLoaderProps } from "next/image";
 import { CardNotFound } from "~/components/card/CardNotFound";
 import { FaceDownCard } from "~/components/card/FaceDownCard";
 import { getCardFullName } from "~/spaces/table/deckbuilder/parseDeckList";
-import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
-import { LorcanitoCard } from "~/engine/cardTypes";
+import { useGameStore } from "~/engine/lib/GameStoreProvider";
+import { LorcanitoCard } from "~/engine/cards/cardTypes";
 import { observer } from "mobx-react-lite";
 
 export const cardLoader = ({ src, width }: ImageLoaderProps) => {
@@ -42,7 +42,7 @@ export function createImgixUrl(
   opt: {
     hideCardText?: boolean;
     imageOnly?: boolean;
-  } = {}
+  } = {},
 ): string {
   if (card.number === undefined && card.alternativeUrl) {
     return card.alternativeUrl;
@@ -51,7 +51,7 @@ export function createImgixUrl(
   const enchantedCard: number = ENCHANTED_MAP[card.number] || 0;
   let url = `https://lorcanito.imgix.net/images/cards/EN/001/${pad(
     enchantedCard || card.number,
-    3
+    3,
   )}.webp?fm=avif&auto=format&q=65&w=250`;
 
   if (opt?.imageOnly) {
@@ -71,6 +71,7 @@ type Props = {
   className?: string;
   hideCardText?: boolean;
   imageOnly?: boolean;
+  onClick?: () => void;
   // This is to allow consumer to override the value
   fill?: boolean;
   width?: number;
@@ -85,6 +86,7 @@ const LorcanaCardImageComponent: FC<Props> = ({
   hideCardText,
   imageOnly,
   instanceId,
+  onClick,
   ...rest
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);

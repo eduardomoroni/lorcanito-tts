@@ -13,7 +13,7 @@ import { Game, type GameLobby } from "~/libs/game";
 import { DeckImportProvider } from "~/providers/DeckImportProvider";
 import { PresenceProvider } from "~/providers/presence/PresenceProvider";
 import { GameLobbyProvider } from "~/providers/lobby/GameLobbyProvider";
-import { GameStoreProvider } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { GameStoreProvider } from "~/engine/lib/GameStoreProvider";
 import { gameMock } from "~/app/(old)/game/[id]/gameMock";
 
 type Props = {

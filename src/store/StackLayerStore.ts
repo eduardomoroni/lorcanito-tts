@@ -5,17 +5,18 @@ import { StackLayerModel } from "~/store/models/StackLayerModel";
 import { CardModel } from "~/store/models/CardModel";
 import { createId } from "@paralleldrive/cuid2";
 import type { MobXRootStore } from "~/store/RootStore";
-import type { ScryEffectPayload } from "~/engine/effectTypes";
+import type { ScryEffectPayload } from "~/engine/rules/effects/effectTypes";
 import {
   Ability,
   ActivatedAbility,
   activatedAbilityPredicate,
+  delayedTriggeredAbilityPredicate,
   ResolutionAbility,
   resolutionAbilityPredicate,
   staticTriggeredAbilityPredicate,
   supportAbility,
   supportAbilityPredicate,
-} from "~/engine/abilities";
+} from "~/engine/rules/abilities/abilities";
 
 export type ResolvingParam = {
   targetId?: string;
@@ -35,7 +36,7 @@ export class StackLayerStore {
     initialState: GameEffect[] = [],
     dependencies: Dependencies,
     rootStore: MobXRootStore,
-    observable: boolean
+    observable: boolean,
   ) {
     if (observable) {
       makeAutoObservable(this, { rootStore: false, dependencies: false });
@@ -61,7 +62,7 @@ export class StackLayerStore {
         effect.responder,
         effect.ability as ResolutionAbility | ActivatedAbility,
         this.rootStore,
-        this.observable
+        this.observable,
       );
     });
   }
@@ -77,17 +78,23 @@ export class StackLayerStore {
   // TODO: mudar Ability para AbilityModel
   addAbilityToStack(
     ability: ResolutionAbility | ActivatedAbility,
-    card: CardModel
+    card: CardModel,
   ) {
     const isResolution = resolutionAbilityPredicate(ability);
     const isActivated = activatedAbilityPredicate(ability);
     const isStaticTriggered = staticTriggeredAbilityPredicate(ability);
+    const isDelayedTriggered = delayedTriggeredAbilityPredicate(ability);
 
-    if (isResolution || isActivated || isStaticTriggered) {
+    if (
+      isResolution ||
+      isActivated ||
+      isStaticTriggered ||
+      isDelayedTriggered
+    ) {
       const responder =
         ability.responder === "opponent"
-          ? this.rootStore.opponentPlayer
-          : this.rootStore.activePlayer;
+          ? this.rootStore.opponentPlayer(card.ownerId)
+          : card.ownerId;
 
       const layer = new StackLayerModel(
         card.instanceId,
@@ -95,16 +102,20 @@ export class StackLayerStore {
         responder,
         ability,
         this.rootStore,
-        this.observable
+        this.observable,
       );
       this.layers.push(layer);
 
       this.rootStore.log({ type: "EFFECT", effect: layer.toJSON() });
 
       if (layer.autoResolve) {
+        console.log("Auto resolving", ability);
         layer.resolve();
       } else {
-        // console.log("Not auto resolving, player has to choose a target");
+        console.log(
+          "Not auto resolving, player has to choose a target",
+          JSON.stringify(ability),
+        );
       }
     } else {
       console.log("Static abilities are not supported yet");
@@ -165,6 +176,8 @@ export class StackLayerStore {
       this.addAbilityToStack(supportEffect, card);
     }
   }
+
+  onChallenge(attacker: CardModel, defender: CardModel) {}
 
   remove(effect: StackLayerModel) {
     const index = this.layers.findIndex((element) => element.id === effect.id);

@@ -3,8 +3,8 @@
 import { createContext, useState } from "react";
 import type { Game } from "~/libs/game";
 
-import { LorcanitoCard } from "~/engine/cardTypes";
-import { ContinuousEffect } from "~/engine/effectTypes";
+import { LorcanitoCard } from "~/engine/cards/cardTypes";
+import { ContinuousEffect } from "~/engine/rules/effects/effectTypes";
 
 export type Meta = {
   exerted?: boolean | null;

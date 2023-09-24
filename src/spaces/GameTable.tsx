@@ -11,9 +11,9 @@ import { SideBar } from "~/spaces/Sidebar";
 import { StackZoneArena } from "~/spaces/StackZone";
 import { Transition } from "@headlessui/react";
 import { AlterHandModal } from "~/components/modals/AlterHandModal";
-import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { useGameStore } from "~/engine/lib/GameStoreProvider";
 import { useTurn } from "~/engine/GameProvider";
-import { useLorcanitoSounds } from "~/engine/useLorcanitoSounds";
+import { useLorcanitoSounds } from "~/hooks/useLorcanitoSounds";
 import { EffectStackZoneArena } from "~/spaces/EffectStackZone";
 import { observer } from "mobx-react-lite";
 
@@ -101,11 +101,7 @@ const GameTable: FC<{ gameId: string }> = (props) => {
           leaveTo="opacity-0 scale-95 "
         >
           <div className="absolute left-1/2 top-1/2 z-10 h-40 w-11/12 -translate-x-1/2 -translate-y-1/2 rounded-lg border border-solid border-slate-700 bg-gray-700 shadow-md ease-in-out">
-            {pendingEffects.length > 0 ? (
-              <EffectStackZoneArena />
-            ) : (
-              <StackZoneArena />
-            )}
+            {pendingEffects.length > 0 ? <EffectStackZoneArena /> : null}
           </div>
         </Transition>
         <div

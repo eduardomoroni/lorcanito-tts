@@ -5,14 +5,14 @@ import {
   type InternalLogEntry,
   type LogEntryMoveCard,
 } from "~/spaces/Log/types";
-import { LorcanitoCard } from "~/engine/cardTypes";
+import { LorcanitoCard } from "~/engine/cards/cardTypes";
 
 export function moveCard(
   elements: Array<unknown>,
   entry: LogEntryMoveCard & { private?: InternalLogEntry["private"] },
   player: string,
   card?: LorcanitoCard,
-  instanceId?: string
+  instanceId?: string,
 ) {
   const { from, to, position } = entry;
 
@@ -42,7 +42,7 @@ export function moveCard(
               instanceId={instanceId}
               privateEntry={entry.private}
               player={player}
-            />
+            />,
           );
           break;
         } else {
@@ -59,7 +59,7 @@ export function moveCard(
             instanceId={instanceId}
             privateEntry={entry.private}
             player={player}
-          />
+          />,
         );
         elements.push(` in play, from the top of their deck`);
         break;
@@ -73,7 +73,7 @@ export function moveCard(
             instanceId={instanceId}
             privateEntry={entry.private}
             player={player}
-          />
+          />,
         );
         elements.push(` in the inkwell, from the top of their deck`);
         break;
@@ -86,7 +86,7 @@ export function moveCard(
             instanceId={instanceId}
             privateEntry={entry.private}
             player={player}
-          />
+          />,
         );
         elements.push(` from the top of their deck`);
       }
@@ -105,7 +105,7 @@ export function moveCard(
             instanceId={instanceId}
             privateEntry={entry.private}
             player={player}
-          />
+          />,
         );
         break;
       case "discard":
@@ -116,7 +116,7 @@ export function moveCard(
             instanceId={instanceId}
             privateEntry={entry.private}
             player={player}
-          />
+          />,
         );
         break;
       case "inkwell":
@@ -128,7 +128,7 @@ export function moveCard(
             instanceId={instanceId}
             privateEntry={entry.private}
             player={player}
-          />
+          />,
         );
         elements.push(` in the inkwell`);
         break;
@@ -140,7 +140,7 @@ export function moveCard(
             instanceId={instanceId}
             privateEntry={entry.private}
             player={player}
-          />
+          />,
         );
 
         if (position === "first") {
@@ -165,7 +165,7 @@ export function moveCard(
             instanceId={instanceId}
             privateEntry={entry.private}
             player={player}
-          />
+          />,
         );
         elements.push(` to their hand`);
         break;
@@ -177,7 +177,7 @@ export function moveCard(
             instanceId={instanceId}
             privateEntry={entry.private}
             player={player}
-          />
+          />,
         );
         break;
       case "inkwell":
@@ -189,7 +189,7 @@ export function moveCard(
             instanceId={instanceId}
             privateEntry={entry.private}
             player={player}
-          />
+          />,
         );
         elements.push(` in the inkwell from play`);
         break;
@@ -201,7 +201,7 @@ export function moveCard(
             instanceId={instanceId}
             privateEntry={entry.private}
             player={player}
-          />
+          />,
         );
 
         if (position === "first") {
@@ -227,7 +227,7 @@ export function moveCard(
             instanceId={instanceId}
             privateEntry={entry.private}
             player={player}
-          />
+          />,
         );
         elements.push(` to their hand`);
         break;
@@ -239,7 +239,7 @@ export function moveCard(
             instanceId={instanceId}
             privateEntry={entry.private}
             player={player}
-          />
+          />,
         );
         break;
       case "play":
@@ -250,7 +250,7 @@ export function moveCard(
             instanceId={instanceId}
             privateEntry={entry.private}
             player={player}
-          />
+          />,
         );
         elements.push(` in play from the inkwell`);
         break;
@@ -262,7 +262,7 @@ export function moveCard(
             instanceId={instanceId}
             privateEntry={entry.private}
             player={player}
-          />
+          />,
         );
 
         if (position === "first") {
@@ -287,7 +287,7 @@ export function moveCard(
             instanceId={instanceId}
             privateEntry={entry.private}
             player={player}
-          />
+          />,
         );
         break;
       case "inkwell":
@@ -299,7 +299,7 @@ export function moveCard(
             instanceId={instanceId}
             privateEntry={entry.private}
             player={player}
-          />
+          />,
         );
         elements.push(` in the inkwell`);
         break;
@@ -311,7 +311,7 @@ export function moveCard(
             instanceId={instanceId}
             privateEntry={entry.private}
             player={player}
-          />
+          />,
         );
         if (position === "first") {
           elements.push(` on the top of the deck`);
@@ -327,7 +327,7 @@ export function moveCard(
             instanceId={instanceId}
             privateEntry={entry.private}
             player={player}
-          />
+          />,
         );
         elements.push(` to their hand`);
         break;

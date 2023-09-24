@@ -7,7 +7,7 @@ import { ref } from "firebase/database";
 import { type Zones } from "~/providers/TabletopProvider";
 import { api } from "~/utils/api";
 import { logAnalyticsEvent } from "~/3rd-party/firebase/FirebaseAnalyticsProvider";
-import { useGameStore } from "~/engine/rule-engine/lib/GameStoreProvider";
+import { useGameStore } from "~/engine/lib/GameStoreProvider";
 
 const Context = createContext<{ game: Game; playerId: string }>({
   game: null!,

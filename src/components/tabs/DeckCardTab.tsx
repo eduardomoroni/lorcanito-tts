@@ -2,7 +2,7 @@ import { useDeckImport } from "~/providers/DeckImportProvider";
 import { LorcanaCardImage } from "~/components/card/LorcanaCardImage";
 import { logAnalyticsEvent } from "~/3rd-party/firebase/FirebaseAnalyticsProvider";
 import React from "react";
-import { LorcanitoCard } from "~/engine/cardTypes";
+import { LorcanitoCard } from "~/engine/cards/cardTypes";
 
 // @ts-ignore
 const CardImage: React.FC<{
