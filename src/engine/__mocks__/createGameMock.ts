@@ -1,9 +1,9 @@
 import { createEmptyGame, type Game } from "~/libs/game";
-import type { Zones } from "~/providers/TabletopProvider";
+import type { Zones } from "~/spaces/providers/TabletopProvider";
 import { createId } from "@paralleldrive/cuid2";
 import type { LorcanitoCard } from "~/engine/cards/cardTypes";
 
-import {simbaProtectiveCub} from "~/engine/cards/TFC/characters/characters";
+import { simbaProtectiveCub } from "~/engine/cards/TFC/characters/characters";
 
 function range(size: number, startAt = 0) {
   return [...Array(size).keys()].map((i) => i + startAt);
@@ -23,6 +23,7 @@ function prepareGame(playerId: string, state: TestInitialState, game: Game) {
   game.tables[playerId] = {
     lore: lore || 0,
     readyToStart: true,
+    cardsAddedToInkWellThisTurn: 0,
     zones: {
       discard: [],
       inkwell: [],

@@ -2,16 +2,16 @@
 
 import React, { useState, type FC } from "react";
 import GameTable from "~/spaces/GameTable";
-import PrivacyPolicyBanner from "~/components/banners/PrivacyPolicyBanner";
-import { CardPreviewProvider } from "~/providers/CardPreviewProvider";
+import PrivacyPolicyBanner from "~/spaces/components/banners/PrivacyPolicyBanner";
+import { CardPreviewProvider } from "~/spaces/providers/CardPreviewProvider";
 import type { Game } from "~/libs/game";
-import { DnDProvider } from "~/providers/DnDProvider";
+import { DnDProvider } from "~/spaces/providers/DnDProvider";
 import { HotkeysProvider } from "react-hotkeys-hook";
-import { ContextMenuProvider } from "~/providers/card-context-menu/ContextMenuProvider";
-import { PreGameProvider } from "~/providers/PreGameProvider";
-import { WelcomeModal } from "~/components/modals/WelcomeModal";
-import { PresenceProvider } from "~/providers/presence/PresenceProvider";
-import { GameLobbyProvider } from "~/providers/lobby/GameLobbyProvider";
+import { ContextMenuProvider } from "~/spaces/providers/card-context-menu/ContextMenuProvider";
+import { PreGameProvider } from "~/spaces/providers/PreGameProvider";
+import { WelcomeModal } from "~/spaces/components/modals/WelcomeModal";
+import { PresenceProvider } from "~/spaces/providers/presence/PresenceProvider";
+import { GameLobbyProvider } from "~/spaces/providers/lobby/GameLobbyProvider";
 import { useGameStore } from "~/engine/lib/GameStoreProvider";
 
 export const Lorcanito: FC<{

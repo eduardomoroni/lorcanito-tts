@@ -1,38 +1,8 @@
 import { type GetServerSidePropsContext } from "next";
-import { getServerSession, type NextAuthOptions, User } from "next-auth";
+import { getServerSession, type NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import admin from "~/3rd-party/firebase/admin";
+import admin from "~/libs/3rd-party/firebase/admin";
 import { type DecodedIdToken } from "firebase-admin/lib/auth/token-verifier";
-import { ISODateString } from "next-auth/src/core/types";
-
-// @expect-error wrong type in next-auth
-// declare module "@auth/core/types" {
-//   interface User {
-//     uid: string;
-//     email: string;
-//     customToken: string;
-//   }
-//
-//   interface Session {
-//     error?: "RefreshAccessTokenError";
-//     user: User;
-//     expires: ISODateString;
-//     customToken: string;
-//     refreshToken: string;
-//   }
-// }
-//
-// // @expect-error wrong type in next-auth
-// declare module "@auth/core/jwt" {
-//   interface JWT {
-//     access_token: string;
-//     expires_at: number;
-//     refresh_token: string;
-//     error?: "RefreshAccessTokenError";
-//     user: User;
-//     customToken: string;
-//   }
-// }
 
 /**
  * Options for NextAuth.js used to configure adapters, providers, callbacks, etc.
@@ -96,9 +66,9 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     session: async function ({ session, token, trigger }) {
       if (token && session) {
-        // @ts-expect-error nextAuth types are not working
+        // @ts-expect-error
         session.user = token.user;
-        // @ts-expect-error nextAuth types are not working
+        // @ts-expect-error
         session.customToken = token.customToken;
       }
 

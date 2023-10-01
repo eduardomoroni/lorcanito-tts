@@ -4,7 +4,8 @@
 
 import { TestStore } from "~/engine/rules/testStore";
 import { friendsOnTheOtherSide } from "~/engine/cards/TFC/songs/songs";
-import {sebastianCourtComposer} from "~/engine/cards/TFC/characters/characters";
+import { sebastianCourtComposer } from "~/engine/cards/TFC/characters/characters";
+import { expect } from "@jest/globals";
 
 describe("Singer keywords", () => {
   it("sings a song cheaper", () => {

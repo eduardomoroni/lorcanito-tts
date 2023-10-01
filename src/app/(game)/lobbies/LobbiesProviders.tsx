@@ -2,8 +2,8 @@
 
 import React, { type FC } from "react";
 import { LobbiesPage } from "./LobbiesPage";
-import { useFirebaseUserId } from "~/3rd-party/firebase/FirebaseSessionProvider";
-import { StreamChatLobbiesProvider } from "~/providers/stream-chat-provider/StreamChatLobbiesProvider";
+import { useFirebaseUserId } from "~/libs/3rd-party/firebase/FirebaseSessionProvider";
+import { StreamChatLobbiesProvider } from "~/spaces/providers/stream-chat-provider/StreamChatLobbiesProvider";
 
 type Props = {
   userId: string;

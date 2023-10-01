@@ -2,8 +2,11 @@
  * @jest-environment node
  */
 import { TestStore } from "~/engine/rules/testStore";
-
-import {moanaOfMotunui, zeusGodOfLightning} from "~/engine/cards/TFC/characters/characters";
+import {
+  moanaOfMotunui,
+  zeusGodOfLightning,
+} from "~/engine/cards/TFC/characters/characters";
+import { expect } from "@jest/globals";
 
 describe("Rush keyword", () => {
   it("Can challenge with fresh ink", () => {
@@ -14,7 +17,7 @@ describe("Rush keyword", () => {
       },
       {
         play: [moanaOfMotunui],
-      }
+      },
     );
 
     const attacker = testStore.getByZoneAndId("hand", zeusGodOfLightning.id);
@@ -23,7 +26,7 @@ describe("Rush keyword", () => {
     const defender = testStore.getByZoneAndId(
       "play",
       moanaOfMotunui.id,
-      "player_two"
+      "player_two",
     );
     defender.updateCardMeta({ exerted: true });
 

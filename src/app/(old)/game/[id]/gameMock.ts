@@ -624,6 +624,7 @@ export const gameMock: Game = {
     player_one: {
       lore: 0,
       readyToStart: true,
+      cardsAddedToInkWellThisTurn: 0,
       zones: {
         discard: [],
         inkwell: [],
@@ -698,6 +699,7 @@ export const gameMock: Game = {
     player_two: {
       lore: 0,
       readyToStart: true,
+      cardsAddedToInkWellThisTurn: 0,
       zones: {
         discard: [],
         inkwell: [],

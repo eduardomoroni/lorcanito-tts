@@ -7,12 +7,13 @@ import type {
   ResolveEffectEntry,
 } from "~/spaces/Log/types";
 import { exhaustiveCheck } from "~/libs/exhaustiveCheck";
+import { Ability } from "~/engine/rules/abilities/abilities";
 
 export function resolveStackLayerEntries(
   elements: (string | JSX.Element)[],
   entry: ResolveEffectEntry,
   activePlayer: string,
-  isActivePlayerTheSender: boolean
+  isActivePlayerTheSender: boolean,
 ) {
   const { targetId, effect } = entry;
   elements.push(`${isActivePlayerTheSender ? "resolved" : "resolves"} `);
@@ -23,10 +24,10 @@ export function resolveStackLayerEntries(
       instanceId={targetId}
       privateEntry={undefined}
       player={activePlayer}
-    />
+    />,
   );
 
-  const ability = effect?.ability || {};
+  const ability = effect?.ability || ({} as Ability);
   if ("effects" in ability) {
     const effects = ability.effects || [];
 
@@ -37,7 +38,7 @@ export function resolveStackLayerEntries(
           elements.push(
             `, ${
               modifier === "add" ? "adding" : "reducing"
-            } its lore by ${amount}`
+            } its lore by ${amount}`,
           );
           break;
         }
@@ -47,14 +48,14 @@ export function resolveStackLayerEntries(
           elements.push(
             `, ${effect.modifier === "add" ? "adding" : "reducing"} its ${
               effect.type
-            } ${effect.duration === "turn" ? "this turn" : "until next turn"}.`
+            } ${effect.duration === "turn" ? "this turn" : "until next turn"}.`,
           );
           break;
         case "restriction":
           elements.push(
             `, and it can not longer ${effect.restriction} ${
               effect.duration === "turn" ? "this turn" : "until next turn"
-            }.`
+            }.`,
           );
           break;
         case "ability":
@@ -90,6 +91,9 @@ export function resolveStackLayerEntries(
         case "shuffle":
           elements.push(`, gaining the ability ${effect}.`);
           break;
+        case "protection":
+          elements.push(`, gaining the ability ${effect}.`);
+          break;
         default: {
           exhaustiveCheck(effect);
         }
@@ -101,7 +105,7 @@ export function resolveStackLayerEntries(
 export function cancelStackLayerEntries(
   elements: (string | JSX.Element)[],
   entry: CancelEffectEntry,
-  isActivePlayerTheSender: boolean
+  isActivePlayerTheSender: boolean,
 ) {
   const { effect } = entry;
   elements.push(`${isActivePlayerTheSender ? "cancelled" : "cancels"} `);
@@ -111,7 +115,7 @@ export function cancelStackLayerEntries(
 export function activateStackLayerEntries(
   elements: (string | JSX.Element)[],
   entry: EffectEntry,
-  isActivePlayerTheSender: boolean
+  isActivePlayerTheSender: boolean,
 ) {
   const { effect } = entry;
   elements.push(`${isActivePlayerTheSender ? "activated" : "activates"} `);

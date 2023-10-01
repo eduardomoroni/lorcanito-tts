@@ -10,10 +10,9 @@ export default createNextApiHandler({
   onError:
     env.NODE_ENV === "development"
       ? ({ path, error }) => {
-          // @ts-expect-error - stack is not on the Error interface
-          console.error(error?.stack.split("\n", 7).join("\n"));
+          console.error(error?.stack?.split("\n", 7).join("\n"));
           console.error(
-            `❌ tRPC failed on ${path ?? "<no-path>"}: ${error.message}`
+            `❌ tRPC failed on ${path ?? "<no-path>"}: ${error.message}`,
           );
         }
       : undefined,

@@ -6,7 +6,7 @@ import { describe, expect, it } from "@jest/globals";
 import { TestStore } from "~/engine/rules/testStore";
 import { friendsOnTheOtherSide } from "~/engine/cards/TFC/songs/songs";
 import { shieldOfVirtue } from "~/engine/cards/TFC/items/items";
-import { CardModel } from "~/store/models/CardModel";
+import { CardModel } from "~/engine/store/models/CardModel";
 import {arielSpectacularSinger, chiefTui, heiheiBoatSnack} from "~/engine/cards/TFC/characters/characters";
 
 describe("Ariel - Spectacular Singer", () => {

@@ -6,7 +6,6 @@ import type {
 } from "~/engine/rules/abilities/abilities";
 import type {
   AbilityEffect,
-  BanishEffect,
   EffectTargets,
   ExertEffect,
   ScryEffect,
@@ -22,16 +21,15 @@ import type {
 import {
   BanishTrigger,
   readyAndCantQuest,
-  Trigger,
   wheneverPlays,
   wheneverYouPlay,
 } from "~/engine/rules/abilities/abilities";
-import { Effect } from "~/engine/rules/effects/effectTypes";
 
 export const dingleHopper: LorcanitoItemCard = {
   implemented: true,
+  characteristics: ["item"],
   id: "15dc6d521d3ad4dfda6c40ff441deec12e90a330",
-  url: "https://static.lorcanito.com/images/cards/TFC/32.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/32.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/32_en_dinglehopper-716.webp",
   name: "Dinglehopper",
@@ -73,8 +71,9 @@ export const dingleHopper: LorcanitoItemCard = {
 };
 export const lantern: LorcanitoItemCard = {
   implemented: true,
+  characteristics: ["item"],
   id: "a068f8f06c08ec83387c2f7a0952acb9859f095f",
-  url: "https://static.lorcanito.com/images/cards/TFC/33.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/33.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/33_en_lantern-716.webp",
   name: "Lantern",
@@ -110,8 +109,9 @@ export const lantern: LorcanitoItemCard = {
 };
 export const ursulaShellNecklace: LorcanitoItemCard = {
   implemented: true,
+  characteristics: ["item"],
   id: "f9becaf6d4cbcb427eeac1de2a7fa391508ca94d",
-  url: "https://static.lorcanito.com/images/cards/TFC/34.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/34.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/34_en_ursulas_shell_necklace-716.webp",
   name: "Ursula's Shell Necklace",
@@ -152,8 +152,9 @@ export const ursulaShellNecklace: LorcanitoItemCard = {
 };
 export const magicMirror: LorcanitoItemCard = {
   implemented: true,
+  characteristics: ["item"],
   id: "a2b67363d97354df5c25713e60d67ca19cfdec61",
-  url: "https://static.lorcanito.com/images/cards/TFC/66.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/66.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/66_en_magic_mirror-716.webp",
   name: "Magic Mirror",
@@ -188,8 +189,9 @@ export const magicMirror: LorcanitoItemCard = {
 };
 export const ursulaCaldron: LorcanitoItemCard = {
   implemented: true,
+  characteristics: ["item"],
   id: "fbcd12f70d9cf78401bcc8c159743cee3bfbaa08",
-  url: "https://static.lorcanito.com/images/cards/TFC/67.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/67.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/67_en_ursulas_cauldron-716.webp",
   name: "Ursula's Cauldron",
@@ -203,7 +205,7 @@ export const ursulaCaldron: LorcanitoItemCard = {
       effects: [
         {
           type: "scry",
-          amount: 3,
+          amount: 2,
           mode: "both",
           limits: {
             top: 1,
@@ -227,8 +229,9 @@ export const ursulaCaldron: LorcanitoItemCard = {
 };
 export const whiteRabbitPocketWatch: LorcanitoItemCard = {
   implemented: true,
+  characteristics: ["item"],
   id: "960fb90370cc04551b74c266f72e5497c7869ae9",
-  url: "https://static.lorcanito.com/images/cards/TFC/68.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/68.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/68_en_white_rabbits_pocket_watch-716.webp",
   name: "White Rabbit's Pocket Watch",
@@ -271,8 +274,9 @@ export const whiteRabbitPocketWatch: LorcanitoItemCard = {
 };
 export const drFacilierCards: LorcanitoItemCard = {
   implemented: true,
+  characteristics: ["item"],
   id: "7009f708b5f8e9437c9f748f11cacc3a1854d7ab",
-  url: "https://static.lorcanito.com/images/cards/TFC/101.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/101.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/101_en_dr_faciliers_cards-716.webp",
   name: "Dr. Facilier's Cards",
@@ -306,8 +310,9 @@ export const drFacilierCards: LorcanitoItemCard = {
 };
 export const stolenScimitar: LorcanitoItemCard = {
   implemented: true,
+  characteristics: ["item"],
   id: "c2bedb26af7c98664dca268c84ddab9d739ec8ac",
-  url: "https://static.lorcanito.com/images/cards/TFC/102.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/102.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/102_en_stolen_scimitar-716.webp",
   name: "Stolen Scimitar",
@@ -377,8 +382,9 @@ export const stolenScimitar: LorcanitoItemCard = {
 };
 export const poisonedApple: LorcanitoItemCard = {
   implemented: true,
+  characteristics: ["item"],
   id: "35cf6b8bf558cc97aa80f792e59006c286dcf293",
-  url: "https://static.lorcanito.com/images/cards/TFC/134.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/134.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/134_en_poisoned_apple-716.webp",
   name: "Poisoned Apple",
@@ -403,7 +409,7 @@ export const poisonedApple: LorcanitoItemCard = {
               target: {
                 type: "card",
                 filters: [
-                  { filter: "characteristics", value: ["princess"] },
+                  { filter: "characteristicss", value: ["princess"] },
                   { filter: "type", value: "character" },
                   { filter: "zone", value: "play" },
                 ],
@@ -440,8 +446,9 @@ export const poisonedApple: LorcanitoItemCard = {
 };
 export const shieldOfVirtue: LorcanitoItemCard = {
   implemented: true,
+  characteristics: ["item"],
   id: "aa68317a85ca67aebbbb2aa8b80c6602715706bd",
-  url: "https://static.lorcanito.com/images/cards/TFC/135.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/135.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/135_en_shield_of_virtue-716.webp",
   name: "Shield of Virtue",
@@ -476,8 +483,9 @@ export const shieldOfVirtue: LorcanitoItemCard = {
 };
 export const swordOfTruth: LorcanitoItemCard = {
   implemented: true,
+  characteristics: ["item"],
   id: "e1a5af4fc658c26c5bf506151b2149821cab0627",
-  url: "https://static.lorcanito.com/images/cards/TFC/136.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/136.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/136_en_sword_of_truth-716.webp",
   name: "Sword of Truth",
@@ -497,7 +505,7 @@ export const swordOfTruth: LorcanitoItemCard = {
             value: 1,
             filters: [
               { filter: "type", value: "character" },
-              { filter: "characteristics", value: ["villain"] },
+              { filter: "characteristicss", value: ["villain"] },
               { filter: "zone", value: "play" },
             ],
           },
@@ -516,8 +524,9 @@ export const swordOfTruth: LorcanitoItemCard = {
 };
 export const coconutbasket: LorcanitoItemCard = {
   implemented: true,
+  characteristics: ["item"],
   id: "8f49d6ea16cda4e7b7cd4d63fd48bf0f5df6bca6",
-  url: "https://static.lorcanito.com/images/cards/TFC/166.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/166.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/166_en_coconut_basket-716.webp",
   name: "Coconut Basket",
@@ -562,8 +571,9 @@ export const coconutbasket: LorcanitoItemCard = {
 };
 export const eyeOfTheFate: LorcanitoItemCard = {
   implemented: true,
+  characteristics: ["item"],
   id: "44e7863c33e135335f206a14f1bdbe4bbb173046",
-  url: "https://static.lorcanito.com/images/cards/TFC/167.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/167.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/167_en_eye_of_the_fates-716.webp",
   name: "Eye of the Fates",
@@ -607,8 +617,9 @@ export const eyeOfTheFate: LorcanitoItemCard = {
 
 export const fishboneQuill: LorcanitoItemCard = {
   implemented: true,
+  characteristics: ["item"],
   id: "ab88bf1331a922de07edd2df9b58f68d9382093d",
-  url: "https://static.lorcanito.com/images/cards/TFC/168.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/168.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/168_en_fishbone_quill-716.webp",
   name: "Fishbone Quill",
@@ -649,8 +660,9 @@ export const fishboneQuill: LorcanitoItemCard = {
 };
 export const magicGoldenFlower: LorcanitoItemCard = {
   implemented: true,
+  characteristics: ["item"],
   id: "80c2d2a3d0c6b3cb465f1f8136077e7e5d9900ae",
-  url: "https://static.lorcanito.com/images/cards/TFC/169.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/169.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/169_en_magic_golden_flower-716.webp",
   name: "Magic Golden Flower",
@@ -692,8 +704,9 @@ export const magicGoldenFlower: LorcanitoItemCard = {
 };
 export const scepterOfArendelle: LorcanitoItemCard = {
   implemented: true,
+  characteristics: ["item"],
   id: "a11f384d67f1a51bc742dd7ce95276ba603f19bf",
-  url: "https://static.lorcanito.com/images/cards/TFC/170.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/170.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/170_en_scepter_of_arendelle-716.webp",
   name: "Scepter Of Arendelle",
@@ -734,8 +747,9 @@ export const scepterOfArendelle: LorcanitoItemCard = {
 };
 export const beastMirror: LorcanitoItemCard = {
   implemented: true,
+  characteristics: ["item"],
   id: "197c85b9c275b5b685e0577ca5cfde34ad21f3ad",
-  url: "https://static.lorcanito.com/images/cards/TFC/201.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/201.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/201_en_beasts_mirror-716.webp",
   name: "Beast's Mirror",
@@ -778,8 +792,9 @@ export const beastMirror: LorcanitoItemCard = {
 };
 export const fryingPan: LorcanitoItemCard = {
   implemented: true,
+  characteristics: ["item"],
   id: "7387466163a37671c614ff1c50702740eef6a578",
-  url: "https://static.lorcanito.com/images/cards/TFC/202.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/202.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/202_en_frying_pan-716.webp",
   name: "Frying Pan",
@@ -820,8 +835,9 @@ export const fryingPan: LorcanitoItemCard = {
 };
 export const musketeerTabard: LorcanitoItemCard = {
   implemented: true,
+  characteristics: ["item"],
   id: "fec6b61460c28b56cbb861e72220e83ef55eac87",
-  url: "https://static.lorcanito.com/images/cards/TFC/203.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/203.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/203_en_musketeer_tabard-716.webp",
   name: "Musketeer Tabard",
@@ -866,8 +882,9 @@ export const musketeerTabard: LorcanitoItemCard = {
 };
 export const plasmaBlaster: LorcanitoItemCard = {
   implemented: true,
+  characteristics: ["item"],
   id: "9e8f180f327b8a7a81fbaa3f558989d400411b45",
-  url: "https://static.lorcanito.com/images/cards/TFC/204.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/204.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/204_en_plasma_blaster-716.webp",
   name: "Plasma Blaster",

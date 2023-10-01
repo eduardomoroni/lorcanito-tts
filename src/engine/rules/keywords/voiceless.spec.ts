@@ -4,7 +4,8 @@
 
 import { TestStore } from "~/engine/rules/testStore";
 import { partOfOurWorld } from "~/engine/cards/TFC/songs/songs";
-import {arielOnHumanLegs} from "~/engine/cards/TFC/characters/characters";
+import { arielOnHumanLegs } from "~/engine/cards/TFC/characters/characters";
+import { expect } from "@jest/globals";
 
 describe("Voiceless keywords", () => {
   it("Does NOT sing if character has voiceless", () => {

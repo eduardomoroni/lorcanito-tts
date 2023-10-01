@@ -2,10 +2,9 @@
 
 import React, { useLayoutEffect } from "react";
 import { Analytics } from "@vercel/analytics/react";
-import { FirebaseProvider } from "~/3rd-party/firebase/FirebaseProvider";
-import { api } from "~/utils/api";
+import { FirebaseProvider } from "~/libs/3rd-party/firebase/FirebaseProvider";
+import { api } from "~/libs/api";
 import { useReportWebVitals } from "next/web-vitals";
-import { NextUIProvider } from "@nextui-org/react";
 
 function RootTemplate({ children }: { children: React.ReactNode }) {
   const metrics: unknown[] = [];

@@ -8,7 +8,10 @@ import {
   ransack,
   youHaveForgottenMe,
 } from "~/engine/cards/TFC/actions/actions";
-import {magicBroomBucketBrigade, robinHoodUnrivaledArcher} from "~/engine/cards/TFC/characters/characters";
+import {
+  magicBroomBucketBrigade,
+  robinHoodUnrivaledArcher,
+} from "~/engine/cards/TFC/characters/characters";
 
 describe("Robin Hood - Unrivaled Archer", () => {
   describe("Good Shot: During your turn, this character gains **Evasive**.", () => {

@@ -1,5 +1,5 @@
 import React from "react";
-import { ZoneOverlay } from "~/components/ZoneOverlay";
+import { ZoneOverlay } from "~/spaces/components/ZoneOverlay";
 
 export const TableOverlay: React.FC<{
   position: "bottom" | "top";

@@ -1,7 +1,7 @@
 import { Fragment, useRef, type FC, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { api } from "~/utils/api";
-import { logAnalyticsEvent } from "~/3rd-party/firebase/FirebaseAnalyticsProvider";
+import { api } from "~/libs/api";
+import { logAnalyticsEvent } from "~/libs/3rd-party/firebase/FirebaseAnalyticsProvider";
 
 export const StartGameModal: FC<{
   lobbyId: string;
@@ -10,6 +10,7 @@ export const StartGameModal: FC<{
   opponentId?: string;
 }> = (props) => {
   const { wonDieRoll, playerId, lobbyId, opponentId } = props;
+  console.log({ wonDieRoll, playerId, lobbyId, opponentId });
   const goingFirstButton = useRef(null);
   const isChoosingFirstPlayer = wonDieRoll === playerId;
   const startGameMutation = api.game.startGame.useMutation();

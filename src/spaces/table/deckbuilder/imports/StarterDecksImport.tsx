@@ -6,8 +6,8 @@ import {
   type DeckType,
   StarterDeckSelect,
 } from "~/spaces/table/deckbuilder/imports/StarterDeckSelect";
-import { logAnalyticsEvent } from "~/3rd-party/firebase/FirebaseAnalyticsProvider";
-import { useDeckImport } from "~/providers/DeckImportProvider";
+import { logAnalyticsEvent } from "~/libs/3rd-party/firebase/FirebaseAnalyticsProvider";
+import { useDeckImport } from "~/spaces/providers/DeckImportProvider";
 
 export function StarterDecksImport(props: {
   deckList: string;

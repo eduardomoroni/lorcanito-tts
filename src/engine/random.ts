@@ -8,7 +8,7 @@
 
 import type { AleaState } from "./random.alea";
 import { alea } from "./random.alea";
-import { api } from "~/utils/api";
+import { api } from "~/libs/api";
 
 export interface RandomState {
   seed: string | number;

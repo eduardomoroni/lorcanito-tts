@@ -3,7 +3,7 @@ import { ResizableBox } from "react-resizable";
 import { Handle } from "~/spaces/Log/Handle";
 import { VirtualizedLogList } from "~/spaces/Log/VirtualizedLogList";
 import { useGameLogContext } from "~/spaces/Log/game-log/GameLogProvider";
-import { ErrorBoundary } from "~/components/ErrorBoundary";
+import { ErrorBoundary } from "~/spaces/components/ErrorBoundary";
 
 export const GameLog: FC = () => {
   // Logs are handled by chat now

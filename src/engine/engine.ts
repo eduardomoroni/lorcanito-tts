@@ -1,20 +1,11 @@
 import type { Game } from "~/libs/game";
-import type { Zones } from "~/providers/TabletopProvider";
-import {
-  selectBottomDeckCard,
-  selectCardMeta,
-  selectCardOwner,
-  selectPlayerZone,
-  selectShiftCost,
-  selectTableCard,
-  selectTopDeckCard,
-} from "~/engine/selectors";
+import type { Zones } from "~/spaces/providers/TabletopProvider";
 import { allCardsById } from "~/engine/cards/cards";
 import { LorcanitoCard } from "~/engine/cards/cardTypes";
-import { MobXRootStore } from "~/store/RootStore";
+import { MobXRootStore } from "~/engine/store/RootStore";
 
 import { type Database } from "firebase/database";
-import type { Dependencies } from "~/store/types";
+import type { Dependencies } from "~/engine/store/types";
 
 export type AdditionalArgs = Dependencies;
 
@@ -47,6 +38,8 @@ export function createRuleEngine(
   } = args;
   const mobxStore = new MobXRootStore(initialState, args);
 
+  console.info("createRuleEngine is discontinued, please use TestStore");
+
   function bySelector<T>(selector: (state: { game: Game }) => T): T {
     return selector({ game: mobxStore.toJSON() });
   }
@@ -65,16 +58,7 @@ export function createRuleEngine(
         zone: Zones;
         lorcanitoId: string;
         owner: string;
-      }) => {
-        const { zone, lorcanitoId, owner } = params;
-        const cardsInZone = engine.get.zoneCards(zone, owner);
-        // TODO: do something when it's not found
-        return cardsInZone.find(
-          (instanceId: string) =>
-            lorcanitoId === engine.get.lorcanitoCard(instanceId)?.id,
-        ) as string;
-      },
-      bySelector: bySelector,
+      }) => {},
       turnPlayer: () => {
         return engine.getState().turnPlayer;
       },
@@ -89,39 +73,11 @@ export function createRuleEngine(
       effects: () => {
         return engine.getState().effects || [];
       },
-      topDeckCard: (playerId: string) =>
-        selectTopDeckCard(engine.getState(), playerId),
-      bottomDeckCard: (playerId: string) =>
-        selectBottomDeckCard(engine.getState(), playerId),
-      cardOwner: (instanceId: string) => {
-        return selectCardOwner(engine.getState(), instanceId);
-      },
-      cardMeta: (instanceId: string) => {
-        return selectCardMeta(engine.getState(), instanceId);
-      },
-      shiftCost: (instanceId: string): number => {
-        return selectShiftCost(engine.getState(), instanceId);
-      },
-      tableCard: (instanceId?: string) => {
-        return selectTableCard(engine.getState(), instanceId);
-      },
-      lorcanitoCard: (
-        instanceId?: string | null,
-      ): LorcanitoCard | undefined => {
-        const cardId = selectTableCard(engine.getState(), instanceId)?.cardId;
-        return cardId ? allCardsById[cardId] : undefined;
-      },
-      zoneCards(zone: Zones, playerId: string) {
-        return selectPlayerZone(engine.getState(), playerId, zone);
-      },
-      zoneTableCards(zone: Zones, playerId: string) {
-        return selectPlayerZone(engine.getState(), playerId, zone).map((card) =>
-          engine.get.tableCard(card),
-        );
-      },
-      allTableCards() {
-        return Object.values(engine.getState().cards || {});
-      },
+      tableCard: (instanceId?: string) => {},
+      lorcanitoCard: (instanceId?: string | null) => {},
+      zoneCards(zone: Zones, playerId: string) {},
+      zoneTableCards(zone: Zones, playerId: string) {},
+
       players() {
         return Object.keys(engine.getState().tables || {}) || [];
       },
@@ -135,18 +91,13 @@ export function createRuleEngine(
       ) => {
         mobxStore.stackLayerStore.resolveLayer(effectId, params);
       },
-      drawCard(player: string) {
-        mobxStore.drawCard(player);
-      },
       alterHand: (cards: string[], player: string) => {
         mobxStore.alterHand(cards, player);
       },
       shuffleDeck: (player: string) => {
         mobxStore.tableStore.shuffleDeck(player);
       },
-      shuffleCardIntoDeck: (params: { instanceId: string; from: Zones }) => {
-        mobxStore.cardStore.shuffleCardIntoDeck(params.instanceId, params.from);
-      },
+
       setPlayerLore: (player: string, lore: number) => {
         mobxStore.tableStore.setPlayerLore(player, lore);
       },
@@ -185,11 +136,6 @@ export function createRuleEngine(
       ) => {
         if (instanceId) {
           mobxStore.cardStore.tapCard(instanceId, opts);
-        }
-      },
-      revealCard: (instanceId: string = "", from: Zones) => {
-        if (instanceId) {
-          mobxStore.cardStore.revealCard(instanceId, from);
         }
       },
       updateCardDamage: (

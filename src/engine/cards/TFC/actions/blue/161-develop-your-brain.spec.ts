@@ -6,7 +6,7 @@ import { describe, expect, it } from "@jest/globals";
 import { TestStore } from "~/engine/rules/testStore";
 import { developYourBrain } from "~/engine/cards/TFC/actions/actions";
 import { shieldOfVirtue } from "~/engine/cards/TFC/items/items";
-import { CardModel } from "~/store/models/CardModel";
+import { CardModel } from "~/engine/store/models/CardModel";
 import {chiefTui, heiheiBoatSnack, moanaOfMotunui} from "~/engine/cards/TFC/characters/characters";
 
 describe("Develop Your Brain", () => {

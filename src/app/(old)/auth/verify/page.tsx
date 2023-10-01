@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { AuthLayout } from "~/components/AuthLayout";
-import { Button } from "~/components/Button";
-import { Logo } from "~/components/Logo";
+import { AuthLayout } from "~/spaces/components/AuthLayout";
+import { Button } from "~/spaces/components/Button";
+import { Logo } from "~/spaces/components/Logo";
 import { useEffect, useState } from "react";
-import { confirmSignIn } from "~/3rd-party/firebase";
+import { confirmSignIn } from "~/libs/3rd-party/firebase";
 import { signIn } from "next-auth/react";
-import { shouldConnectAuthEmulator } from "~/3rd-party/firebase/emulator";
+import { shouldConnectAuthEmulator } from "~/libs/3rd-party/firebase/emulator";
 import { useAuth } from "reactfire";
 import { browserSessionPersistence, setPersistence } from "firebase/auth";
 

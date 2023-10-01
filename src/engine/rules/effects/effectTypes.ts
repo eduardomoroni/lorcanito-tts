@@ -1,6 +1,9 @@
-import type { CardModel } from "~/store/models/CardModel";
-import { Zones } from "~/providers/TabletopProvider";
-import { Keywords, TargetFilter } from "~/components/modals/target/filters";
+import type { CardModel } from "~/engine/store/models/CardModel";
+import type { Zones } from "~/spaces/providers/TabletopProvider";
+import type {
+  Keywords,
+  TargetFilter,
+} from "~/spaces/components/modals/target/filters";
 
 export type Effect =
   | ReplacementEffect
@@ -17,6 +20,7 @@ export type Effect =
   | LoreEffect
   | DrawEffect
   | BanishEffect
+  | ProtectionEffect
   | DiscardEffect
   | ConditionalEffect;
 
@@ -63,10 +67,15 @@ export type TriggerTargetEffectTarget =
   | ChallengeTriggerTarget
   | PlayTriggerTarget;
 
+export type ThisCharacterTarget = {
+  type: "this-character";
+};
+
 export type EffectTargets =
   | CardEffectTarget
   | PlayerEffectTarget
   | TriggerTargetEffectTarget
+  | ThisCharacterTarget
   | TopDeckEffectTarget
   | IdEffectTarget;
 
@@ -89,10 +98,12 @@ interface BaseEffect {
     | "replacement"
     | "banish"
     | "lore"
+    | "protection"
     | "scry"
     | "exert"
     | "move"
     | "attribute";
+  // This dictates what can/should be targeted by the effect
   target?: EffectTargets;
   autoResolve?: boolean;
 }
@@ -100,7 +111,14 @@ interface BaseEffect {
 export interface RestrictionEffect extends BaseEffect {
   type: "restriction";
   restriction: "quest" | "challenge" | "exert";
+  // TODO: Static effects should not have duration, they're valid as long as the source is in play
   duration: "turn" | "next_turn";
+}
+
+export interface ProtectionEffect extends BaseEffect {
+  type: "protection";
+  restriction: "challenge";
+  target: CardEffectTarget;
 }
 
 export interface BanishEffect extends BaseEffect {
@@ -116,7 +134,7 @@ export interface LoreEffect extends BaseEffect {
 export interface ReplacementEffect extends BaseEffect {
   type: "replacement";
   replacement: "cost";
-  duration: "next";
+  duration: "next" | "static";
   amount: number;
   target?: never;
   filters: TargetFilter[];
@@ -179,15 +197,16 @@ export interface AttributeEffect extends BaseEffect {
   type: "attribute";
   attribute: "strength" | "willpower" | "lore";
   amount: number;
-  modifier: "add" | "subtract";
-  duration: "turn" | "next_turn";
+  modifier: "add" | "subtract" | "filter";
+  filters?: TargetFilter[];
+  duration: "turn" | "next_turn" | "static";
 }
 
 export interface AbilityEffect extends BaseEffect {
   type: "ability";
   ability: Keywords;
   modifier: "add" | "remove";
-  duration: "turn" | "next_turn";
+  duration: "turn" | "next_turn" | "static";
 }
 
 export interface ContinuousEffect {
@@ -229,6 +248,19 @@ export const scryEffectPredicate = (effect?: Effect): effect is ScryEffect =>
 export const replacementEffectPredicate = (
   effect?: Effect,
 ): effect is ReplacementEffect => effect?.type === "replacement";
+
+export const costReplacementEffectPredicate = (
+  effect?: Effect,
+): effect is ReplacementEffect =>
+  replacementEffectPredicate(effect) && effect.replacement === "cost";
+
+export const protectionEffectPredicate = (
+  effect?: Effect,
+): effect is ProtectionEffect => effect?.type === "protection";
+
+export const restrictionEffectPredicate = (
+  effect?: Effect,
+): effect is RestrictionEffect => effect?.type === "restriction";
 
 export const cardEffectTargetPredicate = (
   target?: EffectTargets,

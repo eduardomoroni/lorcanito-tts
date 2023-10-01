@@ -10,11 +10,27 @@ export type CardColor =
 
 export type Characteristics =
   | "song"
+  | "action"
+  | "item"
   | "villain"
+  | "dragon"
+  | "tigger"
+  | "pirate"
+  | "detective"
+  | "sorcerer"
+  | "queen"
+  | "alien"
+  | "king"
+  | "mentor"
+  | "inventor"
+  | "fairy"
+  | "captain"
   | "hero"
+  | "prince"
   | "storyborn"
   | "floodborn"
   | "dreamborn"
+  | "broom"
   | "ally"
   | "princess"
   | "musketeer"
@@ -28,69 +44,13 @@ export type LorcanitoCard =
   | LorcanitoItemCard;
 
 interface LorcanitoBaseCard {
+  type: "character" | "item" | "action";
   implemented?: boolean;
   id: string;
   name: string;
-  title?: string;
-  url: string;
-  text?: string;
-  flavour?: string;
-  language: string;
-  set: string;
-  cost: number;
-  type: "character" | "item" | "action";
-  color: CardColor;
-  number: number;
-  illustrator?: string;
-  keywords?: Record<string, unknown>;
-  lore?: number;
-  strength?: number;
-  willpower?: number;
-  inkwell?: boolean;
-  characteristics?: Array<string>;
-  abilities?: Ability[];
-  rarity?: CardRarity;
-  alternativeUrl?: string;
-}
-
-export interface LorcanitoCharacterCard extends LorcanitoBaseCard {
-  type: "character";
-  id: string;
-  name: string;
-  title?: string;
-  url: string;
-  text?: string;
-  flavour?: string;
-  language: string;
-  set: string;
-  illustrator?: string;
-  keywords?: Record<string, unknown>;
-  lore: number;
-  strength?: number;
-  willpower?: number;
-  inkwell?: boolean;
-  characteristics?: Array<string>;
-  rarity?: CardRarity;
-  alternativeUrl?: string;
-}
-
-export interface LorcanitoActionCard extends LorcanitoBaseCard {
-  type: "action";
-  title?: never;
-  lore?: never;
-  strength?: never;
-  willpower?: never;
-  inkwell?: boolean;
-  text: string;
-}
-
-export interface LorcanitoItemCard extends LorcanitoBaseCard {
-  type: "item";
-  id: string;
   url: string;
   alternativeUrl: string;
-  name: string;
-  text: string;
+  text?: string;
   flavour?: string;
   language: string;
   set: string;
@@ -98,6 +58,33 @@ export interface LorcanitoItemCard extends LorcanitoBaseCard {
   color: CardColor;
   number: number;
   illustrator: string;
+  // TODO: I think we can remove this
+  keywords?: Record<string, unknown>;
   inkwell?: boolean;
+  characteristics: Array<Characteristics>;
+  abilities?: Ability[];
   rarity: CardRarity;
+  // Adding this for simplicity
+  strength?: number;
+  lore?: number;
+  willpower?: number;
+  title?: string;
+}
+
+export interface LorcanitoCharacterCard extends LorcanitoBaseCard {
+  type: "character";
+  title: string;
+  lore: number;
+  strength: number;
+  willpower: number;
+}
+
+export interface LorcanitoActionCard extends LorcanitoBaseCard {
+  type: "action";
+  text: string;
+}
+
+export interface LorcanitoItemCard extends LorcanitoBaseCard {
+  type: "item";
+  text: string;
 }

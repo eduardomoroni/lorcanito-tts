@@ -1,12 +1,12 @@
-import { useDropCardInZone } from "~/hooks/dndCard";
+import { useDropCardInZone } from "~/spaces/hooks/dndCard";
 import React, { FC } from "react";
-import CardStack from "~/components/card-stack/cardStack";
-import { DragNDropOverlay } from "~/components/DragNDropOverlay";
+import CardStack from "~/spaces/components/card-stack/cardStack";
+import { DragNDropOverlay } from "~/spaces/components/DragNDropOverlay";
 import { CardCounter } from "~/spaces/table/CardCounter";
 import { useGameStore } from "~/engine/lib/GameStoreProvider";
 import { observer } from "mobx-react-lite";
-import type { CardModel } from "~/store/models/CardModel";
-import { useTargetModal } from "~/providers/TargetModalProvider";
+import type { CardModel } from "~/engine/store/models/CardModel";
+import { useTargetModal } from "~/spaces/providers/TargetModalProvider";
 
 const DiscardPileZoneComponent: FC<{
   cards: CardModel[];
@@ -15,7 +15,7 @@ const DiscardPileZoneComponent: FC<{
   const store = useGameStore();
   const { dropZoneRef, isActive, isOver } = useDropCardInZone(
     playerId,
-    "discard"
+    "discard",
   );
   const { openTargetModal } = useTargetModal();
 

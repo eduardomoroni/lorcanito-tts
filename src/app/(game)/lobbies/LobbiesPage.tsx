@@ -1,8 +1,8 @@
 "use client";
 
-import React, { type FC, useEffect, useState } from "react";
+import React, { type FC, useState } from "react";
 
-import { useStreamChat } from "~/providers/stream-chat-provider/StreamChatLobbiesProvider";
+import { useStreamChat } from "~/spaces/providers/stream-chat-provider/StreamChatLobbiesProvider";
 import {
   Channel,
   ChannelHeader,
@@ -14,7 +14,7 @@ import {
 } from "stream-chat-react";
 import "stream-chat-react/dist/css/v2/index.css";
 import { LobbyList } from "~/app/(game)/lobbies/LobbyList";
-import { Button } from "~/components/button/Button";
+import { Button } from "~/spaces/components/button/Button";
 
 export const LobbiesPage: FC = (props) => {
   const { client, channel } = useStreamChat();

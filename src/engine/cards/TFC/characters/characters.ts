@@ -1,21 +1,29 @@
 import type { LorcanitoCharacterCard } from "~/engine/cards/cardTypes";
 import {
   ActivatedAbility,
+  AttributeStaticAbility,
   bodyguardAbility,
+  challengerAbility,
   ChallengerAbility,
   Condition,
+  EffectStaticAbility,
   evasiveAbility,
   exertAndCantReady,
+  GainAbilityStaticAbility,
+  PropertyStaticAbility,
   readyAndCantQuest,
   recklessAbility,
   ResolutionAbility,
+  RestrictionStaticAbility,
   rushAbility,
   ShiftAbility,
   shiftAbility,
   SingerAbility,
+  StaticAbility,
   supportAbility,
   voicelessAbility,
   wardAbility,
+  whenBanished,
   whenBanishedInAChallenge,
   whenChallenged,
   whenChallengedAndBanished,
@@ -41,14 +49,16 @@ import type {
   MoveCardEffect,
   PlayerEffectTarget,
   ReplacementEffect,
+  RestrictionEffect,
   ScryEffect,
   TriggerTarget,
 } from "~/engine/rules/effects/effectTypes";
+import { ProtectionEffect } from "~/engine/rules/effects/effectTypes";
 
 export const arielOnHumanLegs: LorcanitoCharacterCard = {
   implemented: true,
   id: "8c766695f5b772077a4ed1c678e0986788407888",
-  url: "https://static.lorcanito.com/images/cards/TFC/1.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/1.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/1_en_ariel-716.webp",
   name: "Ariel",
   title: "On Human Legs",
@@ -72,7 +82,7 @@ export const arielOnHumanLegs: LorcanitoCharacterCard = {
 export const arielSpectacularSinger: LorcanitoCharacterCard = {
   implemented: true,
   id: "96b1d403dfaecafa40eb546c92ca312707725a25",
-  url: "https://static.lorcanito.com/images/cards/TFC/2.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/2.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/2_en_ariel-716.webp",
   name: "Ariel",
   title: "Spectacular Singer",
@@ -130,7 +140,7 @@ export const arielSpectacularSinger: LorcanitoCharacterCard = {
 export const mickeyMouseTrueFriend: LorcanitoCharacterCard = {
   implemented: true,
   id: "e4ba00ac45ffe2b93b4bfe0a868fa0c5d1021fd3",
-  url: "https://static.lorcanito.com/images/cards/TFC/12.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/12.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/12_en_mickey_mouse_true_friend-716.webp",
   name: "Mickey Mouse",
@@ -154,7 +164,7 @@ export const mickeyMouseTrueFriend: LorcanitoCharacterCard = {
 export const moanaOfMotunui: LorcanitoCharacterCard = {
   implemented: true,
   id: "0c38f1d5d8323c21fdbfd19474095d037a4bc9c3",
-  url: "https://static.lorcanito.com/images/cards/TFC/14.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/14.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/14_en_moana-716.webp",
   name: "Moana",
   title: "Of Motunui",
@@ -195,7 +205,7 @@ export const moanaOfMotunui: LorcanitoCharacterCard = {
 };
 export const mickeyMouseArtfulRogue: LorcanitoCharacterCard = {
   id: "84a08338d65129d7d5defd4ab09e0237eb542b02",
-  url: "https://static.lorcanito.com/images/cards/TFC/88.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/88.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/88_en_mickey_mouse-716.webp",
   name: "Mickey Mouse",
@@ -203,14 +213,7 @@ export const mickeyMouseArtfulRogue: LorcanitoCharacterCard = {
   characteristics: ["hero", "floodborn"],
   text: "**Shift** 5 (_You may pay 5 ⬡ to play this on top of one of your characters named Tinker Bell._)\n**MISDIRECTION** Whenever you play an action, chosen opposing character can't quest during their next turn.",
   type: "character",
-  abilities: [
-    {
-      shift: 5,
-      type: "static",
-      ability: "shift",
-      text: "**Shift** 5 (_You may pay 5 ⬡ to play this on top of one of your characters named Tinker Bell._)",
-    } as ShiftAbility,
-  ],
+  abilities: [shiftAbility(5, "Mickey Mouse")],
   flavour: "Quiet as a . . . well, you know.",
   color: "emerald",
   cost: 7,
@@ -226,7 +229,7 @@ export const mickeyMouseArtfulRogue: LorcanitoCharacterCard = {
 export const heiheiBoatSnack: LorcanitoCharacterCard = {
   implemented: true,
   id: "3b55ddeb72fc1762bac07b6b18b0054f5668c8b6",
-  url: "https://static.lorcanito.com/images/cards/TFC/7.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/7.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/7_en_heihei-716.webp",
   name: "Heihei",
   title: "Boat Snack",
@@ -251,7 +254,7 @@ export const heiheiBoatSnack: LorcanitoCharacterCard = {
 export const simbaProtectiveCub: LorcanitoCharacterCard = {
   implemented: true,
   id: "8332934dd94d53dbcc8099741a83362185f4bd10",
-  url: "https://static.lorcanito.com/images/cards/TFC/20.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/20.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/20_en_simba-716.webp",
   name: "Simba",
   title: "Protective Cub",
@@ -275,7 +278,7 @@ export const simbaProtectiveCub: LorcanitoCharacterCard = {
 export const liloMakingAWish: LorcanitoCharacterCard = {
   implemented: true,
   id: "79c8ef7bb3800b86cb254e8f2cdc0415351d82ad",
-  url: "https://static.lorcanito.com/images/cards/TFC/9.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/9.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/9_en_lilo-716.webp",
   name: "Lilo",
   title: "Making a Wish",
@@ -296,7 +299,7 @@ export const liloMakingAWish: LorcanitoCharacterCard = {
 export const magicBroomBucketBrigade: LorcanitoCharacterCard = {
   implemented: true,
   id: "06e4319e7d20e661bfb74bec2b26f18e7344bead",
-  url: "https://static.lorcanito.com/images/cards/TFC/47.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/47.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/47_en_magic_broom-716.webp",
   name: "Magic Broom",
@@ -339,7 +342,7 @@ export const magicBroomBucketBrigade: LorcanitoCharacterCard = {
 export const sebastianCourtComposer: LorcanitoCharacterCard = {
   implemented: true,
   id: "48ca58c53e9e3575c525dc28295b073718d5273c",
-  url: "https://static.lorcanito.com/images/cards/TFC/19.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/19.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/19_en_sebastian-716.webp",
   name: "Sebastian",
@@ -372,13 +375,14 @@ export const sebastianCourtComposer: LorcanitoCharacterCard = {
 export const zeusGodOfLightning: LorcanitoCharacterCard = {
   implemented: true,
   id: "c9a7fcebaa5069148a86cd12c80c29a41f8e93b5",
-  url: "https://static.lorcanito.com/images/cards/TFC/61.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/61.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/61_en_zeus-716.webp",
   name: "Zeus",
   title: "God of Lightning",
   characteristics: ["storyborn", "deity"],
   text: "**Rush** _(This character can challenge the turn they're played.)_\n**Challenger** +4 (_When challenging, this character get +4 ※._)",
   type: "character",
+  strength: 0,
   abilities: [
     {
       type: "static",
@@ -402,7 +406,7 @@ export const zeusGodOfLightning: LorcanitoCharacterCard = {
 export const mickeyBraveLittleTailor: LorcanitoCharacterCard = {
   implemented: true,
   id: "f365b46a87f3caf57739cbd78d01722b98dad421",
-  url: "https://static.lorcanito.com/images/cards/TFC/115.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/115.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards%2Ftfc%2F115_en_mickey-716.webp",
   name: "Mickey Mouse",
@@ -428,13 +432,14 @@ export const mickeyBraveLittleTailor: LorcanitoCharacterCard = {
 export const moanChosenByTheOcean: LorcanitoCharacterCard = {
   implemented: true,
   id: "13ea097d91d8bc5a8733643069cf015ea21a528c",
-  url: "https://static.lorcanito.com/images/cards/TFC/117.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/117.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/117_en_moana-716.webp",
   name: "Moana",
   title: "Chosen by the Ocean",
   characteristics: ["hero", "storyborn", "princess"],
   text: "**THIS IS NOT WHO YOU ARE** When you play this character, you may banish chosen character named Te Ka.",
   type: "character",
+  illustrator: "Tanisha Cherislin",
   abilities: [
     {
       optional: true,
@@ -476,7 +481,7 @@ export const moanChosenByTheOcean: LorcanitoCharacterCard = {
 export const pongoOlRascal: LorcanitoCharacterCard = {
   implemented: true,
   id: "66d4062bfdfac19ff34fc3c12509d30e4b478b5f",
-  url: "https://static.lorcanito.com/images/cards/TFC/120.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/120.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/120_en_pongo-716.webp",
   name: "Pongo",
   title: "Ol' Rascal",
@@ -501,7 +506,7 @@ export const pongoOlRascal: LorcanitoCharacterCard = {
 export const peterPanNeverLanding: LorcanitoCharacterCard = {
   implemented: true,
   id: "065ea0271dac223e8b4ebbe8102647fb688ccdf7",
-  url: "https://static.lorcanito.com/images/cards/TFC/91.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/91.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/91_en_peter_pan-716.webp",
   name: "Peter Pan",
@@ -526,7 +531,7 @@ export const peterPanNeverLanding: LorcanitoCharacterCard = {
 export const aladdinPrinceAli: LorcanitoCharacterCard = {
   implemented: true,
   id: "5a227e41952275b33f2349169f2666bb19ea3e81",
-  url: "https://static.lorcanito.com/images/cards/TFC/69.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/69.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/69_en_aladdin-716.webp",
   name: "Aladdin",
@@ -534,6 +539,7 @@ export const aladdinPrinceAli: LorcanitoCharacterCard = {
   characteristics: ["hero", "storyborn", "prince"],
   text: "**Ward** _(Opponents can't choose this character except to challenge.)_",
   type: "character",
+  illustrator: "Lauren Walsh",
   abilities: [wardAbility],
   flavour:
     "Fabulously wealthy. Practically untouchable. Genuinely inauthentic.",
@@ -551,7 +557,7 @@ export const aladdinPrinceAli: LorcanitoCharacterCard = {
 export const auroraBriarRose: LorcanitoCharacterCard = {
   implemented: true,
   id: "8a38dd75013a8b2cf64fdd10d98488460b59d416",
-  url: "https://static.lorcanito.com/images/cards/TFC/138.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/138.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/138_en_aurora-716.webp",
   name: "Aurora",
@@ -599,7 +605,7 @@ export const auroraBriarRose: LorcanitoCharacterCard = {
 export const donaldDuckStruttingHisStuff: LorcanitoCharacterCard = {
   implemented: true,
   id: "b8155cdc1bff27cda8c1fbb8345c5ff1778519ec",
-  url: "https://static.lorcanito.com/images/cards/TFC/144.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/144.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/144_en_donald_duck-716.webp",
   name: "Donald Duck",
@@ -624,7 +630,7 @@ export const donaldDuckStruttingHisStuff: LorcanitoCharacterCard = {
 export const maleficentMonstrousDragon: LorcanitoCharacterCard = {
   implemented: true,
   id: "f50f43918b726685d3efd67a43f9cb272a4c673e",
-  url: "https://static.lorcanito.com/images/cards/TFC/113.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/113.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/113_en_maleficent-716.webp",
   name: "Maleficent",
@@ -669,13 +675,14 @@ export const maleficentMonstrousDragon: LorcanitoCharacterCard = {
 export const mauiHeroToAll: LorcanitoCharacterCard = {
   implemented: true,
   id: "f66f5a08dfee46157a91c28b8b57a1021ebce3fd",
-  url: "https://static.lorcanito.com/images/cards/TFC/114.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/114.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/114_en_maui-716.webp",
   name: "Maui",
   title: "Hero to All",
   characteristics: ["hero", "storyborn", "deity"],
   text: "**Rush** _(This character can challenge the turn they're played.)_\n\n**Reckless** _(This character can't quest and must challenge each turn if able.)_",
   type: "character",
+  illustrator: "Pirel / Marco Giorgianni",
   abilities: [rushAbility, recklessAbility],
   flavour: "“What I believe you were trying to say is ‘Thank you.”",
   inkwell: true,
@@ -692,7 +699,7 @@ export const mauiHeroToAll: LorcanitoCharacterCard = {
 export const scarShamelessFirebrand: LorcanitoCharacterCard = {
   implemented: true,
   id: "5c80f5fa20be9a268f061535327ca5a8f14e1523",
-  url: "https://static.lorcanito.com/images/cards/TFC/123.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/123.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/123_en_scar-716.webp",
   name: "Scar",
   title: "Shameless Firebrand",
@@ -740,7 +747,7 @@ export const scarShamelessFirebrand: LorcanitoCharacterCard = {
 export const teKaTheBurningOne: LorcanitoCharacterCard = {
   implemented: true,
   id: "38b61c8495a5d6a7e5a163f59f527569925b632a",
-  url: "https://static.lorcanito.com/images/cards/TFC/126.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/126.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/126_en_te_ka-716.webp",
   name: "Te Ka",
   title: "The Burning One",
@@ -763,7 +770,7 @@ export const teKaTheBurningOne: LorcanitoCharacterCard = {
 export const gastonArrogantHunter: LorcanitoCharacterCard = {
   implemented: true,
   id: "5b9ee235eb05707ac86ad62297f89342e03de6d4",
-  url: "https://static.lorcanito.com/images/cards/TFC/110.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/110.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/110_en_gaston-716.webp",
   name: "Gaston",
@@ -788,7 +795,7 @@ export const gastonArrogantHunter: LorcanitoCharacterCard = {
 export const lefouInstigator: LorcanitoCharacterCard = {
   implemented: true,
   id: "e5df187506116ad1da712ec1a9a72eb63fc55ad7",
-  url: "https://static.lorcanito.com/images/cards/TFC/112.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/112.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/112_en_lefou-716.webp",
   name: "Lefou",
   title: "Instigator",
@@ -824,9 +831,9 @@ export const lefouInstigator: LorcanitoCharacterCard = {
   rarity: "rare",
 };
 export const jetsamUrsulaSpy: LorcanitoCharacterCard = {
-  implemented: false,
+  implemented: undefined,
   id: "a63044c8c13dee47cb2ea87b01d0606716848edc",
-  url: "https://static.lorcanito.com/images/cards/TFC/46.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/46.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/46_en_jetsam-716.webp",
   name: "Jetsam",
   title: "Ursula's Spy",
@@ -835,10 +842,10 @@ export const jetsamUrsulaSpy: LorcanitoCharacterCard = {
   type: "character",
   abilities: [
     evasiveAbility,
-    {
-      ability: "",
-      text: "Your characters named Flotsam gain **Evasive.**",
-    },
+    // {
+    //   name: "Sinister Slither",
+    //   text: "Your characters named Flotsam gain **Evasive.**",
+    // },
   ],
   flavour: "“We can help you get anything you want. . . .”",
   inkwell: true,
@@ -856,7 +863,7 @@ export const jetsamUrsulaSpy: LorcanitoCharacterCard = {
 export const chiefTui: LorcanitoCharacterCard = {
   implemented: true,
   id: "f0c8d745c261ae81cbbb93a54a5dfa8c95460583",
-  url: "https://static.lorcanito.com/images/cards/TFC/143.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/143.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/143_en_chief_tui-716.webp",
   name: "Chief Tui",
@@ -865,6 +872,7 @@ export const chiefTui: LorcanitoCharacterCard = {
   text: "**Support** _(Whenever this character quests, you\u0003 may add their ※ to another chosen character‘s ※ this turn.)_",
   type: "character",
   abilities: [supportAbility],
+  illustrator: "Pirel",
   flavour: "“You can always rely on the strength of those who love you.”",
   inkwell: true,
   color: "sapphire",
@@ -878,20 +886,27 @@ export const chiefTui: LorcanitoCharacterCard = {
   rarity: "uncommon",
 };
 export const pascalRapunzelCompanion: LorcanitoCharacterCard = {
-  implemented: false,
+  implemented: true,
   id: "9127c8806579718bffec6817bd50502e82f1d1c0",
-  url: "https://static.lorcanito.com/images/cards/TFC/53.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/53.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/53_en_pascal-716.webp",
   name: "Pascal",
   title: "Rapunzel's Companion",
   characteristics: ["storyborn", "ally"],
-  text: "**CAMOUFLAGE** While you have another character\rin play, this character gains **Evasive**. _(Only characters\rwith Evasive can challenge them.)_",
+  text: "**CAMOUFLAGE** While you have another character in play, this character gains **Evasive**. _(Only characters\rwith Evasive can challenge them.)_",
   type: "character",
   abilities: [
     {
-      ability: "CAMOUFLAGE",
+      type: "while-static",
+      name: "Camouflage",
       text: "While you have another character in play, this character gains **Evasive**. _(Only characters\rwith Evasive can challenge them.)_",
-    },
+      whileCondition: [
+        {
+          type: "not-alone",
+        },
+      ] as WhileCondition[],
+      ability: evasiveAbility,
+    } as WhileStaticAbility,
   ],
   flavour:
     "A true friend is always there for you, whether you can\rsee them or not.",
@@ -910,7 +925,7 @@ export const pascalRapunzelCompanion: LorcanitoCharacterCard = {
 export const aladdinHeroicOutlaw: LorcanitoCharacterCard = {
   implemented: true,
   id: "318c72716a49166352e2998addd3ee0cf0e4b7b7",
-  url: "https://static.lorcanito.com/images/cards/TFC/104.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/104.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/104_en_aladdin-716.webp",
   name: "Aladdin",
@@ -960,7 +975,7 @@ export const aladdinHeroicOutlaw: LorcanitoCharacterCard = {
 export const aladdinStreetRat: LorcanitoCharacterCard = {
   implemented: true,
   id: "ac3ac937e7f33e0cd531cf0031908014009ad524",
-  url: "https://static.lorcanito.com/images/cards/TFC/105.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/105.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/105_en_aladdin-716.webp",
   name: "Aladdin",
@@ -1003,7 +1018,7 @@ export const aladdinStreetRat: LorcanitoCharacterCard = {
 export const johnSilverAlienPirate: LorcanitoCharacterCard = {
   implemented: true,
   id: "7235e7b244b2288d6b1d6a5e8b691a88a9d225e0",
-  url: "https://static.lorcanito.com/images/cards/TFC/82.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/82.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/82_en_john_silver-716.webp",
   name: "John Silver",
@@ -1046,7 +1061,7 @@ export const johnSilverAlienPirate: LorcanitoCharacterCard = {
 export const jasmineQueenOfAgrabah: LorcanitoCharacterCard = {
   implemented: true,
   id: "28aa89d1c918ac7190b50ebe966b01f3f790a076",
-  url: "https://static.lorcanito.com/images/cards/TFC/149.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/149.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/149_en_jasmine-716.webp",
   name: "Jasmine",
@@ -1092,7 +1107,7 @@ export const jasmineQueenOfAgrabah: LorcanitoCharacterCard = {
 export const scarMastermind: LorcanitoCharacterCard = {
   implemented: true,
   id: "4281a28f0283d2065244072afb69ce0768a41d7a",
-  url: "https://static.lorcanito.com/images/cards/TFC/158.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/158.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/158_en_scar-716.webp",
   name: "Scar",
   title: "Mastermind",
@@ -1139,7 +1154,7 @@ export const scarMastermind: LorcanitoCharacterCard = {
 export const tamatoaSoShiny: LorcanitoCharacterCard = {
   implemented: true,
   id: "f1352605ee385deb120aa5ec50e198acf3e1a515",
-  url: "https://static.lorcanito.com/images/cards/TFC/159.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/159.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/159_en_tamatoa-716.webp",
   name: "Tamatoa",
@@ -1149,9 +1164,27 @@ export const tamatoaSoShiny: LorcanitoCharacterCard = {
   type: "character",
   abilities: [
     {
+      type: "property-static",
+      ability: "attribute",
       name: "Glam",
       text: "This character gets +1 ◆ for each item you have in play.",
-    },
+      effects: [
+        {
+          type: "attribute",
+          attribute: "lore",
+          amount: 1,
+          modifier: "filter",
+          filters: [
+            { filter: "zone", value: "play" },
+            { filter: "type", value: "item" },
+            { filter: "owner", value: "self" },
+          ],
+          target: {
+            type: "this-character",
+          },
+        } as AttributeEffect,
+      ],
+    } as PropertyStaticAbility,
     ...whenPlayAndWheneverQuests({
       name: "What have we here?",
       text: "When you play this character and whenever he quests, you may return an item card from your discard to your hand.",
@@ -1189,7 +1222,7 @@ export const tamatoaSoShiny: LorcanitoCharacterCard = {
 export const hansThirteenthInLine: LorcanitoCharacterCard = {
   implemented: true,
   id: "d672a2f8234f1b44909e7075170007395e273012",
-  url: "https://static.lorcanito.com/images/cards/TFC/180.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/180.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/180_en_hans-716.webp",
   name: "Hans",
   title: "Thirteenth in Line",
@@ -1231,7 +1264,7 @@ export const hansThirteenthInLine: LorcanitoCharacterCard = {
 export const herculesTrueHero: LorcanitoCharacterCard = {
   implemented: true,
   id: "49c4b20256ff0b3ce0ec40ae7e5c5771712f1a47",
-  url: "https://static.lorcanito.com/images/cards/TFC/181.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/181.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/181_en_hercules-716.webp",
   name: "Hercules",
@@ -1256,7 +1289,7 @@ export const herculesTrueHero: LorcanitoCharacterCard = {
 export const maximusPalaceHorse: LorcanitoCharacterCard = {
   implemented: true,
   id: "43878dfe4bcfa40fa6b4bfa0b958b39e724e4756",
-  url: "https://static.lorcanito.com/images/cards/TFC/10.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/10.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/10_en_maximus-716.webp",
   name: "Maximus",
@@ -1280,13 +1313,14 @@ export const maximusPalaceHorse: LorcanitoCharacterCard = {
 export const geniePowerUnleashed: LorcanitoCharacterCard = {
   implemented: true,
   id: "ea8356faccf2fb2d41eaa6e6e22f71a181066c1c",
-  url: "https://static.lorcanito.com/images/cards/TFC/76.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/76.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/76_en_genie-716.webp",
   name: "Genie",
   title: "Powers Unleashed",
   characteristics: ["hero", "floodborn"],
   text: "**Shift** 6 (_You may pay 6 ⬡ to play this on top of one of your characters named Genie._)\n\n**Evasive** _(Only characters with Evasive can challenge this character.)_\n\n**PHENOMENAL COSMIC POWER** Whenever this character quests, you may play an action with cost 5 or less for free.",
   type: "character",
+  illustrator: "Javier Salas",
   abilities: [
     ...wheneverQuests({
       name: "Phenomenal Cosmic Power",
@@ -1335,7 +1369,7 @@ export const geniePowerUnleashed: LorcanitoCharacterCard = {
 export const genieOnTheJob: LorcanitoCharacterCard = {
   implemented: true,
   id: "bfe18ed0b478715ee108ebe428ea319d83d93bdd",
-  url: "https://static.lorcanito.com/images/cards/TFC/75.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/75.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/75_en_genie-716.webp",
   name: "Genie",
   title: "On the Job",
@@ -1382,7 +1416,7 @@ export const genieOnTheJob: LorcanitoCharacterCard = {
 export const ladyTremaine: LorcanitoCharacterCard = {
   implemented: true,
   id: "b6cb1ea3d13079ac57a5b08580cb201854d23064",
-  url: "https://static.lorcanito.com/images/cards/TFC/85.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/85.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/85_en_lady_tremaine-716.webp",
   name: "Lady Tremaine",
@@ -1429,7 +1463,7 @@ export const ladyTremaine: LorcanitoCharacterCard = {
 export const cinderellaGentleAndKind: LorcanitoCharacterCard = {
   implemented: true,
   id: "fc48d56196f5b2ca41d0f97ec4c7e6ce9892dec9",
-  url: "https://static.lorcanito.com/images/cards/TFC/3.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/3.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/3_en_cinderella-716.webp",
   name: "Cinderella",
@@ -1437,6 +1471,7 @@ export const cinderellaGentleAndKind: LorcanitoCharacterCard = {
   characteristics: ["hero", "storyborn", "princess"],
   text: "**Singer** 4 _(This character counts as cost 4 to sing songs.)_\n\n**A WONDERFUL DREAM** ↷− Remove up to 3 damage from chosen Princess character.",
   type: "character",
+  illustrator: "Javier Salas",
   abilities: [
     {
       type: "activated",
@@ -1479,7 +1514,7 @@ export const cinderellaGentleAndKind: LorcanitoCharacterCard = {
 export const goofyMusketeer: LorcanitoCharacterCard = {
   implemented: true,
   id: "09a20bc4bd197ab265992b3303bfa06ab7353b23",
-  url: "https://static.lorcanito.com/images/cards/TFC/4.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/4.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/4_en_goofy-716.webp",
   name: "Goofy",
   title: "Musketeer",
@@ -1525,16 +1560,41 @@ export const goofyMusketeer: LorcanitoCharacterCard = {
   rarity: "uncommon",
 };
 export const hadesKingOfOlympus: LorcanitoCharacterCard = {
-  implemented: false,
+  implemented: true,
   id: "f5892a77a09f396003c36f6542fa7e567daa8dc8",
-  url: "https://static.lorcanito.com/images/cards/TFC/5.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/5.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/5_en_hades-716.webp",
   name: "Hades",
   title: "King of Olympus",
   characteristics: ["floodborn", "villain", "king", "deity"],
   text: "**Shift** 6 (_You may pay 6 ⬡ to play this on top of one of your characters named Hades._)\n**Sinister plot** This character gets +1 ◆ for every other Villain character you have in play.",
   type: "character",
-  abilities: [shiftAbility(6, "Hades")],
+  abilities: [
+    {
+      type: "property-static",
+      ability: "attribute",
+      name: "Sinister plot",
+      text: "This character gets +1 ◆ for every other Villain character you have in play.",
+      effects: [
+        {
+          type: "attribute",
+          attribute: "strength",
+          amount: 1,
+          modifier: "filter",
+          filters: [
+            { filter: "zone", value: "play" },
+            { filter: "type", value: "character" },
+            { filter: "owner", value: "self" },
+            { filter: "characteristics", value: ["villain"] },
+          ],
+          target: {
+            type: "this-character",
+          },
+        } as AttributeEffect,
+      ],
+    } as PropertyStaticAbility,
+    shiftAbility(6, "Hades"),
+  ],
   flavour: "Oh hey, I'm gonna need new business cards.",
   color: "amber",
   cost: 8,
@@ -1550,7 +1610,7 @@ export const hadesKingOfOlympus: LorcanitoCharacterCard = {
 export const hadesLordOfUnderworld: LorcanitoCharacterCard = {
   implemented: true,
   id: "630bd3bfefe5fde1d485736de061d9b356324f24",
-  url: "https://static.lorcanito.com/images/cards/TFC/6.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/6.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/6_en_hades_lord_of_the_underworld-716.webp",
   name: "Hades",
@@ -1594,10 +1654,10 @@ export const hadesLordOfUnderworld: LorcanitoCharacterCard = {
   set: "TFC",
   rarity: "rare",
 };
-export const legouBumbler: LorcanitoCharacterCard = {
-  implemented: false,
+export const lefouBumbler: LorcanitoCharacterCard = {
+  implemented: undefined,
   id: "455ef90fe42c7606e55db5e05d152d254daff2b2",
-  url: "https://static.lorcanito.com/images/cards/TFC/8.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/8.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/8_en_lefou-716.webp",
   name: "Lefou",
   title: "Bumbler",
@@ -1605,10 +1665,10 @@ export const legouBumbler: LorcanitoCharacterCard = {
   text: "**LOYAL** If you have a character named Gaston in play, you pay 1 ⬡ less to play this character.",
   type: "character",
   abilities: [
-    {
-      ability: "LOYAL",
-      text: "If you have a character named Gaston in play, you pay 1 ⬡ less to play this character.",
-    },
+    // {
+    //   name: "Loyal",
+    //   text: "If you have a character named Gaston in play, you pay 1 ⬡ less to play this character.",
+    // },
   ],
   flavour: "You need a good toady to be a proper bad guy.",
   inkwell: true,
@@ -1626,7 +1686,7 @@ export const legouBumbler: LorcanitoCharacterCard = {
 export const maximusRentlessPersuer: LorcanitoCharacterCard = {
   implemented: true,
   id: "b9ce30f1b09c27a83f07f7e7e7095878f0635916",
-  url: "https://static.lorcanito.com/images/cards/TFC/11.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/11.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/11_en_maximus-716.webp",
   name: "Maximus",
@@ -1674,7 +1734,7 @@ export const maximusRentlessPersuer: LorcanitoCharacterCard = {
 export const minnieMouseBelovedPrincess: LorcanitoCharacterCard = {
   implemented: true,
   id: "0243b1a886c6a400cb01bcc0411dda97b98513fb",
-  url: "https://static.lorcanito.com/images/cards/TFC/13.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/13.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/13_en_minnie_mouse-716.webp",
   name: "Minnie Mouse",
@@ -1698,7 +1758,7 @@ export const minnieMouseBelovedPrincess: LorcanitoCharacterCard = {
 export const mrSmee: LorcanitoCharacterCard = {
   implemented: true,
   id: "132e8bc39cf27ce978ce558a8a5650b2f164707f",
-  url: "https://static.lorcanito.com/images/cards/TFC/15.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/15.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/15_en_mr_smee-716.webp",
   name: "Mr. Smee",
@@ -1706,6 +1766,7 @@ export const mrSmee: LorcanitoCharacterCard = {
   characteristics: ["dreamborn", "pirate", "ally"],
   type: "character",
   inkwell: true,
+  illustrator: "Kamil Murzyn / Eri Welli",
   color: "amber",
   cost: 3,
   strength: 2,
@@ -1719,7 +1780,7 @@ export const mrSmee: LorcanitoCharacterCard = {
 export const princePhillipDragonSlayer: LorcanitoCharacterCard = {
   implemented: true,
   id: "f181d1bd9703f2a33a22e5997b37b1a29491e1ad",
-  url: "https://static.lorcanito.com/images/cards/TFC/16.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/16.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/16_en_prince_phillip-716.webp",
   name: "Prince Phillip",
@@ -1757,7 +1818,7 @@ export const princePhillipDragonSlayer: LorcanitoCharacterCard = {
 export const pumbaFriendlyWarhog: LorcanitoCharacterCard = {
   implemented: true,
   id: "9056a29ac70ebe340e277f700a9edc6e52a49d54",
-  url: "https://static.lorcanito.com/images/cards/TFC/17.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/17.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/17_en_pumbaa-716.webp",
   name: "Pumbaa",
   title: "Friendly Warthog",
@@ -1779,7 +1840,7 @@ export const pumbaFriendlyWarhog: LorcanitoCharacterCard = {
 export const rapunzelGiftedWithHealing: LorcanitoCharacterCard = {
   implemented: true,
   id: "d9da7a6860b6d9d422df8708625d85e580f8f864",
-  url: "https://static.lorcanito.com/images/cards/TFC/18.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/18.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/18_en_rapunzel-716.webp",
   name: "Rapunzel",
@@ -1825,9 +1886,9 @@ export const rapunzelGiftedWithHealing: LorcanitoCharacterCard = {
   rarity: "legendary",
 };
 export const stichtCarefreeSurfer: LorcanitoCharacterCard = {
-  implemented: false,
+  implemented: true,
   id: "f1c33c755e8729b00e3672c17760585bc421f587",
-  url: "https://static.lorcanito.com/images/cards/TFC/21.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/21.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/21_en_stitch-716.webp",
   name: "Stitch",
   title: "Carefree Surfer",
@@ -1836,8 +1897,20 @@ export const stichtCarefreeSurfer: LorcanitoCharacterCard = {
   type: "character",
   abilities: [
     {
-      ability: "OHANA",
+      type: "resolution",
+      name: "Ohana",
       text: "When you play this character, if you have 2 or more other characters in play, you may draw 2 cards.",
+      conditions: [{ type: "play", comparison: { operator: "gte", value: 3 } }],
+      effects: [
+        {
+          type: "draw",
+          amount: 2,
+          target: {
+            type: "player",
+            value: "self",
+          },
+        } as DrawEffect,
+      ],
     },
   ],
   flavour:
@@ -1857,7 +1930,7 @@ export const stichtCarefreeSurfer: LorcanitoCharacterCard = {
 export const stichtNewDog: LorcanitoCharacterCard = {
   implemented: true,
   id: "2191094152854240ff5a8e1d9ccc3c314e3919a3",
-  url: "https://static.lorcanito.com/images/cards/TFC/22.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/22.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/22_en_stitch_new_dog-716.webp",
   name: "Stitch",
@@ -1881,7 +1954,7 @@ export const stichtNewDog: LorcanitoCharacterCard = {
 export const stitchRockStar: LorcanitoCharacterCard = {
   implemented: true,
   id: "0b0b9719a4dc2c76e6622e6de0a0a2c43a08de2b",
-  url: "https://static.lorcanito.com/images/cards/TFC/23.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/23.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/23_en_stitch-716.webp",
   name: "Stitch",
   title: "Rock Star",
@@ -1944,7 +2017,7 @@ export const stitchRockStar: LorcanitoCharacterCard = {
 export const timonGrubRustler: LorcanitoCharacterCard = {
   implemented: true,
   id: "75433b458ad8c65424f82797f8481a5fac8c043f",
-  url: "https://static.lorcanito.com/images/cards/TFC/24.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/24.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/24_en_timon-716.webp",
   name: "Timon",
   title: "Grub Rustler",
@@ -1987,10 +2060,10 @@ export const timonGrubRustler: LorcanitoCharacterCard = {
   set: "TFC",
   rarity: "common",
 };
-export const annaHeirToArrendelle: LorcanitoCharacterCard = {
-  implemented: false,
+export const annaHeirToArendelle: LorcanitoCharacterCard = {
+  implemented: undefined,
   id: "5e32b8ed3080008d7ea3e9dd544aea140888b7ad",
-  url: "https://static.lorcanito.com/images/cards/TFC/35.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/35.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/35_en_anna-716.webp",
   name: "Anna",
   title: "Heir to Arendelle",
@@ -1998,10 +2071,10 @@ export const annaHeirToArrendelle: LorcanitoCharacterCard = {
   text: "**LOVING HEART** When you play this character, if you have a character named Elsa in play, choose an opposing character. The chosen character doesn't ready at the start of their next turn.",
   type: "character",
   abilities: [
-    {
-      ability: "LOVING HEART",
-      text: "When you play this character, if you have a character named Elsa in play, choose an opposing character. The chosen character doesn't ready at the start of their next turn.",
-    },
+    // {
+    //   name: "LOVING HEART",
+    //   text: "When you play this character, if you have a character named Elsa in play, choose an opposing character. The chosen character doesn't ready at the start of their next turn.",
+    // },
   ],
   flavour: "“Two sisters, one mind.”",
   inkwell: true,
@@ -2019,7 +2092,7 @@ export const annaHeirToArrendelle: LorcanitoCharacterCard = {
 export const archimedsHighlyEducatedOwl: LorcanitoCharacterCard = {
   implemented: true,
   id: "a02691efda4ee4aca1cba59017468521d0b85d1c",
-  url: "https://static.lorcanito.com/images/cards/TFC/36.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/36.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/36_en_archimedes-716.webp",
   name: "Archimedes",
@@ -2043,7 +2116,7 @@ export const archimedsHighlyEducatedOwl: LorcanitoCharacterCard = {
 export const drFacilierAgentProvocateur: LorcanitoCharacterCard = {
   implemented: true,
   id: "4df072cb79a8f62561d7ad2d8935f3e91eda96b8",
-  url: "https://static.lorcanito.com/images/cards/TFC/37.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/37.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/37_en_dr_facilier-716.webp",
   name: "Dr. Facilier",
@@ -2087,7 +2160,7 @@ export const drFacilierAgentProvocateur: LorcanitoCharacterCard = {
 export const drFacilierCharlatan: LorcanitoCharacterCard = {
   implemented: true,
   id: "603bfc67da556bc70e2d0126e1bb749f32631bdb",
-  url: "https://static.lorcanito.com/images/cards/TFC/38.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/38.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/38_en_dr_facilier-716.webp",
   name: "Dr. Facilier",
@@ -2095,6 +2168,7 @@ export const drFacilierCharlatan: LorcanitoCharacterCard = {
   characteristics: ["sorcerer", "storyborn", "villain"],
   text: "**Challenger** +2 (_When challenging, this character get +2 ※._)",
   type: "character",
+  strength: 0,
   abilities: [
     {
       type: "static",
@@ -2118,7 +2192,7 @@ export const drFacilierCharlatan: LorcanitoCharacterCard = {
 export const drFacilierRemarkable: LorcanitoCharacterCard = {
   implemented: true,
   id: "e611364f095c35888741bc665ce4b861f91fdb82",
-  url: "https://static.lorcanito.com/images/cards/TFC/39.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/39.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/39_en_dr_facilier-716.webp",
   name: "Dr. Facilier",
@@ -2169,7 +2243,7 @@ export const drFacilierRemarkable: LorcanitoCharacterCard = {
 export const elsaQueenRegent: LorcanitoCharacterCard = {
   implemented: true,
   id: "a2b28cb910cebea65d689b96308f81cf93977857",
-  url: "https://static.lorcanito.com/images/cards/TFC/40.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/40.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/40_en_elsa-716.webp",
   name: "Elsa",
   title: "Queen Regent",
@@ -2178,6 +2252,7 @@ export const elsaQueenRegent: LorcanitoCharacterCard = {
   flavour: "“I never knew what I was capable of.”",
   inkwell: true,
   color: "amethyst",
+  illustrator: "Duyen Nguyen / Aubrey Archer",
   cost: 4,
   strength: 4,
   willpower: 4,
@@ -2190,7 +2265,7 @@ export const elsaQueenRegent: LorcanitoCharacterCard = {
 export const elsaSnowQueen: LorcanitoCharacterCard = {
   implemented: true,
   id: "c2fe2d31d267c85476124dae3bfd317484515044",
-  url: "https://static.lorcanito.com/images/cards/TFC/41.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/41.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/41_en_elsa-716.webp",
   name: "Elsa",
   title: "Snow Queen",
@@ -2237,7 +2312,7 @@ export const elsaSnowQueen: LorcanitoCharacterCard = {
 export const elsaSpiritOfWinter: LorcanitoCharacterCard = {
   implemented: true,
   id: "a76a871e3ff183140a0463f9c444a3377b478036",
-  url: "https://static.lorcanito.com/images/cards/TFC/42.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/42.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/42_en_elsa-716.webp",
   name: "Elsa",
   title: "Spirit of Winter",
@@ -2279,21 +2354,21 @@ export const elsaSpiritOfWinter: LorcanitoCharacterCard = {
   rarity: "legendary",
 };
 export const flotsamUrsulaSpy: LorcanitoCharacterCard = {
-  implemented: false,
+  implemented: undefined,
   id: "263ea92bad720546e16173828b184b91dcf2da69",
-  url: "https://static.lorcanito.com/images/cards/TFC/43.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/43.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/43_en_flotsam-716.webp",
   name: "Flotsam",
   title: "Ursula's Spy",
   characteristics: ["storyborn", "ally"],
-  text: "**Rush** _(This character can challenge the turn they're played.)_\n**DEXTEROUS LUNGE** Your characters named Jetsam gain **Rush.**",
+  text: "**Rush** _(This character can challenge the turn they're played.)_\nc",
   type: "character",
   abilities: [
-    {
-      ability: "",
-      text: "Your characters named Jetsam gain **Rush.**",
-    },
+    // {
+    //   name: "Dexterous Lunge",
+    //   text: "Your characters named Jetsam gain **Rush.**",
+    // },
     rushAbility,
   ],
   flavour: "“We know someone who can help you . . . for a price.”",
@@ -2309,9 +2384,9 @@ export const flotsamUrsulaSpy: LorcanitoCharacterCard = {
   rarity: "rare",
 };
 export const jafarKeeperOfTheSecrets: LorcanitoCharacterCard = {
-  implemented: false,
+  implemented: true,
   id: "8dc63a09fc4060675cd09d28bbad074fbfbde5f0",
-  url: "https://static.lorcanito.com/images/cards/TFC/44.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/44.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/44_en_jafar-716.webp",
   name: "Jafar",
   title: "Keeper of Secrets",
@@ -2320,15 +2395,33 @@ export const jafarKeeperOfTheSecrets: LorcanitoCharacterCard = {
   type: "character",
   abilities: [
     {
-      ability: "HIDDEN WONDERS",
+      type: "property-static",
+      ability: "attribute",
+      name: "Hidden Wonders",
       text: "This character gets +1 ※ for each card in your hand.",
-    },
+      effects: [
+        {
+          type: "attribute",
+          attribute: "strength",
+          amount: 1,
+          modifier: "filter",
+          filters: [
+            { filter: "zone", value: "hand" },
+            { filter: "owner", value: "self" },
+          ],
+          target: {
+            type: "this-character",
+          },
+        } as AttributeEffect,
+      ],
+    } as PropertyStaticAbility,
   ],
   flavour: "There's more than one way to bury secrets.",
   inkwell: true,
   color: "amethyst",
   cost: 4,
   willpower: 5,
+  strength: 0,
   lore: 2,
   language: "EN",
   illustrator: "Marcel Berg",
@@ -2339,7 +2432,7 @@ export const jafarKeeperOfTheSecrets: LorcanitoCharacterCard = {
 export const jafarWicked: LorcanitoCharacterCard = {
   implemented: true,
   id: "5425c8ea44f7ce17855f0af83ce36ca759fab001",
-  url: "https://static.lorcanito.com/images/cards/TFC/45.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/45.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/45_en_jafar-716.webp",
   name: "Jafar",
   title: "Wicked Sorcerer",
@@ -2371,7 +2464,7 @@ export const jafarWicked: LorcanitoCharacterCard = {
 export const maleficentBinding: LorcanitoCharacterCard = {
   implemented: true,
   id: "aa12a1438e69df6cb8cf70456c934a651bb28537",
-  url: "https://static.lorcanito.com/images/cards/TFC/48.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/48.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/48_en_maleficent_biding_her_time-716.webp",
   name: "Maleficent",
@@ -2394,7 +2487,7 @@ export const maleficentBinding: LorcanitoCharacterCard = {
 export const maleficentSorceress: LorcanitoCharacterCard = {
   implemented: true,
   id: "2e93e1f6a80a4e2ce7cfe388ff7a1c32c5277a0f",
-  url: "https://static.lorcanito.com/images/cards/TFC/49.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/49.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/49_en_maleficent-716.webp",
   name: "Maleficent",
@@ -2436,7 +2529,7 @@ export const maleficentSorceress: LorcanitoCharacterCard = {
 export const marshmallowPersistentGuardian: LorcanitoCharacterCard = {
   implemented: true,
   id: "1f0ca9a138f9d8fb3d3f2357f32b317904c004cd",
-  url: "https://static.lorcanito.com/images/cards/TFC/50.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/50.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/50_en_marshmallow-716.webp",
   name: "Marshmallow",
@@ -2473,9 +2566,9 @@ export const marshmallowPersistentGuardian: LorcanitoCharacterCard = {
   rarity: "super_rare",
 };
 export const mickeyMouseWaywardSorcerer: LorcanitoCharacterCard = {
-  implemented: false,
+  implemented: true,
   id: "fe51f849e11152e0acb9c6363f7a4f9bca9a987b",
-  url: "https://static.lorcanito.com/images/cards/TFC/51.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/51.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/51_en_mickey_mouse-716.webp",
   name: "Mickey Mouse",
@@ -2485,13 +2578,42 @@ export const mickeyMouseWaywardSorcerer: LorcanitoCharacterCard = {
   type: "character",
   abilities: [
     {
+      type: "static",
       name: "Animate Broom",
-      text: "You pay 1 ⬡ less to play Broom characters.\n\n**CEASELESS WORKER",
-    },
-    {
+      text: "You pay 1 ⬡ less to play Broom characters.",
+      effects: [
+        {
+          type: "replacement",
+          replacement: "cost",
+          duration: "static",
+          amount: 1,
+          filters: [
+            { filter: "type", value: "character" },
+            { filter: "characteristics", value: ["broom"] },
+          ],
+        } as ReplacementEffect,
+      ],
+    } as StaticAbility,
+    ...wheneverCharactersIsBanishedInAChallenge({
       name: "Ceaseless Worker",
       text: "Whenever one of your Broom characters is banished in a challenge, you may return that card to your hand.",
-    },
+      optional: true,
+      triggerFilter: [
+        { filter: "owner", value: "self" },
+        { filter: "type", value: "character" },
+        { filter: "characteristics", value: ["broom"] },
+      ],
+      effects: [
+        {
+          type: "move",
+          to: "hand",
+          target: {
+            type: "trigger",
+            trigger: "itself",
+          } as TriggerTarget,
+        },
+      ],
+    }),
   ],
   flavour: "He always goes for the clean sweep.",
   inkwell: true,
@@ -2509,7 +2631,7 @@ export const mickeyMouseWaywardSorcerer: LorcanitoCharacterCard = {
 export const olafFriendlySnowman: LorcanitoCharacterCard = {
   implemented: true,
   id: "e68a8af90beef5514772664113bcedcd3e0f816a",
-  url: "https://static.lorcanito.com/images/cards/TFC/52.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/52.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/en_olaf-716.webp",
   name: "Olaf",
   title: "Friendly Snowman",
@@ -2531,7 +2653,7 @@ export const olafFriendlySnowman: LorcanitoCharacterCard = {
 export const rafikiMysterious: LorcanitoCharacterCard = {
   implemented: true,
   id: "29477cb3be2ed0e62a2094b9467faaa80911a2c7",
-  url: "https://static.lorcanito.com/images/cards/TFC/54.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/54.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/54_en_rafiki-716.webp",
   name: "Rafiki",
   title: "Mysterious Sage",
@@ -2555,7 +2677,7 @@ export const rafikiMysterious: LorcanitoCharacterCard = {
 export const svenOficialIceDeliverer: LorcanitoCharacterCard = {
   implemented: true,
   id: "6c43f6094fb7b7848d361b84c8eb8ef1e154237d",
-  url: "https://static.lorcanito.com/images/cards/TFC/55.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/55.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/55_en_sven-716.webp",
   name: "Sven",
   title: "Official Ice Deliverer",
@@ -2577,7 +2699,7 @@ export const svenOficialIceDeliverer: LorcanitoCharacterCard = {
 export const theQueenWickedAndVain: LorcanitoCharacterCard = {
   implemented: true,
   id: "945611f7e147050dd2e3f007bbb022f6075c6022",
-  url: "https://static.lorcanito.com/images/cards/TFC/56.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/56.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/56_en_the_queen-716.webp",
   name: "The Queen",
@@ -2621,7 +2743,7 @@ export const theQueenWickedAndVain: LorcanitoCharacterCard = {
 export const theWardrobeBelleConfident: LorcanitoCharacterCard = {
   implemented: true,
   id: "bf4f9f27ff65e0825b11c33472000973af3bdc85",
-  url: "https://static.lorcanito.com/images/cards/TFC/57.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/57.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/57_en_the_wardrobe-716.webp",
   name: "The Wardrobe",
@@ -2642,9 +2764,9 @@ export const theWardrobeBelleConfident: LorcanitoCharacterCard = {
   rarity: "common",
 };
 export const tinkerBellPeterPan: LorcanitoCharacterCard = {
-  implemented: false,
+  implemented: undefined,
   id: "b765a553846273c09881a72bd9c368d0227f9522",
-  url: "https://static.lorcanito.com/images/cards/TFC/58.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/58.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/58_en_tinker_bell-716.webp",
   name: "Tinker Bell",
@@ -2653,12 +2775,11 @@ export const tinkerBellPeterPan: LorcanitoCharacterCard = {
   text: "**Evasive** _(Only characters with Evasive can challenge this character.)_\n\n**LOYAL AND DEVOTED** Your characters named Peter Pan gain **Challenger +1.** _(They get +1 ※ while challenging.)_",
   type: "character",
   abilities: [
+    // {
+    //   name: "Loyal and Devoted",
+    //   text: "Your characters named Peter Pan gain **Challenger +1.** _(They get +1 ※ while challenging.)_",
+    // },
     evasiveAbility,
-    {
-      ability:
-        "**Evasive** _(Only characters with Evasive can challenge this character.)_\n\nLOYAL AND DEVOTED",
-      text: "Your characters named Peter Pan gain **Challenger +1.** _(They get +1 ※ while challenging.)_",
-    },
   ],
   color: "amethyst",
   cost: 5,
@@ -2674,7 +2795,7 @@ export const tinkerBellPeterPan: LorcanitoCharacterCard = {
 export const ursulaPowerHungry: LorcanitoCharacterCard = {
   implemented: true,
   id: "90a361a6b7a803175b94de80cadb8de616cbf9ed",
-  url: "https://static.lorcanito.com/images/cards/TFC/59.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/59.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/59_en_ursula-716.webp",
   name: "Ursula",
   title: "Power Hungry",
@@ -2725,7 +2846,7 @@ export const ursulaPowerHungry: LorcanitoCharacterCard = {
 export const yzmaAlchemist: LorcanitoCharacterCard = {
   implemented: true,
   id: "23bcc36ad574f118e8af3ff794462c7830edcac7",
-  url: "https://static.lorcanito.com/images/cards/TFC/60.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/60.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/60_en_yzma-716.webp",
   name: "Yzma",
   title: "Alchemist",
@@ -2764,9 +2885,9 @@ export const yzmaAlchemist: LorcanitoCharacterCard = {
   rarity: "common",
 };
 export const donaldDuckMusketeer: LorcanitoCharacterCard = {
-  implemented: false,
+  implemented: true,
   id: "e40c2ea4aea2e35b030750b39d7866b73ce232ca",
-  url: "https://static.lorcanito.com/images/cards/TFC/177.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/177.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/177_en_donald_duck-716.webp",
   name: "Donald Duck",
@@ -2774,7 +2895,26 @@ export const donaldDuckMusketeer: LorcanitoCharacterCard = {
   characteristics: ["hero", "dreamborn", "musketeer"],
   text: "**Bodyguard** _(This character may enter play exerted. An opposing character who challenges one of your characters must choose one with Bodyguard if able.)_\n\n**STAY ALERT!** During your turn, your Musketeer characters gain **Evasive.** _(They can challenge characters with Evasive.)_",
   type: "character",
-  abilities: [bodyguardAbility],
+  abilities: [
+    {
+      type: "static",
+      ability: "gain-ability",
+      name: "Stay Alert!",
+      text: "During your turn, your Musketeer characters gain **Evasive.** _(They can challenge characters with Evasive.)_",
+      gainedAbility: evasiveAbility,
+      conditions: [{ type: "turn", value: "self" }],
+      target: {
+        type: "card",
+        value: "all",
+        filters: [
+          { filter: "zone", value: "play" },
+          { filter: "owner", value: "self" },
+          { filter: "characteristics", value: ["musketeer"] },
+        ],
+      } as CardEffectTarget,
+    } as GainAbilityStaticAbility,
+    bodyguardAbility,
+  ],
   inkwell: true,
   color: "steel",
   cost: 4,
@@ -2790,7 +2930,7 @@ export const donaldDuckMusketeer: LorcanitoCharacterCard = {
 export const beastWolfbane: LorcanitoCharacterCard = {
   implemented: true,
   id: "e88838de4dc1a56bbc2287f82b034ab7ee8d94a6",
-  url: "https://static.lorcanito.com/images/cards/TFC/70.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/70.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/70_en_beast-716.webp",
   name: "Beast",
   title: "Wolfsbane",
@@ -2839,7 +2979,7 @@ export const beastWolfbane: LorcanitoCharacterCard = {
 export const cheshireCat: LorcanitoCharacterCard = {
   implemented: true,
   id: "4d92544c1a06472ddcd9999139e06f05f4148f61",
-  url: "https://static.lorcanito.com/images/cards/TFC/71.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/71.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/71_en_cheshire_cat-716.webp",
   name: "Cheshire Cat",
@@ -2875,9 +3015,9 @@ export const cheshireCat: LorcanitoCharacterCard = {
   rarity: "uncommon",
 };
 export const cruellaDeVilMiserableAsUsual: LorcanitoCharacterCard = {
-  implemented: false,
+  implemented: true,
   id: "618f6ca4671ed6054b3038aac10aca0da6c84921",
-  url: "https://static.lorcanito.com/images/cards/TFC/72.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/72.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/72_en_cruella-716.webp",
   name: "Cruella De Vil",
@@ -2920,7 +3060,7 @@ export const cruellaDeVilMiserableAsUsual: LorcanitoCharacterCard = {
 export const dukeOfWeselton: LorcanitoCharacterCard = {
   implemented: true,
   id: "43cf2280630c759bc241110a48f2508aefd2e390",
-  url: "https://static.lorcanito.com/images/cards/TFC/73.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/73.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/73_en_duke_of_weselton-716.webp",
   name: "Duke Of Weselton",
@@ -2941,9 +3081,9 @@ export const dukeOfWeselton: LorcanitoCharacterCard = {
   rarity: "common",
 };
 export const flynnRiderCharmingRogue: LorcanitoCharacterCard = {
-  implemented: false,
+  implemented: true,
   id: "fe2547a8f3e95f8da3394b784299995009b31508",
-  url: "https://static.lorcanito.com/images/cards/TFC/74.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/74.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/74_en_flynn_rider-716.webp",
   name: "Flynn Rider",
@@ -2987,7 +3127,7 @@ export const flynnRiderCharmingRogue: LorcanitoCharacterCard = {
 export const genieTheEverImpressive: LorcanitoCharacterCard = {
   implemented: true,
   id: "73be64474564ee297c91dd0eabc2dd6f20f1df01",
-  url: "https://static.lorcanito.com/images/cards/TFC/77.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/77.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/77_en_genie-716.webp",
   name: "Genie",
   title: "The Ever Impressive",
@@ -3010,7 +3150,7 @@ export const genieTheEverImpressive: LorcanitoCharacterCard = {
 export const iagoLoudMouthedParrot: LorcanitoCharacterCard = {
   implemented: true,
   id: "669b330b34503cbe42a705fbf8795e671e757496",
-  url: "https://static.lorcanito.com/images/cards/TFC/80.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/80.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/80_en_iago-716.webp",
   name: "Iago",
   title: "Loud-Mouthed Parrot",
@@ -3056,7 +3196,7 @@ export const iagoLoudMouthedParrot: LorcanitoCharacterCard = {
 export const captainColonelsLieutenant: LorcanitoCharacterCard = {
   implemented: true,
   id: "b7a8d52a9a3889b83a2b373c538f0639714c8ba9",
-  url: "https://static.lorcanito.com/images/cards/TFC/106.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/106.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/106_en_captain-716.webp",
   name: "Captain",
@@ -3079,7 +3219,7 @@ export const captainColonelsLieutenant: LorcanitoCharacterCard = {
 export const beastHardheaded: LorcanitoCharacterCard = {
   implemented: true,
   id: "2649175fd57f066a8ec75c816ab4dd3d70ff831c",
-  url: "https://static.lorcanito.com/images/cards/TFC/172.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/172.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/172_en_beast-716.webp",
   name: "Beast",
   title: "Hardheaded",
@@ -3122,7 +3262,7 @@ export const beastHardheaded: LorcanitoCharacterCard = {
 export const captainHookCaptainOfTheJollyRoger: LorcanitoCharacterCard = {
   implemented: true,
   id: "74c3513f1cf85ef96fbfa2010a06c3251d7c98e3",
-  url: "https://static.lorcanito.com/images/cards/TFC/173.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/173.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/173_en_captain_hook_captain_of_the_jolly_roger-716.webp",
   name: "Captain Hook",
@@ -3173,7 +3313,7 @@ export const captainHookCaptainOfTheJollyRoger: LorcanitoCharacterCard = {
 export const elsaIceSurfer: LorcanitoCharacterCard = {
   implemented: true,
   id: "6e8f301b128ebf9cf8fff30866cd5a141285af30",
-  url: "https://static.lorcanito.com/images/cards/TFC/109.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/109.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/109_en_elsa-716.webp",
   name: "Elsa",
   title: "Ice Surfer",
@@ -3226,7 +3366,7 @@ export const elsaIceSurfer: LorcanitoCharacterCard = {
 export const simbaFutureKing: LorcanitoCharacterCard = {
   implemented: true,
   id: "18bc7987058996fec2c34bfc96a464b5d1a6ee01",
-  url: "https://static.lorcanito.com/images/cards/TFC/188.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/188.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/188_en_simba-716.webp",
   name: "Simba",
   title: "Future King",
@@ -3280,7 +3420,7 @@ export const simbaFutureKing: LorcanitoCharacterCard = {
 export const simbaReturnedKing: LorcanitoCharacterCard = {
   implemented: true,
   id: "29caf7e87492104348c1ef1df59c776b035706db",
-  url: "https://static.lorcanito.com/images/cards/TFC/189.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/189.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/189_en_simba-716.webp",
   name: "Simba",
   title: "Returned King",
@@ -3298,10 +3438,12 @@ export const simbaReturnedKing: LorcanitoCharacterCard = {
       type: "while-static",
       name: "POUNCE",
       text: "During your turn, this character gains **Evasive**. _(They can challenge characters with Evasive.)_",
-      whileCondition: {
-        type: "turn",
-        value: "self",
-      } as WhileCondition,
+      whileCondition: [
+        {
+          type: "turn",
+          value: "self",
+        },
+      ] as WhileCondition[],
       ability: evasiveAbility,
     } as WhileStaticAbility,
   ],
@@ -3321,7 +3463,7 @@ export const simbaReturnedKing: LorcanitoCharacterCard = {
 export const tinkerBellTinyTactician: LorcanitoCharacterCard = {
   implemented: true,
   id: "9f23abb5c0481592ea7708af5667b5b7fd87d817",
-  url: "https://static.lorcanito.com/images/cards/TFC/194.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/194.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards%2Ftfc%2F194_en_tinkerbell-716.webp",
   name: "Tinker Bell",
@@ -3376,7 +3518,7 @@ export const tinkerBellTinyTactician: LorcanitoCharacterCard = {
 export const mauriceWorldFamousInventor: LorcanitoCharacterCard = {
   implemented: true,
   id: "2565db9ce02730733399af99182e01725bf03751",
-  url: "https://static.lorcanito.com/images/cards/TFC/152.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/152.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards%2Ftfc%2Fen_maurice-716.webp",
   name: "Maurice",
@@ -3435,7 +3577,7 @@ export const mauriceWorldFamousInventor: LorcanitoCharacterCard = {
 export const madHatterGraciousHost: LorcanitoCharacterCard = {
   implemented: true,
   id: "1b332aff98977900eb3255187762f2fee752c28b",
-  url: "https://static.lorcanito.com/images/cards/TFC/86.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/86.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/86_en_mad_hatter-716.webp",
   name: "Mad Hatter",
@@ -3475,17 +3617,18 @@ export const madHatterGraciousHost: LorcanitoCharacterCard = {
 export const megaraPullingTheStrings: LorcanitoCharacterCard = {
   implemented: true,
   id: "0d959591cd31c4aa16d3794ed7f78ef1c7825b7a",
-  url: "https://static.lorcanito.com/images/cards/TFC/87.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/87.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/87_en_megara-716.webp",
   name: "Megara",
   title: "Pulling the Strings",
   characteristics: ["dreamborn", "ally"],
   text: "**WONDER BOY** When you play this character, chosen character gets +2 ※ this turn.",
   type: "character",
+  illustrator: "Aubrey Archer",
   abilities: [
     {
       type: "resolution",
-      name: "WONDER BOY",
+      name: "Wonder Boy",
       text: "When you play this character, chosen character gets +2 ※ this turn.",
       effects: [
         {
@@ -3521,7 +3664,7 @@ export const megaraPullingTheStrings: LorcanitoCharacterCard = {
 export const robinHoodUnrivaledArcher: LorcanitoCharacterCard = {
   implemented: true,
   id: "4ee91d47552e97edc271059c7d853771fe902efc",
-  url: "https://static.lorcanito.com/images/cards/TFC/157.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/157.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/157_en_robin-716.webp",
   name: "Robin Hood",
   title: "Unrivaled Archer",
@@ -3554,10 +3697,12 @@ export const robinHoodUnrivaledArcher: LorcanitoCharacterCard = {
       type: "while-static",
       name: "Good Shot",
       text: "During your turn, this character gains **Evasive**. (_They can challenge characters with Evasive._)",
-      whileCondition: {
-        type: "turn",
-        value: "self",
-      } as WhileCondition,
+      whileCondition: [
+        {
+          type: "turn",
+          value: "self",
+        },
+      ] as WhileCondition[],
       ability: evasiveAbility,
     } as WhileStaticAbility,
   ],
@@ -3578,7 +3723,7 @@ export const robinHoodUnrivaledArcher: LorcanitoCharacterCard = {
 export const teKaHeartless: LorcanitoCharacterCard = {
   implemented: true,
   id: "36d52ae56e50216bb99256c4a12e332723a4a535",
-  url: "https://static.lorcanito.com/images/cards/TFC/192.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/192.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/192_en_te_ka-716.webp",
   name: "Te Ka",
   title: "Heartless",
@@ -3614,7 +3759,7 @@ export const teKaHeartless: LorcanitoCharacterCard = {
 export const kuzcoTemperamentalEmperor: LorcanitoCharacterCard = {
   implemented: true,
   id: "7a8cb684596d4f9df795170f5217c8f413efeb65",
-  url: "https://static.lorcanito.com/images/cards/TFC/84.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/84.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/84_en_kuzco-716.webp",
   name: "Kuzco",
   title: "Temperamental Emperor",
@@ -3655,7 +3800,7 @@ export const kuzcoTemperamentalEmperor: LorcanitoCharacterCard = {
 export const simbaRightfulHeir: LorcanitoCharacterCard = {
   implemented: true,
   id: "db049dd162db9b5e414d8c8ffa89e753c76d21ea",
-  url: "https://static.lorcanito.com/images/cards/TFC/190.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/190.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/190_en_simba-716.webp",
   name: "Simba",
   title: "Rightful Heir",
@@ -3692,7 +3837,7 @@ export const simbaRightfulHeir: LorcanitoCharacterCard = {
 export const mauiDemiGod: LorcanitoCharacterCard = {
   implemented: true,
   id: "80c27dec97ee601a6c839c1b2ff955fb2a174e5c",
-  url: "https://static.lorcanito.com/images/cards/TFC/185.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/185.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/185_en_maui-716.webp",
   name: "Maui",
   title: "Demigod",
@@ -3715,7 +3860,7 @@ export const mauiDemiGod: LorcanitoCharacterCard = {
 export const tinkerBellGiantFairy: LorcanitoCharacterCard = {
   implemented: true,
   id: "b1d4bc8bf55b2d5cccc309eb02e19c1669a86afe",
-  url: "https://static.lorcanito.com/images/cards/TFC/193.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/193.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/193_en_tinker_bell-716.webp",
   name: "Tinker Bell",
@@ -3779,7 +3924,7 @@ export const tinkerBellGiantFairy: LorcanitoCharacterCard = {
 export const mulanImperialSoldier: LorcanitoCharacterCard = {
   implemented: true,
   id: "1f90f6aa6e8cb71601b4aa5c948f7f1f98f696c2",
-  url: "https://static.lorcanito.com/images/cards/TFC/118.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/118.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/118_en_mulan-716.webp",
   name: "Mulan",
   title: "Imperial Soldier",
@@ -3822,9 +3967,9 @@ export const mulanImperialSoldier: LorcanitoCharacterCard = {
   rarity: "super_rare",
 };
 export const starkeyHooksHenchman: LorcanitoCharacterCard = {
-  implemented: false,
+  implemented: undefined,
   id: "22bbccd1db111dd488344be3101b8a86aa98a2a9",
-  url: "https://static.lorcanito.com/images/cards/TFC/191.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/191.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/191_en_starkey-716.webp",
   name: "Starkey",
@@ -3833,10 +3978,10 @@ export const starkeyHooksHenchman: LorcanitoCharacterCard = {
   text: "**AYE AYE, CAPTAIN** While you have a Captain character in play, this character gets +1 ◆.",
   type: "character",
   abilities: [
-    {
-      ability: "AYE AYE, CAPTAIN",
-      text: "While you have a Captain character in play, this character gets +1 ◆.",
-    },
+    // {
+    //   name: "Ay Aye, Captain",
+    //   text: "While you have a Captain character in play, this character gets +1 ◆.",
+    // },
   ],
   flavour:
     "A pirate must be tough, loyal, and strong. “Smart” doesn't even make the list.",
@@ -3855,7 +4000,7 @@ export const starkeyHooksHenchman: LorcanitoCharacterCard = {
 export const tritonTheSeaKing: LorcanitoCharacterCard = {
   implemented: true,
   id: "398c54328c277e14ec3b2400897e6dd85be47cdc",
-  url: "https://static.lorcanito.com/images/cards/TFC/160.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/160.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/160_en_triton-716.webp",
   name: "Triton",
@@ -3878,7 +4023,7 @@ export const tritonTheSeaKing: LorcanitoCharacterCard = {
 export const aladdinCorneredSwordman: LorcanitoCharacterCard = {
   implemented: true,
   id: "895b6866d01b794a64b3284ec8f809b829e6076a",
-  url: "https://static.lorcanito.com/images/cards/TFC/171.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/171.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/171_en_aladdin-716.webp",
   name: "Aladdin",
@@ -3901,7 +4046,7 @@ export const aladdinCorneredSwordman: LorcanitoCharacterCard = {
 export const captainHookForcefulDuelist: LorcanitoCharacterCard = {
   implemented: true,
   id: "64028502d7dea8a518d3f2673824a17f8e2f8641",
-  url: "https://static.lorcanito.com/images/cards/TFC/174.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/174.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/174_en_hook-716.webp",
   name: "Captain Hook",
   title: "Forceful Duelist",
@@ -3930,9 +4075,9 @@ export const captainHookForcefulDuelist: LorcanitoCharacterCard = {
   rarity: "common",
 };
 export const captainHookThinkingAHappyThought: LorcanitoCharacterCard = {
-  implemented: undefined,
+  implemented: true,
   id: "e06a99a80af93d531d215de56b647d4afa4bcbe0",
-  url: "https://static.lorcanito.com/images/cards/TFC/175.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/175.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/175_en_captain_hook-716.webp",
   name: "Captain Hook",
@@ -3940,19 +4085,35 @@ export const captainHookThinkingAHappyThought: LorcanitoCharacterCard = {
   characteristics: ["floodborn", "villain", "pirate", "captain"],
   text: "**Shift** 3 _(You may pay 3 ⬡ to play this on top of one of your characters named Captain Hook.)_\n\n**Challenger** +3 _(While challenging, this character gets +3 ※.)_\n\n**STOLEN DUST** Characters with cost 3 or less can't challenge this character.",
   type: "character",
+  illustrator: "Elliot Bocxtaele",
   abilities: [
     {
       type: "static",
-      ability: "challenger",
-      value: 3,
-      text: "**Challenger** +3 (_When challenging, this character get +3 ※._)",
-    } as ChallengerAbility,
-    {
-      type: "static",
-      shift: 3,
-      ability: "shift",
-      text: "**Shift** 3 _(You may pay 3 ⬡ to play this on top of one of your characters named Captain Hook.)_",
-    } as ShiftAbility,
+      name: "Stolen Dust",
+      text: "Characters with cost 3 or less can't challenge this character.",
+      effects: [
+        {
+          type: "protection",
+          restriction: "challenge",
+          duration: "turn",
+          target: {
+            type: "card",
+            value: "all",
+            filters: [
+              { filter: "type", value: "character" },
+              { filter: "zone", value: "play" },
+              {
+                filter: "attribute",
+                value: "cost",
+                comparison: { operator: "lte", value: 3 },
+              },
+            ],
+          },
+        } as ProtectionEffect,
+      ],
+    } as StaticAbility,
+    challengerAbility(3),
+    shiftAbility(3, "Captain Hook"),
   ],
   color: "steel",
   cost: 5,
@@ -3967,7 +4128,7 @@ export const captainHookThinkingAHappyThought: LorcanitoCharacterCard = {
 export const cerberusThreeHeadedDog: LorcanitoCharacterCard = {
   implemented: true,
   id: "3643157ff6e688ae483bf3eefcc22004d9b73f10",
-  url: "https://static.lorcanito.com/images/cards/TFC/176.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/176.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/en_cerberus-716.webp",
   name: "Cerberus",
   title: "Three-Headed Dog",
@@ -3975,6 +4136,7 @@ export const cerberusThreeHeadedDog: LorcanitoCharacterCard = {
   type: "character",
   inkwell: true,
   color: "steel",
+  illustrator: "Oleg Yurkov",
   cost: 5,
   strength: 5,
   willpower: 6,
@@ -3984,11 +4146,10 @@ export const cerberusThreeHeadedDog: LorcanitoCharacterCard = {
   set: "TFC",
   rarity: "common",
 };
-export const gantuGalactic: LorcanitoCharacterCard = {
-  // SKIP THIS ONE
-  implemented: undefined,
+export const gantuGalacticFederationCaptain: LorcanitoCharacterCard = {
+  implemented: true,
   id: "94dfb61ecd7dab5c3a57a2fbc390eb7f402acaa8",
-  url: "https://static.lorcanito.com/images/cards/TFC/178.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/178.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards%2Ftfc%2F178_en_gantu-716.webp",
   name: "Gantu",
@@ -3998,10 +4159,31 @@ export const gantuGalactic: LorcanitoCharacterCard = {
   type: "character",
   abilities: [
     {
-      ability: "Under arrest",
-      // I don't think we have challenge restrictions, ski
+      type: "static",
+      name: "Under arrest",
       text: "Characters with cost 2 or less can't challenge your characters.",
-    },
+      effects: [
+        {
+          type: "restriction",
+          restriction: "challenge",
+          duration: "turn",
+          target: {
+            type: "card",
+            value: "all",
+            filters: [
+              { filter: "type", value: "character" },
+              { filter: "zone", value: "play" },
+              { filter: "owner", value: "opponent" },
+              {
+                filter: "attribute",
+                value: "cost",
+                comparison: { operator: "lte", value: 2 },
+              },
+            ],
+          },
+        } as RestrictionEffect,
+      ],
+    } as StaticAbility,
   ],
   flavour: '"Relax, enjoy the trip... and don\'t get any ideas!"',
   inkwell: true,
@@ -4019,7 +4201,7 @@ export const gantuGalactic: LorcanitoCharacterCard = {
 export const goonsMaleficent: LorcanitoCharacterCard = {
   implemented: true,
   id: "db8266f390b508110c9a18e22200d558dfbe0f40",
-  url: "https://static.lorcanito.com/images/cards/TFC/179.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/179.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/179_en_goons-716.webp",
   name: "Goons",
   title: "Maleficent's Underlings",
@@ -4041,7 +4223,7 @@ export const goonsMaleficent: LorcanitoCharacterCard = {
 export const kristoff: LorcanitoCharacterCard = {
   implemented: true,
   id: "e8f999ac7fd191c30c45f9d1a7c5f11e94e35054",
-  url: "https://static.lorcanito.com/images/cards/TFC/182.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/182.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/182_en_kristoff-716.webp",
   name: "Kristoff",
@@ -4065,7 +4247,7 @@ export const kristoff: LorcanitoCharacterCard = {
 export const kronRightHandMan: LorcanitoCharacterCard = {
   implemented: true,
   id: "3ca598602446570d99e2d6e67f257f6482105d60",
-  url: "https://static.lorcanito.com/images/cards/TFC/183.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/183.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/183_en_kronk-716.webp",
   name: "Kronk",
   title: "Right-Hand Man",
@@ -4087,7 +4269,7 @@ export const kronRightHandMan: LorcanitoCharacterCard = {
 export const liloGalacticHero: LorcanitoCharacterCard = {
   implemented: true,
   id: "2c075421e2b78e8b9cbe1b489d13652d12546990",
-  url: "https://static.lorcanito.com/images/cards/TFC/184.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/184.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/184_en_lilo-716.webp",
   name: "Lilo",
   title: "Galactic Hero",
@@ -4107,21 +4289,43 @@ export const liloGalacticHero: LorcanitoCharacterCard = {
   rarity: "uncommon",
 };
 export const mickeyMouseMusketeer: LorcanitoCharacterCard = {
-  implemented: false,
+  implemented: true,
   id: "5ab4b0bc6efd4d0a76af395c62120d8b2c88a9d1",
-  url: "https://static.lorcanito.com/images/cards/TFC/186.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/186.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/186_en_mickey_mouse-716.webp",
   name: "Mickey Mouse",
   title: "Musketeer",
   characteristics: ["hero", "dreamborn", "musketeer"],
-  text: "**Bodyguard** _(This character may enter play exerted. \rAn opposing character who challenges one of \ryour characters must choose one with Bodyguard\rif able.)_\n**ALL FOR ONE** Your other Musketeer characters\rget +1 ※.",
+  text: "**Bodyguard** _(This character may enter play exerted. An opposing character who challenges one of your characters must choose one with Bodyguard if able.)_\n**ALL FOR ONE** Your other Musketeer characters\rget +1 ※.",
   type: "character",
   abilities: [
     {
-      ability: "bodyguard",
-      text: "**Bodyguard** _(This character may enter play exerted. An opposing character who challenges one of your characters must choose one with Bodyguard if able.)_",
-    },
+      type: "static",
+      ability: "effects",
+      name: "All For One",
+      text: "Your other Musketeer characters get +1 ※.",
+      effects: [
+        {
+          type: "attribute",
+          attribute: "strength",
+          amount: 1,
+          modifier: "add",
+          duration: "turn",
+          target: {
+            type: "card",
+            value: "all",
+            excludeSelf: true,
+            filters: [
+              { filter: "zone", value: "play" },
+              { filter: "owner", value: "self" },
+              { filter: "characteristics", value: ["musketeer"] },
+            ],
+          } as CardEffectTarget,
+        } as AttributeEffect,
+      ],
+    } as EffectStaticAbility,
+    bodyguardAbility,
   ],
   inkwell: true,
   color: "steel",
@@ -4138,7 +4342,7 @@ export const mickeyMouseMusketeer: LorcanitoCharacterCard = {
 export const priceEricDashingAndBrave: LorcanitoCharacterCard = {
   implemented: true,
   id: "f8ff29f55a3d1fd5d921c5b1e697a7815e2844fc",
-  url: "https://static.lorcanito.com/images/cards/TFC/187.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/187.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/187_en_prince_eric-716.webp",
   name: "Prince Eric",
@@ -4167,10 +4371,10 @@ export const priceEricDashingAndBrave: LorcanitoCharacterCard = {
   set: "TFC",
   rarity: "common",
 };
-export const hasnSchemingPrince: LorcanitoCharacterCard = {
+export const hansSchemingPrince: LorcanitoCharacterCard = {
   implemented: true,
   id: "3e59e338d85b12a6e5ce4fc5571fb53e9e711609",
-  url: "https://static.lorcanito.com/images/cards/TFC/78.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/78.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/78_en_hans-716.webp",
   name: "Hans",
   title: "Scheming Prince",
@@ -4192,7 +4396,7 @@ export const hasnSchemingPrince: LorcanitoCharacterCard = {
 export const horaceNoGood: LorcanitoCharacterCard = {
   implemented: true,
   id: "c2ecddda32699ff4b4ec8e48cb25b80e82dc2892",
-  url: "https://static.lorcanito.com/images/cards/TFC/79.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/79.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/79_en_horace-716.webp",
   name: "Horace",
   title: "No-Good Scoundrel",
@@ -4212,21 +4416,35 @@ export const horaceNoGood: LorcanitoCharacterCard = {
   rarity: "common",
 };
 export const jasperCommonCrook: LorcanitoCharacterCard = {
-  implemented: false,
+  implemented: true,
   id: "b59ff96b5691e28ec7fc440c821d7971c1c9c64c",
-  url: "https://static.lorcanito.com/images/cards/TFC/81.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/81.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/81_en_jasper-716.webp",
   name: "Jasper",
   title: "Common Crook",
   characteristics: ["storyborn", "ally"],
   text: "**PUPPYNAPPING** Whenever this character quests, chosen opposing character can't quest during their next turn.",
   type: "character",
-  abilities: [
-    {
-      ability: "PUPPYNAPPING",
-      text: "Whenever this character quests, chosen opposing character can't quest during their next turn.",
-    },
-  ],
+  abilities: wheneverQuests({
+    name: "Puppynapping",
+    text: "Whenever this character quests, chosen opposing character can't quest during their next turn.",
+    effects: [
+      {
+        type: "restriction",
+        restriction: "quest",
+        duration: "next_turn",
+        target: {
+          type: "card",
+          value: 1,
+          filters: [
+            { filter: "type", value: "character" },
+            { filter: "zone", value: "play" },
+            { filter: "owner", value: "opponent" },
+          ],
+        },
+      } as RestrictionEffect,
+    ],
+  }),
   flavour: "“Now, look here, Horace, I warned you about thinkin.”",
   inkwell: true,
   color: "emerald",
@@ -4243,7 +4461,7 @@ export const jasperCommonCrook: LorcanitoCharacterCard = {
 export const jumbaJokibaaRenegadeScientist: LorcanitoCharacterCard = {
   implemented: true,
   id: "003b88c512a9e6c22fe350cc7ee7e78578471005",
-  url: "https://static.lorcanito.com/images/cards/TFC/83.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/83.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/83_en_jumba_jookiba-716.webp",
   name: "Jumba Jookiba",
@@ -4267,7 +4485,7 @@ export const jumbaJokibaaRenegadeScientist: LorcanitoCharacterCard = {
 export const mickeyMouseSteamBoatPilot: LorcanitoCharacterCard = {
   implemented: true,
   id: "83bc405d0a554beff5679f6420689e6fe1043b98",
-  url: "https://static.lorcanito.com/images/cards/TFC/89.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/89.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/89_en_mickey_mouse_steamboat_pilot-716.webp",
   name: "Mickey Mouse",
@@ -4289,9 +4507,9 @@ export const mickeyMouseSteamBoatPilot: LorcanitoCharacterCard = {
   rarity: "common",
 };
 export const motherGoethelSelfishManipulator: LorcanitoCharacterCard = {
-  implemented: undefined,
+  implemented: true,
   id: "f19ebd8afadcbfbbaed05d48b029d69f3784f272",
-  url: "https://static.lorcanito.com/images/cards/TFC/90.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/90.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/90_en_mother_gothel-716.webp",
   name: "Mother Gothel",
@@ -4299,11 +4517,33 @@ export const motherGoethelSelfishManipulator: LorcanitoCharacterCard = {
   characteristics: ["storyborn", "villain"],
   text: "**SKIP THE DRAMA, STAY WITH MAMA** While this character is exerted, opposing character can't quest.",
   type: "character",
+  illustrator: "Javier Salas",
   abilities: [
     {
-      ability: "SKIP THE DRAMA, STAY WITH MAMA",
+      type: "while-static",
+      name: "Skip the Drama, Stay with Mama",
       text: "While this character is exerted, opposing character can't quest.",
-    },
+      whileCondition: [{ type: "exerted" }],
+      ability: {
+        type: "static",
+        ability: "restriction",
+        effect: {
+          type: "restriction",
+          restriction: "quest",
+          // TODO: Static should not have duration, they're valid as long as the source is in play
+          duration: "turn",
+        },
+        target: {
+          type: "card",
+          value: "all",
+          filters: [
+            { filter: "owner", value: "opponent" },
+            { filter: "zone", value: "play" },
+            { filter: "type", value: "character" },
+          ],
+        } as CardEffectTarget,
+      } as RestrictionStaticAbility,
+    } as WhileStaticAbility,
   ],
   flavour: "“Great. Now I'm the bad guy.”",
   inkwell: true,
@@ -4318,9 +4558,9 @@ export const motherGoethelSelfishManipulator: LorcanitoCharacterCard = {
   rarity: "super_rare",
 };
 export const tinkerBellMostHelpful: LorcanitoCharacterCard = {
-  implemented: false,
+  implemented: true,
   id: "10a2017e76c3bfd0ae9e09a110b33ae22e73fd1b",
-  url: "https://static.lorcanito.com/images/cards/TFC/93.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/93.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/93_en_tinker_bell-716.webp",
   name: "Tinker Bell",
@@ -4329,11 +4569,28 @@ export const tinkerBellMostHelpful: LorcanitoCharacterCard = {
   text: "**Evasive** _(Only characters with Evasive can challenge this character.)_\n\n**PIXIE DUST** When you play this character, chosen character gains **Evasive** this turn.",
   type: "character",
   abilities: [
-    evasiveAbility,
     {
+      type: "resolution",
       name: "Pixie Dust",
       text: "When you play this character, chosen character gains **Evasive** this turn.",
+      effects: [
+        {
+          type: "ability",
+          ability: "evasive",
+          modifier: "add",
+          duration: "turn",
+          target: {
+            type: "card",
+            value: 1,
+            filters: [
+              { filter: "zone", value: "play" },
+              { filter: "type", value: "character" },
+            ],
+          },
+        } as AbilityEffect,
+      ],
     },
+    evasiveAbility,
   ],
   inkwell: true,
   color: "emerald",
@@ -4350,7 +4607,7 @@ export const tinkerBellMostHelpful: LorcanitoCharacterCard = {
 export const tamatoaDrabLittleCrab: LorcanitoCharacterCard = {
   implemented: true,
   id: "b2b3662b0a63cbe6a6906bfcdf40fcb58cd04f66",
-  url: "https://static.lorcanito.com/images/cards/TFC/92.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/92.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/92_en_tamatoa-716.webp",
   name: "Tamatoa",
@@ -4374,10 +4631,11 @@ export const tamatoaDrabLittleCrab: LorcanitoCharacterCard = {
 export const abuMischievenusMonkey: LorcanitoCharacterCard = {
   implemented: true,
   id: "15b2098df25111223eb562ab824b3a2f89a05107",
-  url: "https://static.lorcanito.com/images/cards/TFC/103.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/103.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/103_en_abu-716.webp",
   name: "Abu",
   title: "Mischievous Monkey",
+  illustrator: "Oleg Yurkov",
   characteristics: ["storyborn", "ally"],
   type: "character",
   flavour:
@@ -4394,9 +4652,9 @@ export const abuMischievenusMonkey: LorcanitoCharacterCard = {
   rarity: "common",
 };
 export const captainHookRecklessPirate: LorcanitoCharacterCard = {
-  implemented: false,
+  implemented: undefined,
   id: "017e2174128da5aab842d6ca8d509d1753902b3b",
-  url: "https://static.lorcanito.com/images/cards/TFC/107.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/107.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/107_en_captain_hook-716.webp",
   name: "Captain Hook",
@@ -4405,11 +4663,11 @@ export const captainHookRecklessPirate: LorcanitoCharacterCard = {
   text: "**Rush** _(This character can challenge the turn they're played.)_\n\n**YOU COWARD!** While this character is exerted, opposing characters with **Evasive** gain **Reckless**. _(They can't quest and must challenge if able.)_",
   type: "character",
   abilities: [
+    // {
+    //   name: "You Coward!",
+    //   text: "While this character is exerted, opposing characters with **Evasive** gain **Reckless**. _(They can't quest and must challenge if able.)_",
+    // },
     rushAbility,
-    {
-      ability: "",
-      text: "While this character is exerted, opposing characters with **Evasive** gain **Reckless**. _(They can't quest and must challenge if able.)_",
-    },
   ],
   flavour: "“You wouldn't dare fight old Hook man-to-man!”",
   color: "ruby",
@@ -4426,7 +4684,7 @@ export const captainHookRecklessPirate: LorcanitoCharacterCard = {
 export const donaldDuck: LorcanitoCharacterCard = {
   implemented: true,
   id: "c9c6e903edf437213f7234baf4cd4f965b0d3af3",
-  url: "https://static.lorcanito.com/images/cards/TFC/108.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/108.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/108_en_donald_duck-716.webp",
   name: "Donald Duck",
@@ -4449,30 +4707,31 @@ export const donaldDuck: LorcanitoCharacterCard = {
 export const goodyDaredevil: LorcanitoCharacterCard = {
   implemented: true,
   id: "4f339b02757c77cffad8506ed93a8839d0684ede",
-  url: "https://static.lorcanito.com/images/cards/TFC/111.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/111.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/111_en_goofy-716.webp",
   name: "Goofy",
   title: "Daredevil",
   characteristics: ["hero", "dreamborn"],
+  illustrator: "Kenneth Anderson",
   text: "**Evasive** (_Only characters with Evasive can challenge this character._)",
   type: "character",
   abilities: [evasiveAbility],
   flavour: "Sometimes you gotta give it the ol’ jump and hyuck.",
   inkwell: true,
+  rarity: "common",
   color: "ruby",
   cost: 5,
   strength: 3,
   willpower: 4,
   lore: 2,
   language: "EN",
-  illustrator: "Kenneth Anderson",
   number: 111,
   set: "TFC",
 };
 export const minniMouseAlwaysClassy: LorcanitoCharacterCard = {
   implemented: true,
   id: "24e5861a9a8a32841117253d221395d4baa19215",
-  url: "https://static.lorcanito.com/images/cards/TFC/116.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/116.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/116_en_minnie_mouse-716.webp",
   name: "Minnie Mouse",
@@ -4495,11 +4754,12 @@ export const minniMouseAlwaysClassy: LorcanitoCharacterCard = {
 export const peterPanFearless: LorcanitoCharacterCard = {
   implemented: true,
   id: "1b5f517a6f85a5a9c1d96c7ae88ce16ecdceee02",
-  url: "https://static.lorcanito.com/images/cards/TFC/119.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/119.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/119_en_peter_pan-716.webp",
   name: "Peter Pan",
   title: "Fearless Fighter",
+  illustrator: "Anh Dang",
   characteristics: ["hero", "storyborn"],
   text: "**Rush** _(This character can challenge the turn they're played.)_",
   type: "character",
@@ -4517,9 +4777,9 @@ export const peterPanFearless: LorcanitoCharacterCard = {
   rarity: "common",
 };
 export const rapunzelLettingHerHairDown: LorcanitoCharacterCard = {
-  implemented: false,
+  implemented: true,
   id: "89ab5bda31e3c02840ff8e60b7fb9b4a269506dc",
-  url: "https://static.lorcanito.com/images/cards/TFC/121.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/121.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/121_en_rapunzel-716.webp",
   name: "Rapunzel",
@@ -4529,8 +4789,20 @@ export const rapunzelLettingHerHairDown: LorcanitoCharacterCard = {
   type: "character",
   abilities: [
     {
-      ability: "TANGLE",
+      type: "resolution",
+      name: "Tangle",
       text: "When you play this character, each opponent loses 1 lore.",
+      effects: [
+        {
+          type: "lore",
+          modifier: "subtract",
+          amount: 1,
+          target: {
+            type: "player",
+            value: "opponent",
+          },
+        } as LoreEffect,
+      ],
     },
   ],
   flavour: "“Who are you? And how did you find me?”",
@@ -4548,7 +4820,7 @@ export const rapunzelLettingHerHairDown: LorcanitoCharacterCard = {
 export const scarFieryUsurper: LorcanitoCharacterCard = {
   implemented: true,
   id: "84a90dcb7f0362c8f46b2ff0373a9ca7f683323c",
-  url: "https://static.lorcanito.com/images/cards/TFC/122.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/122.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/122_en_scar-716.webp",
   name: "Scar",
   title: "Fiery Usurper",
@@ -4570,7 +4842,7 @@ export const scarFieryUsurper: LorcanitoCharacterCard = {
 export const seargentTibbies: LorcanitoCharacterCard = {
   implemented: true,
   id: "5a949c4ca95c8112a21204cf7ec472933d7ba8cb",
-  url: "https://static.lorcanito.com/images/cards/TFC/124.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/124.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/124_en_sergeant_tibbs-716.webp",
   name: "Sergeant Tibbs",
@@ -4593,7 +4865,7 @@ export const seargentTibbies: LorcanitoCharacterCard = {
 export const stitchAbomination: LorcanitoCharacterCard = {
   implemented: true,
   id: "1ce7e1998020c86b68e014fdb75dd28cf094af15",
-  url: "https://static.lorcanito.com/images/cards/TFC/125.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/125.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/125_en_stitch-716.webp",
   name: "Stitch",
@@ -4617,7 +4889,7 @@ export const stitchAbomination: LorcanitoCharacterCard = {
 export const tiggerWonderfulThing: LorcanitoCharacterCard = {
   implemented: true,
   id: "a9de7d95c269aab60d601dcc6d71967d357bfd79",
-  url: "https://static.lorcanito.com/images/cards/TFC/127.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/127.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards%2Ftfc%2Fen_tigger-716.webp",
   name: "Tigger",
@@ -4625,6 +4897,7 @@ export const tiggerWonderfulThing: LorcanitoCharacterCard = {
   characteristics: ["storyborn", "tigger"],
   text: "**Evasive** (_Only characters with Evasive can challenge this character._)",
   type: "character",
+  rarity: "uncommon",
   abilities: [evasiveAbility],
   flavour: '"I\'m the bounciest bouncer that ever bounced!"',
   inkwell: true,
@@ -4639,22 +4912,37 @@ export const tiggerWonderfulThing: LorcanitoCharacterCard = {
   set: "TFC",
 };
 export const arielWhoseitCollector: LorcanitoCharacterCard = {
-  implemented: false,
+  implemented: true,
   id: "74e5038478511db0b1e56f75efbfb926f225137f",
-  url: "https://static.lorcanito.com/images/cards/TFC/137.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/137.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/137_en_ariel-716.webp",
   name: "Ariel",
   title: "Whoseit Collector",
   characteristics: ["hero", "storyborn", "princess"],
   text: "**LOOK AT THIS STUFF** Whenever you play an item, you may ready this character.",
   type: "character",
-  abilities: [
-    {
-      ability: "LOOK AT THIS STUFF",
-      text: "Whenever you play an item, you may ready this character.",
-      // We can use TriggerTarget effect, but the target replacement is not implemented for the on play trigger (look at on banish)
+  abilities: wheneverPlays({
+    name: "Look at This Stuff",
+    text: "Whenever you play an item, you may ready this character.",
+    optional: true,
+    triggerTarget: {
+      type: "card",
+      value: 1,
+      filters: [
+        { filter: "type", value: "item" },
+        { filter: "owner", value: "self" },
+      ],
     },
-  ],
+    effects: [
+      {
+        type: "exert",
+        exert: false,
+        target: {
+          type: "this-character",
+        },
+      } as ExertEffect,
+    ],
+  }),
   flavour: "“You want thingamabobs? I got twenty.”",
   color: "sapphire",
   cost: 4,
@@ -4668,28 +4956,35 @@ export const arielWhoseitCollector: LorcanitoCharacterCard = {
   rarity: "rare",
 };
 export const auroraDreamingGuardian: LorcanitoCharacterCard = {
-  implemented: false,
+  implemented: true,
   id: "2d908299d413f916ccc9d11191e5426c7d529997",
-  url: "https://static.lorcanito.com/images/cards/TFC/139.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/139.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/139_en_aurora-716.webp",
   name: "Aurora",
   title: "Dreaming Guardian",
   characteristics: ["hero", "floodborn", "princess"],
-  text: "**Shift** 3 (_You may pay 3 ⬡ to play this on top of one of your characters named Aurora._)<br>**Protective Embrace** Your other characters gain **Ward**. _(Opponents can't choose them except to challenge.)_",
+  text: "**Shift** 3 (_You may pay 3 ⬡ to play this on top of one of your characters named Aurora._)\n**Protective Embrace** Your other characters gain **Ward**. _(Opponents can't choose them except to challenge.)_",
   type: "character",
   abilities: [
     {
       type: "static",
-      ability: "shift",
-      shift: 3,
-      text: "**Shift** 3 (_You may pay 3 ⬡ to play this on top of one of your characters named Aurora._)",
-    } as ShiftAbility,
-    {
+      ability: "gain-ability",
       name: "Protective Embrace",
-      // CardEffectTarget has a flag called `excludeSelf` to cover this case
       text: "Your other characters gain **Ward**. _(Opponents can't choose them except to challenge.)_",
-    },
+      gainedAbility: wardAbility,
+      target: {
+        type: "card",
+        value: "all",
+        excludeSelf: true,
+        filters: [
+          { filter: "zone", value: "play" },
+          { filter: "type", value: "character" },
+          { filter: "owner", value: "self" },
+        ],
+      } as CardEffectTarget,
+    } as GainAbilityStaticAbility,
+    shiftAbility(3, "Aurora"),
   ],
   flavour: "As the princess slumbered, her power awoke.",
   inkwell: true,
@@ -4707,7 +5002,7 @@ export const auroraDreamingGuardian: LorcanitoCharacterCard = {
 export const auroraRegalPrincess: LorcanitoCharacterCard = {
   implemented: true,
   id: "32ea9e97941bc292ced8db9d961b254f7fbf519c",
-  url: "https://static.lorcanito.com/images/cards/TFC/140.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/140.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/140_en_aurora_regal_princess-716.webp",
   name: "Aurora",
@@ -4729,23 +5024,30 @@ export const auroraRegalPrincess: LorcanitoCharacterCard = {
   rarity: "uncommon",
 };
 export const belleInventive: LorcanitoCharacterCard = {
-  implemented: false,
+  implemented: true,
   id: "c60bd56829cade8c2b4d24a07fb25d0fcb48fb1b",
-  url: "https://static.lorcanito.com/images/cards/TFC/141.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/141.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/141_en_belle-716.webp",
   name: "Belle",
   title: "Inventive Engineer",
   characteristics: ["hero", "dreamborn", "inventor", "princess"],
   text: "**TINKER** Whenever this character quests, you pay 1 ⬡ less for the next item you play this turn.",
   type: "character",
-  abilities: [
-    {
-      ability: "TINKER",
-      text: "Whenever this character quests, you pay 1 ⬡ less for the next item you play this turn.",
-    },
-  ],
+  abilities: wheneverQuests({
+    name: "Tinker",
+    text: "Whenever this character quests, you pay 1 ⬡ less for the next item you play this turn.",
+    effects: [
+      {
+        type: "replacement",
+        replacement: "cost",
+        duration: "next",
+        amount: 1,
+        filters: [{ filter: "type", value: "item" }],
+      } as ReplacementEffect,
+    ],
+  }),
   flavour:
-    "A little ingenuity and a lot of heart will take you far \rin this world.",
+    "A little ingenuity and a lot of heart will take you far in this world.",
   inkwell: true,
   color: "sapphire",
   cost: 3,
@@ -4759,9 +5061,9 @@ export const belleInventive: LorcanitoCharacterCard = {
   rarity: "uncommon",
 };
 export const belleStrangeButBeautiful: LorcanitoCharacterCard = {
-  implemented: false,
+  implemented: true,
   id: "85f4cdadeca495cad78e309d1a4661c9d57a7c67",
-  url: "https://static.lorcanito.com/images/cards/TFC/142.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/142.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/142_en_belle-716.webp",
   name: "Belle",
   title: "Strange but Special",
@@ -4769,10 +5071,39 @@ export const belleStrangeButBeautiful: LorcanitoCharacterCard = {
   text: "**READ A BOOK** During your turn, you may put an additional card from your hand into your inkwell facedown.\n\n**MY FAVOURITE PART!** While you have 10 or more cards in your inkwell, this character gets +4 ◆.",
   type: "character",
   abilities: [
+    // {
+    //   type: "static",
+    //   name: "Read a Book",
+    //   text: "During your turn, you may put an additional card from your hand into your inkwell facedown.",
+    //   // TODO: Sorry but I was too lazy to properly implement this
+    //   // TableModel is querying how many Belles we have in place
+    // },
     {
-      ability: "READ A BOOK",
-      text: "During your turn, you may put an additional card from your hand into your inkwell facedown.\n\n**MY FAVOURITE PART!",
-    },
+      type: "while-static",
+      name: "My Favourite Part!",
+      text: "While you have 10 or more cards in your inkwell, this character gets +4 ◆.",
+      whileCondition: [
+        {
+          type: "inkwell",
+          amount: 10,
+        },
+      ],
+      ability: {
+        type: "static",
+        // TODO: this is kind of breaking the rules, double check whether this is a static ability or not
+        ability: "attribute",
+        effect: {
+          type: "attribute",
+          attribute: "lore",
+          amount: 4,
+          modifier: "add",
+          duration: "static",
+          target: {
+            type: "this-character",
+          },
+        } as AttributeEffect,
+      } as AttributeStaticAbility,
+    } as WhileStaticAbility,
   ],
   flavour:
     "“Far-off places, daring sword fights, magic spells, a prince in disguise . . .”",
@@ -4791,7 +5122,7 @@ export const belleStrangeButBeautiful: LorcanitoCharacterCard = {
 export const flounderVoiceOfReason: LorcanitoCharacterCard = {
   implemented: true,
   id: "16ae262ecf7a83eed4b588d3f0e55e50947895a4",
-  url: "https://static.lorcanito.com/images/cards/TFC/145.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/145.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/145_en_flounder-716.webp",
   name: "Flounder",
@@ -4812,10 +5143,10 @@ export const flounderVoiceOfReason: LorcanitoCharacterCard = {
   set: "TFC",
   rarity: "common",
 };
-export const grammaTallaStoryteller: LorcanitoCharacterCard = {
-  implemented: false,
+export const grammaTalaStoryteller: LorcanitoCharacterCard = {
+  implemented: true,
   id: "1bc8644a4af0e748bce710d6e188658af5fb51ba",
-  url: "https://static.lorcanito.com/images/cards/TFC/146.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/146.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/146_en_gramma_tala-716.webp",
   name: "Gramma Tala",
@@ -4824,11 +5155,20 @@ export const grammaTallaStoryteller: LorcanitoCharacterCard = {
   text: "**I WILL BE WITH YOU** When this character is banished, you may put this card into your inkwell facedown and exerted.",
   type: "character",
   abilities: [
-    {
-      name: "I WILL BE WITH YOU",
-      // we can check musketeer tabard and the TriggerTarget
+    whenBanished({
+      name: "I Will Be With You",
       text: "When this character is banished, you may put this card into your inkwell facedown and exerted.",
-    },
+      effects: [
+        {
+          type: "move",
+          to: "inkwell",
+          exerted: true,
+          target: {
+            type: "this-character",
+          },
+        },
+      ],
+    }),
   ],
   flavour:
     "Moana: “Is there something you want to tell me?”\nGramma Tala: “Is there something you want to hear?”",
@@ -4845,9 +5185,9 @@ export const grammaTallaStoryteller: LorcanitoCharacterCard = {
   rarity: "uncommon",
 };
 export const hadesInfernalSchemer: LorcanitoCharacterCard = {
-  implemented: false,
+  implemented: true,
   id: "6c579ecac046e09a7f0da178e1ea7000bbe5ffea",
-  url: "https://static.lorcanito.com/images/cards/TFC/147.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/147.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/147_en_hades-716.webp",
   name: "Hades",
   title: "Infernal Schemer",
@@ -4856,9 +5196,25 @@ export const hadesInfernalSchemer: LorcanitoCharacterCard = {
   type: "character",
   abilities: [
     {
-      ability: "IS THERE A DOWNSIDE TO THIS?",
+      type: "resolution",
+      name: "Is There a Downside to This?",
       text: "When you play this character, you may put chosen opposing character into their player's inkwell facedown.",
-    },
+      effects: [
+        {
+          type: "move",
+          to: "inkwell",
+          exerted: true,
+          target: {
+            type: "card",
+            value: 1,
+            filters: [
+              { filter: "zone", value: "play" },
+              { filter: "owner", value: "opponent" },
+            ],
+          },
+        },
+      ],
+    } as ResolutionAbility,
   ],
   flavour: "“He's gotta have a weakness, because everybody's got a weakness.”",
   color: "sapphire",
@@ -4875,7 +5231,7 @@ export const hadesInfernalSchemer: LorcanitoCharacterCard = {
 export const jasmineDisguised: LorcanitoCharacterCard = {
   implemented: true,
   id: "7be1a09f39a9a14afa52274a1714f813a3bd0ad2",
-  url: "https://static.lorcanito.com/images/cards/TFC/148.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/148.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/148_en_jasmine-716.webp",
   name: "Jasmine",
@@ -4899,7 +5255,7 @@ export const jasmineDisguised: LorcanitoCharacterCard = {
 export const maleficentSinisterVisitor: LorcanitoCharacterCard = {
   implemented: true,
   id: "18bf70682c04ecc77f5fad0d839dfefa4be15ee7",
-  url: "https://static.lorcanito.com/images/cards/TFC/150.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/150.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/150_en_maleficent-716.webp",
   name: "Maleficent",
@@ -4923,7 +5279,7 @@ export const maleficentSinisterVisitor: LorcanitoCharacterCard = {
 export const maleficentUninvited: LorcanitoCharacterCard = {
   implemented: true,
   id: "71774cecc22b2de91b82045a1d45187957783f1e",
-  url: "https://static.lorcanito.com/images/cards/TFC/151.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/151.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/151_en_maleficent-716.webp",
   name: "Maleficent",
@@ -4946,7 +5302,7 @@ export const maleficentUninvited: LorcanitoCharacterCard = {
 export const merlinSelfAppointmentMentor: LorcanitoCharacterCard = {
   implemented: true,
   id: "a25beb6a8d23469c74b2a0bc2b95c83aa02f8861",
-  url: "https://static.lorcanito.com/images/cards/TFC/153.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/153.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/153_en_merlin-716.webp",
   name: "Merlin",
@@ -4969,9 +5325,9 @@ export const merlinSelfAppointmentMentor: LorcanitoCharacterCard = {
   rarity: "common",
 };
 export const mickeyMouseDetective: LorcanitoCharacterCard = {
-  implemented: false,
+  implemented: true,
   id: "0e96f23cc392d8f62f8ec19a8599b95faea4f0e9",
-  url: "https://static.lorcanito.com/images/cards/TFC/154.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/154.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/en_mickey_mouse_detective-716.webp",
   name: "Mickey Mouse",
@@ -4981,9 +5337,20 @@ export const mickeyMouseDetective: LorcanitoCharacterCard = {
   type: "character",
   abilities: [
     {
-      ability: "GET A CLUE",
-      // there's TopDeckEffectTarget
+      type: "resolution",
+      name: "Get a Clue",
       text: "When you play this character, you may put the top card of your deck into your inkwell facedown and exerted.",
+      effects: [
+        {
+          type: "move",
+          to: "inkwell",
+          exerted: true,
+          target: {
+            type: "top-deck",
+            amount: 1,
+          },
+        },
+      ],
     },
   ],
   flavour:
@@ -5002,7 +5369,7 @@ export const mickeyMouseDetective: LorcanitoCharacterCard = {
 export const mufasaKingOfProudLands: LorcanitoCharacterCard = {
   implemented: true,
   id: "bd44fca3cf91ce6da2f9e4b45eb389bca09ed3b5",
-  url: "https://static.lorcanito.com/images/cards/TFC/155.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/155.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/155_en_mufasa-716.webp",
   name: "Mufasa",
@@ -5026,7 +5393,7 @@ export const mufasaKingOfProudLands: LorcanitoCharacterCard = {
 export const philoctetes: LorcanitoCharacterCard = {
   implemented: true,
   id: "2f2648d92a18618237c950882e5e5ae6cddf81f3",
-  url: "https://static.lorcanito.com/images/cards/TFC/156.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/156.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/156_en_philoctetes-716.webp",
   name: "Philoctetes",

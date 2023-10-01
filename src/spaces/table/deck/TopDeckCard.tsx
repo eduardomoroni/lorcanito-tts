@@ -1,14 +1,14 @@
-import { CardModel } from "~/store/models/CardModel";
+import { CardModel } from "~/engine/store/models/CardModel";
 import { useGameStore } from "~/engine/lib/GameStoreProvider";
 import { useHotkeysContext } from "react-hotkeys-hook";
 import React, { MouseEvent, useEffect, useRef } from "react";
 import { useUser } from "reactfire";
-import { useDragCard, useDropCardInZone } from "~/hooks/dndCard";
-import { useDeckZoneContextMenu } from "~/providers/card-context-menu/useCardContextMenu";
-import { LorcanaCardImage } from "~/components/card/LorcanaCardImage";
-import { FaceDownCard } from "~/components/card/FaceDownCard";
-import { logAnalyticsEvent } from "~/3rd-party/firebase/FirebaseAnalyticsProvider";
-import { CardHotKeyOverlay } from "~/components/card/CardHotKeyOverlay";
+import { useDragCard, useDropCardInZone } from "~/spaces/hooks/dndCard";
+import { useDeckZoneContextMenu } from "~/spaces/providers/card-context-menu/useCardContextMenu";
+import { LorcanaCardImage } from "~/spaces/components/card/LorcanaCardImage";
+import { FaceDownCard } from "~/spaces/components/card/FaceDownCard";
+import { logAnalyticsEvent } from "~/libs/3rd-party/firebase/FirebaseAnalyticsProvider";
+import { CardHotKeyOverlay } from "~/spaces/components/card/CardHotKeyOverlay";
 import { observer } from "mobx-react-lite";
 
 function TopDeckCardComponent({
@@ -36,8 +36,8 @@ function TopDeckCardComponent({
   }, [showHotKey]);
   const { data: user } = useUser();
 
-  const topDropZone = useDropCardInZone(playerId, "deck", "first");
-  const bottomDropZone = useDropCardInZone(playerId, "deck", "last");
+  const topDropZone = useDropCardInZone(playerId, "deck", "last");
+  const bottomDropZone = useDropCardInZone(playerId, "deck", "first");
   const isActive = topDropZone.isActive || bottomDropZone.isActive;
   const isOpponentsCard = playerId !== user?.uid;
 

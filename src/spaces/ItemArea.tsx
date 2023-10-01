@@ -1,11 +1,11 @@
-import { useDropCardInZone } from "~/hooks/dndCard";
-import { ZoneOverlay } from "~/components/ZoneOverlay";
-import { DragNDropOverlay } from "~/components/DragNDropOverlay";
-import { CardImage } from "~/components/card/CardImage";
+import { useDropCardInZone } from "~/spaces/hooks/dndCard";
+import { ZoneOverlay } from "~/spaces/components/ZoneOverlay";
+import { DragNDropOverlay } from "~/spaces/components/DragNDropOverlay";
+import { CardImage } from "~/spaces/components/card/CardImage";
 import React, { FC } from "react";
 import { useUser } from "reactfire";
 import { observer } from "mobx-react-lite";
-import type { CardModel } from "~/store/models/CardModel";
+import type { CardModel } from "~/engine/store/models/CardModel";
 
 const PlayAreaItemComponent: FC<{
   cards: CardModel[];

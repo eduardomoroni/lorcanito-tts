@@ -1,12 +1,12 @@
-import { ZoneOverlay } from "~/components/ZoneOverlay";
+import { ZoneOverlay } from "~/spaces/components/ZoneOverlay";
 import React, { FC, useEffect } from "react";
 import { useTurn } from "~/engine/GameProvider";
-import { LorcanaCardImage } from "~/components/card/LorcanaCardImage";
-import { useCardPreview } from "~/providers/CardPreviewProvider";
+import { LorcanaCardImage } from "~/spaces/components/card/LorcanaCardImage";
+import { useCardPreview } from "~/spaces/providers/CardPreviewProvider";
 import { useHotkeys, useHotkeysContext } from "react-hotkeys-hook";
-import { logAnalyticsEvent } from "~/3rd-party/firebase/FirebaseAnalyticsProvider";
+import { logAnalyticsEvent } from "~/libs/3rd-party/firebase/FirebaseAnalyticsProvider";
 import { useGameStore } from "~/engine/lib/GameStoreProvider";
-import { CardModel } from "~/store/models/CardModel";
+import { CardModel } from "~/engine/store/models/CardModel";
 
 // The game does not have a stack, but I want to add one.
 export const StackZoneArena: FC = () => {
@@ -18,7 +18,7 @@ export const StackZoneArena: FC = () => {
     store.tableStore
       .getPlayerZone(turnPlayer, "play")
       ?.cards.filter(
-        (card: CardModel) => card.lorcanitoCard?.type === "action"
+        (card: CardModel) => card.lorcanitoCard?.type === "action",
       ) ?? [];
   const setCardPreview = useCardPreview();
   const ref = React.useRef<HTMLDivElement>(null);
@@ -101,7 +101,7 @@ export function Hotkey(props: {
       // enableOnFormTags: true,
       description: "Close Stack Zone",
       enabled: true,
-    }
+    },
   );
 
   return (

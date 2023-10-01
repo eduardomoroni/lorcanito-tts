@@ -32,6 +32,7 @@ describe("Marshmallow - Persistent Guardian", () => {
         "player_two",
       );
 
+      defender.updateCardMeta({ exerted: true });
       cardUnderTest.challenge(defender);
       testStore.resolveTopOfStack();
 
@@ -57,6 +58,8 @@ describe("Marshmallow - Persistent Guardian", () => {
         "player_two",
       );
       const attacker = testStore.getByZoneAndId("play", mauiDemiGod.id);
+
+      cardUnderTest.updateCardMeta({ exerted: true });
 
       attacker.challenge(cardUnderTest);
       testStore.resolveTopOfStack();

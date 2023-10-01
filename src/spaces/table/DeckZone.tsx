@@ -1,7 +1,7 @@
 import React, { type FC } from "react";
 import { useGameStore } from "~/engine/lib/GameStoreProvider";
 import { observer } from "mobx-react-lite";
-import type { CardModel } from "~/store/models/CardModel";
+import type { CardModel } from "~/engine/store/models/CardModel";
 import { DeckCard } from "~/spaces/table/deck/DeckCard";
 
 export const DeckZoneComponent: FC<{ cards: CardModel[]; ownerId: string }> = ({

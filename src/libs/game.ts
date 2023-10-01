@@ -1,11 +1,14 @@
-import type { Deck, Table, TableCard } from "~/providers/TabletopProvider";
+import type {
+  Deck,
+  Table,
+  TableCard,
+} from "~/spaces/providers/TabletopProvider";
 import { createId } from "@paralleldrive/cuid2";
 import { shuffleDeck } from "~/libs/shuffle";
 
-import {
+import type {
   Ability,
   DelayedTriggeredAbility,
-  StaticTriggeredAbility,
 } from "~/engine/rules/abilities/abilities";
 import { ContinuousEffect } from "~/engine/rules/effects/effectTypes";
 
@@ -24,6 +27,7 @@ export type Game = {
   turnPlayer: string;
   turnCount: number;
   mode: "solo" | "multiplayer";
+  wonDieRoll?: string | null;
   tables: Record<string, Table>;
   players: Record<string, boolean>;
   cards: Record<string, TableCard>;
@@ -94,6 +98,7 @@ export function recreateTable(sourceTable?: Table): Table {
 
   newTable.lore = 0;
   newTable.readyToStart = false;
+  newTable.cardsAddedToInkWellThisTurn = 0;
 
   if (!newTable.zones) {
     newTable.zones = {
@@ -132,6 +137,7 @@ export function createTable(): Table {
   return {
     readyToStart: false,
     lore: 0,
+    cardsAddedToInkWellThisTurn: 0,
     zones: {
       inkwell: [],
       hand: [],

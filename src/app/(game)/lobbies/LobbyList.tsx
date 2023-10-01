@@ -1,7 +1,7 @@
 import { ChevronRightIcon } from "@heroicons/react/20/solid";
 import { query, ref } from "firebase/database";
 import { useDatabase, useDatabaseListData } from "reactfire";
-import { LobbyPresence } from "~/3rd-party/firebase/database/presence";
+import { LobbyPresence } from "~/libs/3rd-party/firebase/database/presence";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 

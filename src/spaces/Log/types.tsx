@@ -1,4 +1,4 @@
-import type { Zones } from "~/providers/TabletopProvider";
+import type { Zones } from "~/spaces/providers/TabletopProvider";
 import { GameEffect } from "~/libs/game";
 
 import { ResolutionAbility } from "~/engine/rules/abilities/abilities";

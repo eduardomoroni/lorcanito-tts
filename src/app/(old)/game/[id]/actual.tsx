@@ -1,19 +1,19 @@
 "use client";
 
 import React, { type FC, useEffect, useState } from "react";
-import { useFirebaseUserId } from "~/3rd-party/firebase/FirebaseSessionProvider";
+import { useFirebaseUserId } from "~/libs/3rd-party/firebase/FirebaseSessionProvider";
 import { useSigninCheck } from "reactfire";
 import type { Game } from "~/libs/game";
 import { Lorcanito } from "./Lorcanito";
 import { GameStoreProvider } from "~/engine/lib/GameStoreProvider";
 import { GameProvider } from "~/engine/GameProvider";
-import { StreamChatProvider } from "~/providers/stream-chat-provider/StreamChatProvider";
+import { StreamChatProvider } from "~/spaces/providers/stream-chat-provider/StreamChatProvider";
 import { GameLogProvider } from "~/spaces/Log/game-log/GameLogProvider";
-import { NotificationProvider } from "~/providers/NotificationProvider";
-import { YesOrNoModalProvider } from "~/providers/YesOrNoModalProvider";
-import { ConfirmationModalProvider } from "~/providers/ConfirmationModalProvider";
-import { TargetModalProvider } from "~/providers/TargetModalProvider";
-import { ScryModalProvider } from "~/providers/ScryModalProvider";
+import { NotificationProvider } from "~/spaces/providers/NotificationProvider";
+import { YesOrNoModalProvider } from "~/spaces/providers/YesOrNoModalProvider";
+import { ConfirmationModalProvider } from "~/spaces/providers/ConfirmationModalProvider";
+import { TargetModalProvider } from "~/spaces/providers/TargetModalProvider";
+import { ScryModalProvider } from "~/spaces/providers/ScryModalProvider";
 
 // TODO: I created this file because firebase was initializing as null and it was breaking the app
 const GamePage: FC<{

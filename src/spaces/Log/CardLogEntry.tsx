@@ -1,9 +1,9 @@
 import React, { type FC } from "react";
-import { useCardPreview } from "~/providers/CardPreviewProvider";
+import { useCardPreview } from "~/spaces/providers/CardPreviewProvider";
 import { EyeSlashIcon } from "@heroicons/react/20/solid";
 import type { InternalLogEntry } from "~/spaces/Log/types";
 import { useGameStore } from "~/engine/lib/GameStoreProvider";
-import type { CardModel } from "~/store/models/CardModel";
+import type { CardModel } from "~/engine/store/models/CardModel";
 import { Tooltip } from "antd";
 
 const COLORS = {

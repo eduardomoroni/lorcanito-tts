@@ -1,15 +1,15 @@
-import { useDropCardInZone } from "~/hooks/dndCard";
-import { ZoneOverlay } from "~/components/ZoneOverlay";
-import { DragNDropOverlay } from "~/components/DragNDropOverlay";
-import { CardImage } from "~/components/card/CardImage";
+import { useDropCardInZone } from "~/spaces/hooks/dndCard";
+import { ZoneOverlay } from "~/spaces/components/ZoneOverlay";
+import { DragNDropOverlay } from "~/spaces/components/DragNDropOverlay";
+import { CardImage } from "~/spaces/components/card/CardImage";
 import React, { FC, useEffect } from "react";
 import { useUser } from "reactfire";
 import { useTurn } from "~/engine/GameProvider";
 import { useHotkeysContext } from "react-hotkeys-hook";
-import { LorcanaCardImage } from "~/components/card/LorcanaCardImage";
+import { LorcanaCardImage } from "~/spaces/components/card/LorcanaCardImage";
 import { useGameStore } from "~/engine/lib/GameStoreProvider";
 import { observer } from "mobx-react-lite";
-import type { CardModel } from "~/store/models/CardModel";
+import type { CardModel } from "~/engine/store/models/CardModel";
 
 const PlayAreaComponent: FC<{
   cards: CardModel[];
@@ -33,7 +33,8 @@ const PlayAreaComponent: FC<{
 
   const playAreaCards = cards
     .filter(
-      (card) => !cardsOnStack.map((c) => c.instanceId).includes(card.instanceId)
+      (card) =>
+        !cardsOnStack.map((c) => c.instanceId).includes(card.instanceId),
     )
     .filter((card) => !card.meta?.shifted);
 
@@ -41,7 +42,8 @@ const PlayAreaComponent: FC<{
   const dryInk = playAreaCards.filter((card) => !card.meta?.playedThisTurn);
   const shiftedCards = cards
     .filter(
-      (card) => !cardsOnStack.map((c) => c.instanceId).includes(card.instanceId)
+      (card) =>
+        !cardsOnStack.map((c) => c.instanceId).includes(card.instanceId),
     )
     .filter((card) => card.meta?.shifter)
     .filter((card, index, cards) => {

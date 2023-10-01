@@ -61,6 +61,8 @@ describe("Flynn Rider - Charming Rogue", () => {
         "player_one",
       );
 
+      cardUnderTest.updateCardMeta({ exerted: true });
+
       attacker.challenge(cardUnderTest);
       testStore.resolveTopOfStack({ targetId: cardToDiscard.instanceId });
 

@@ -4,11 +4,12 @@
 import { TestStore } from "~/engine/rules/testStore";
 
 import {
-    genieOnTheJob,
-    geniePowerUnleashed,
-    peterPanNeverLanding,
-    zeusGodOfLightning
+  genieOnTheJob,
+  geniePowerUnleashed,
+  peterPanNeverLanding,
+  zeusGodOfLightning,
 } from "~/engine/cards/TFC/characters/characters";
+import { expect } from "@jest/globals";
 
 describe("Evasive keyword", () => {
   it("Can challenge another evasive", () => {
@@ -18,14 +19,14 @@ describe("Evasive keyword", () => {
       },
       {
         play: [genieOnTheJob],
-      }
+      },
     );
 
     const attacker = testStore.getByZoneAndId("play", geniePowerUnleashed.id);
     const defender = testStore.getByZoneAndId(
       "play",
       genieOnTheJob.id,
-      "player_two"
+      "player_two",
     );
     defender.updateCardMeta({ exerted: true });
     expect(defender.ready).toBeFalsy();
@@ -33,10 +34,10 @@ describe("Evasive keyword", () => {
     attacker.challenge(defender);
 
     expect(attacker.meta).toEqual(
-      expect.objectContaining({ damage: 3, exerted: true })
+      expect.objectContaining({ damage: 3, exerted: true }),
     );
     expect(defender.meta).toEqual(
-      expect.objectContaining({ damage: 3, exerted: true })
+      expect.objectContaining({ damage: 3, exerted: true }),
     );
   });
 
@@ -47,27 +48,27 @@ describe("Evasive keyword", () => {
       },
       {
         play: [peterPanNeverLanding],
-      }
+      },
     );
 
     const attacker = testStore.getByZoneAndId("play", zeusGodOfLightning.id);
     const defender = testStore.getByZoneAndId(
       "play",
       peterPanNeverLanding.id,
-      "player_two"
+      "player_two",
     );
     defender.updateCardMeta({ exerted: true });
 
     testStore.store.cardStore.challenge(
       attacker.instanceId,
-      defender.instanceId
+      defender.instanceId,
     );
 
     expect(attacker.meta).toEqual(
-      expect.objectContaining({ damage: undefined, exerted: undefined })
+      expect.objectContaining({ damage: undefined, exerted: undefined }),
     );
     expect(defender.meta).toEqual(
-      expect.objectContaining({ damage: undefined, exerted: true })
+      expect.objectContaining({ damage: undefined, exerted: true }),
     );
   });
 });

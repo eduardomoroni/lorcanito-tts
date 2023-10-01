@@ -1,6 +1,6 @@
 import { PassTurnSection } from "~/spaces/table/PassTurnSection";
 import React from "react";
-import { usePreGame } from "~/providers/PreGameProvider";
+import { usePreGame } from "~/spaces/providers/PreGameProvider";
 import { useTurn } from "~/engine/GameProvider";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useGameStore } from "~/engine/lib/GameStoreProvider";
@@ -30,8 +30,8 @@ export const Button: React.FC<{
 export function RighHandSideButtons() {
   const {
     passTurn,
-    readyToStart,
-    isReadyToStartLoading,
+    // readyToStart,
+    // isReadyToStartLoading,
     isPassingTurn,
     isMyTurn,
   } = useTurn();
@@ -82,13 +82,13 @@ export function RighHandSideButtons() {
   } else if (!playerIsReadyToStart) {
     content = (
       <>
-        <Button
-          color="bg-green-600"
-          onClick={() => readyToStart(false)}
-          disabled={isReadyToStartLoading}
-        >
-          {isReadyToStartLoading ? "Loading" : "I'M READY"}
-        </Button>
+        {/*<Button*/}
+        {/*  color="bg-green-600"*/}
+        {/*  onClick={() => readyToStart(false)}*/}
+        {/*  disabled={isReadyToStartLoading}*/}
+        {/*>*/}
+        {/*  {isReadyToStartLoading ? "Loading" : "I'M READY"}*/}
+        {/*</Button>*/}
       </>
     );
   }

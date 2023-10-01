@@ -15,5 +15,5 @@ export async function GET(request: NextRequest) {
     redirect(`/auth/signin`);
   }
 
-  redirect(`/game/${userUid}?${request.nextUrl?.searchParams}`);
+  redirect(`/lobbies`);
 }

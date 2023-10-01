@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { logAnalyticsEvent } from "~/3rd-party/firebase/FirebaseAnalyticsProvider";
+import { logAnalyticsEvent } from "~/libs/3rd-party/firebase/FirebaseAnalyticsProvider";
 
 async function fetchDreambornDeck(deckCode: string): Promise<string[]> {
   const response = await fetch(`/api/dreambornink/deck/${deckCode}`);

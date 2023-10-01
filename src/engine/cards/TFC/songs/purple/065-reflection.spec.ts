@@ -5,7 +5,7 @@
 import { describe, expect, it } from "@jest/globals";
 import { TestStore } from "~/engine/rules/testStore";
 import { reflection } from "~/engine/cards/TFC/songs/songs";
-import type { CardModel } from "~/store/models/CardModel";
+import type { CardModel } from "~/engine/store/models/CardModel";
 import {chiefTui, heiheiBoatSnack, liloMakingAWish, moanaOfMotunui} from "~/engine/cards/TFC/characters/characters";
 
 describe("Reflection", () => {

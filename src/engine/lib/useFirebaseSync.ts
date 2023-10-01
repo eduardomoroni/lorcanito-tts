@@ -1,28 +1,22 @@
-import { usePrevious } from "~/hooks/usePrevious";
 import { Game } from "~/libs/game";
 import { useEffect } from "react";
 import { autorun } from "mobx";
-import {
-  convertDiffToRealTimeUpdates,
-  getDiff,
-} from "~/engine/lib/stateDiff";
-import { Database, ref, update } from "firebase/database";
+import { convertDiffToRealTimeUpdates, getDiff } from "~/engine/lib/stateDiff";
 import { Firestore, updateDoc, doc, getDoc, setDoc } from "firebase/firestore";
-import { MobXRootStore } from "~/store/RootStore";
-import { Dependencies } from "~/store/types";
+import { MobXRootStore } from "~/engine/store/RootStore";
+import { Dependencies } from "~/engine/store/types";
 
 export const useFirebaseSync = (
   rootStore: MobXRootStore,
-  database: Database,
   firestore: Firestore,
-  data: Game
+  data: Game,
 ) => {
   useEffect(() => {
     const storeState = rootStore.toJSON();
     const firebaseState = new MobXRootStore(
       data,
       {} as Dependencies,
-      false
+      false,
     ).toJSON();
 
     const diff = getDiff(storeState, firebaseState);
@@ -66,12 +60,12 @@ export const useFirebaseSync = (
             console.groupCollapsed(`[SYNC] Firebase: ${prevState.id}`);
             console.log({ prevState, nextState, diff: difference });
 
-            if (database) {
-              update(ref(database, `games/${prevState.id}`), updates).catch(
-                console.error
-              );
-              console.log("Realtime DB", updates);
-            }
+            // if (database) {
+            //   update(ref(database, `games/${prevState.id}`), updates).catch(
+            //     console.error,
+            //   );
+            //   console.log("Realtime DB", updates);
+            // }
 
             if (firestore) {
               const gameReference = doc(firestore, "games", prevState.id);

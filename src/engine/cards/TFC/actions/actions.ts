@@ -16,13 +16,13 @@ import type {
   HealEffect,
   LoreEffect,
 } from "~/engine/rules/effects/effectTypes";
-import { TargetFilter } from "~/components/modals/target/filters";
+import { TargetFilter } from "~/spaces/components/modals/target/filters";
 import { CardEffectTarget } from "~/engine/rules/effects/effectTypes";
 
 export const controlYourTemper: LorcanitoActionCard = {
   implemented: true,
   id: "65699c6262dea5080cd00636733660c64e4c7b25",
-  url: "https://static.lorcanito.com/images/cards/TFC/26.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/26.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/26_en_control_your_temper-716.webp",
   name: "Control Your Temper!",
@@ -62,13 +62,14 @@ export const controlYourTemper: LorcanitoActionCard = {
 export const healingGlow: LorcanitoActionCard = {
   implemented: true,
   id: "09f9618de70b8402787968bd5c8f752da37c2aa0",
-  url: "https://static.lorcanito.com/images/cards/TFC/28.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/28.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/28_en_healing_glow-716.webp",
   name: "Healing Glow",
   characteristics: ["action"],
   text: "Remove up to 2 damage from chosen character.",
   type: "action",
+  rarity: "common",
   abilities: [
     {
       type: "resolution",
@@ -103,7 +104,7 @@ export const healingGlow: LorcanitoActionCard = {
 export const justInTime: LorcanitoActionCard = {
   implemented: true,
   id: "2b2ec1ded689159045ee10790d96e74ac7d07db4",
-  url: "https://static.lorcanito.com/images/cards/TFC/29.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/29.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/29_en_just_in_time-716.webp",
   name: "Just in Time",
@@ -150,7 +151,7 @@ export const justInTime: LorcanitoActionCard = {
 export const youHaveForgottenMe: LorcanitoActionCard = {
   implemented: true,
   id: "e14c1754f2cdbfd07f620d4aa1e7ec6b110a95be",
-  url: "https://static.lorcanito.com/images/cards/TFC/31.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/31.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/31_en_you_have_forgotten_me-716.webp",
   name: "You Have Forgotten Me",
@@ -189,7 +190,7 @@ export const youHaveForgottenMe: LorcanitoActionCard = {
 export const befuddle: LorcanitoActionCard = {
   implemented: true,
   id: "92ae697dc90b18a30c624603e635e2d5180d4d69",
-  url: "https://static.lorcanito.com/images/cards/TFC/62.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/62.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/62_en_befuddle-716.webp",
   name: "Befuddle",
@@ -235,7 +236,7 @@ export const befuddle: LorcanitoActionCard = {
 export const freeze: LorcanitoActionCard = {
   implemented: true,
   id: "ee51a10c657f1b42fd0493f7fddbf9fdbc53dd59",
-  url: "https://static.lorcanito.com/images/cards/TFC/63.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/63.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/63_en_freeze-716.webp",
   name: "Freeze",
   characteristics: ["action"],
@@ -275,7 +276,7 @@ export const freeze: LorcanitoActionCard = {
 export const doItAgain: LorcanitoActionCard = {
   implemented: true,
   id: "881b1adc3c80b082c78c50354d25952579b36d6a",
-  url: "https://static.lorcanito.com/images/cards/TFC/94.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/94.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/3_en_do_it_again-716.webp",
   name: "Do It Again!",
@@ -317,7 +318,7 @@ export const doItAgain: LorcanitoActionCard = {
 export const stampede: LorcanitoActionCard = {
   implemented: true,
   id: "35bdb36f1579e326476e096dd05830dbfd02b45b",
-  url: "https://static.lorcanito.com/images/cards/TFC/96.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/96.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/96_en_stampede-716.webp",
   name: "Stampede",
@@ -363,7 +364,7 @@ export const stampede: LorcanitoActionCard = {
 export const stealFromRich: LorcanitoActionCard = {
   implemented: true,
   id: "38becbbae98c662e838ff5f30c6895879eb0083d",
-  url: "https://static.lorcanito.com/images/cards/TFC/97.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/97.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/97_en_steam_from_the_rich-716.webp",
   name: "Steal from the Rich",
@@ -406,7 +407,7 @@ export const stealFromRich: LorcanitoActionCard = {
 export const theBeastIsMine: LorcanitoActionCard = {
   implemented: true,
   id: "528e3faa7ae9d994e14c517c29b3d3d11fafd9a6",
-  url: "https://static.lorcanito.com/images/cards/TFC/99.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/99.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/99_en_the_beast_is_mine-716.webp",
   name: "The Beast is Mine!",
@@ -451,7 +452,7 @@ export const theBeastIsMine: LorcanitoActionCard = {
 export const viciousBetrayal: LorcanitoActionCard = {
   implemented: true,
   id: "3b98947510e01d01f9837ff6138619315039597e",
-  url: "https://static.lorcanito.com/images/cards/TFC/100.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/100.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/100_en_vicious_betrayal-716.webp",
   name: "Vicious Betrayal",
@@ -517,7 +518,7 @@ export const viciousBetrayal: LorcanitoActionCard = {
 export const cutToTheChase: LorcanitoActionCard = {
   implemented: true,
   id: "edd7ccbf838b25a958247e17b48752ba949530c7",
-  url: "https://static.lorcanito.com/images/cards/TFC/129.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/129.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/129_en_cut_to_the_chase-716.webp",
   name: "Cut to the Chase",
@@ -560,7 +561,7 @@ export const cutToTheChase: LorcanitoActionCard = {
 export const dragonFire: LorcanitoActionCard = {
   implemented: true,
   id: "4f55b90e0359772a0bae9396bb37200e63897c42",
-  url: "https://static.lorcanito.com/images/cards/TFC/130.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/130.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/130_en_dragon_fire-716.webp",
   name: "Dragon Fire",
@@ -599,7 +600,7 @@ export const dragonFire: LorcanitoActionCard = {
 export const fanTheFlames: LorcanitoActionCard = {
   implemented: true,
   id: "6febf2f105416b14a755de9a55f69ac10c63b124",
-  url: "https://static.lorcanito.com/images/cards/TFC/131.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/131.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/131_en_fan_the_flames-716.webp",
   name: "Fan The Flames",
@@ -634,7 +635,7 @@ export const fanTheFlames: LorcanitoActionCard = {
 export const hesGotASword: LorcanitoActionCard = {
   implemented: true,
   id: "09245fd73de7b2293d02a3aea74fcf061aff889b",
-  url: "https://static.lorcanito.com/images/cards/TFC/132.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/132.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/132_en_hes_got_a_sword-716.webp",
   name: "He's Got a Sword!",
@@ -675,7 +676,7 @@ export const hesGotASword: LorcanitoActionCard = {
 export const tangle: LorcanitoActionCard = {
   implemented: true,
   id: "fb3475577b166d19cfd6e9fe418e233322392e26",
-  url: "https://static.lorcanito.com/images/cards/TFC/133.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/133.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/133_en_tangle-716.webp",
   name: "Tangle",
@@ -712,7 +713,7 @@ export const tangle: LorcanitoActionCard = {
 export const developYourBrain: LorcanitoActionCard = {
   implemented: true,
   id: "a7f2dc6604f4409d80252bb3d4140046f336d2ed",
-  url: "https://static.lorcanito.com/images/cards/TFC/161.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/161.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/161_en_develop_your_brain-716.webp",
   name: "Develop Your Brain",
@@ -762,7 +763,7 @@ export const developYourBrain: LorcanitoActionCard = {
 export const ifItsNotBaroque: LorcanitoActionCard = {
   implemented: true,
   id: "9350d1618fa8bedd97705c4b7bea64d9e66ae1eb",
-  url: "https://static.lorcanito.com/images/cards/TFC/162.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/162.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/162_en_if_its_not_baroque-716.webp",
   name: "If It's Not Baroque",
@@ -801,7 +802,7 @@ export const ifItsNotBaroque: LorcanitoActionCard = {
 export const workTogether: LorcanitoActionCard = {
   implemented: true,
   id: "a007dee2587ca79e20d55cf45d86ee0f5a5872b6",
-  url: "https://static.lorcanito.com/images/cards/TFC/165.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/165.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/165_en_work_together-716.webp",
   name: "Work Together",
@@ -845,7 +846,7 @@ export const workTogether: LorcanitoActionCard = {
 export const breakAction: LorcanitoActionCard = {
   implemented: true,
   id: "24f53be3106c63af52982c92cfcce03b319edb95",
-  url: "https://static.lorcanito.com/images/cards/TFC/196.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/196.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/196_en_break-716.webp",
   name: "Break",
   characteristics: ["action"],
@@ -882,7 +883,7 @@ export const breakAction: LorcanitoActionCard = {
 export const fireTheCannons: LorcanitoActionCard = {
   implemented: true,
   id: "b26d01b43ef8e6a3802ef81a6cd8dad8c79d09f6",
-  url: "https://static.lorcanito.com/images/cards/TFC/197.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/197.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/197_en_fire_the_cannons-716.webp",
   name: "Fire the Cannons!",
@@ -923,7 +924,7 @@ export const fireTheCannons: LorcanitoActionCard = {
 export const ransack: LorcanitoActionCard = {
   implemented: true,
   id: "6ea078ad44c30a1b22a0f293c097af3e1efbbd69",
-  url: "https://static.lorcanito.com/images/cards/TFC/199.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/199.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/199_en_ransack-716.webp",
   name: "Ransack",
@@ -972,7 +973,7 @@ export const ransack: LorcanitoActionCard = {
 export const smash: LorcanitoActionCard = {
   implemented: true,
   id: "45afd1bfb76f45add7f410a0ede509c100ea0243",
-  url: "https://static.lorcanito.com/images/cards/TFC/200.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/200.webp",
   alternativeUrl: "https://images.lorcania.com/cards/tfc/200_en_smash-716.webp",
   name: "Smash",
   characteristics: ["action"],

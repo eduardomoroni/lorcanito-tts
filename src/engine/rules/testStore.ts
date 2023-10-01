@@ -1,14 +1,14 @@
-import { MobXRootStore } from "~/store/RootStore";
-import { Dependencies } from "~/store/types";
+import { MobXRootStore } from "~/engine/store/RootStore";
+import { Dependencies } from "~/engine/store/types";
 import {
   createMockGame,
   TestInitialState,
 } from "~/engine/__mocks__/createGameMock";
-import type { Zones } from "~/providers/TabletopProvider";
+import type { Zones } from "~/spaces/providers/TabletopProvider";
 import { dingleHopper } from "~/engine/cards/TFC/items/items";
 import { LorcanitoCard } from "~/engine/cards/cardTypes";
 import { friendsOnTheOtherSide } from "~/engine/cards/TFC/songs/songs";
-import type { ResolvingParam } from "~/store/StackLayerStore";
+import type { ResolvingParam } from "~/engine/store/StackLayerStore";
 
 function noOp() {}
 

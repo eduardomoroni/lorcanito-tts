@@ -8,7 +8,7 @@ import {
 } from "~/spaces/Log/stackLayerEntries";
 import { moveCard } from "~/spaces/Log/moveCardEntries";
 import { exhaustiveCheck } from "~/libs/exhaustiveCheck";
-import type { MobXRootStore } from "~/store/RootStore";
+import type { MobXRootStore } from "~/engine/store/RootStore";
 import type { InternalLogEntry } from "~/spaces/Log/types";
 
 const playerAction = "▾ ";
@@ -16,7 +16,7 @@ const systemAction = "◆ ";
 const opponentAction = "▴ ";
 
 export function mapLogEntries(store: MobXRootStore, entry: InternalLogEntry) {
-  const elements = [];
+  const elements: (string | JSX.Element)[] = [];
   const isMyTurn = store.isMyTurn;
   const activePlayer = store.activePlayer;
   const isActivePlayerTheSender = activePlayer === entry.sender;
@@ -47,7 +47,7 @@ export function mapLogEntries(store: MobXRootStore, entry: InternalLogEntry) {
           instanceId={instanceId}
           privateEntry={entry.private}
           player={activePlayer}
-        />
+        />,
       );
       break;
     }
@@ -71,7 +71,7 @@ export function mapLogEntries(store: MobXRootStore, entry: InternalLogEntry) {
                 instanceId={card}
                 privateEntry={undefined}
                 player={activePlayer}
-              />
+              />,
             );
           });
           elements.push(` in hand.`);
@@ -83,7 +83,7 @@ export function mapLogEntries(store: MobXRootStore, entry: InternalLogEntry) {
     }
     case "NEW_GAME": {
       elements.push(
-        `Thanks for playing! To start a new game click on the top right corner and select your deck.`
+        `Thanks for playing! To start a new game click on the top right corner and select your deck.`,
       );
       break;
     }
@@ -103,7 +103,7 @@ export function mapLogEntries(store: MobXRootStore, entry: InternalLogEntry) {
           instanceId={instanceId}
           privateEntry={undefined}
           player={activePlayer}
-        />
+        />,
       );
       elements.push(` into owner's deck.`);
       break;
@@ -121,7 +121,7 @@ export function mapLogEntries(store: MobXRootStore, entry: InternalLogEntry) {
         elements,
         entry,
         activePlayer,
-        isActivePlayerTheSender
+        isActivePlayerTheSender,
       );
       break;
     }
@@ -137,7 +137,7 @@ export function mapLogEntries(store: MobXRootStore, entry: InternalLogEntry) {
           instanceId={card}
           privateEntry={undefined}
           player={activePlayer}
-        />
+        />,
       );
       elements.push(` from ${from}.`);
       break;
@@ -146,7 +146,7 @@ export function mapLogEntries(store: MobXRootStore, entry: InternalLogEntry) {
       elements.push(
         `${isActivePlayerTheSender ? "are" : "is"} ready to start the game ${
           entry.solo ? "in SOLO mode" : ""
-        }.`
+        }.`,
       );
       break;
     }
@@ -156,7 +156,7 @@ export function mapLogEntries(store: MobXRootStore, entry: InternalLogEntry) {
       elements.push(
         ` ${
           isActivePlayerTheSender ? "have" : "has"
-        } taken a mulligan, drawing ${cards?.length} new cards. `
+        } taken a mulligan, drawing ${cards?.length} new cards. `,
       );
       if (player === activePlayer) {
         cards?.forEach((card) => {
@@ -165,7 +165,7 @@ export function mapLogEntries(store: MobXRootStore, entry: InternalLogEntry) {
               instanceId={card}
               privateEntry={entry.private}
               player={activePlayer}
-            />
+            />,
           );
           elements.push(", \n");
         });
@@ -179,7 +179,7 @@ export function mapLogEntries(store: MobXRootStore, entry: InternalLogEntry) {
         entry,
         activePlayer,
         store.cardStore.getCard(entry.instanceId)?.lorcanitoCard,
-        entry.instanceId
+        entry.instanceId,
       );
       break;
     }
@@ -192,14 +192,14 @@ export function mapLogEntries(store: MobXRootStore, entry: InternalLogEntry) {
           instanceId={instanceId}
           privateEntry={entry.private}
           player={activePlayer}
-        />
+        />,
       );
       elements.push(` ${damageMark} ${damageDelta} damage`);
       break;
     }
     case "SHUFFLE_DECK": {
       elements.push(
-        `shuffled ${isActivePlayerTheSender ? "your" : "their"} deck`
+        `shuffled ${isActivePlayerTheSender ? "your" : "their"} deck`,
       );
       break;
     }
@@ -215,11 +215,11 @@ export function mapLogEntries(store: MobXRootStore, entry: InternalLogEntry) {
       elements.push(`shifted `);
 
       elements.push(
-        <CardLogEntry instanceId={shifted} player={activePlayer} />
+        <CardLogEntry instanceId={shifted} player={activePlayer} />,
       );
       elements.push(` into `);
       elements.push(
-        <CardLogEntry instanceId={shifter} player={activePlayer} />
+        <CardLogEntry instanceId={shifter} player={activePlayer} />,
       );
       break;
     }
@@ -245,7 +245,7 @@ export function mapLogEntries(store: MobXRootStore, entry: InternalLogEntry) {
           instanceId={instanceId}
           privateEntry={entry.private}
           player={activePlayer}
-        />
+        />,
       );
       elements.push(` for ${amount} lore`);
 
@@ -272,7 +272,7 @@ export function mapLogEntries(store: MobXRootStore, entry: InternalLogEntry) {
       elements.push(
         `${loreDelta < 0 ? "lost ▼" : "gained ▲"} ${loreDelta} lore and now ${
           isActivePlayerTheSender ? "have" : "has"
-        } ${to} lore.`
+        } ${to} lore.`,
       );
 
       break;
@@ -284,8 +284,8 @@ export function mapLogEntries(store: MobXRootStore, entry: InternalLogEntry) {
     case "NEW_TURN": {
       elements.push(
         ` ${isMyTurn ? "are" : "is"} starting turn #${Math.round(
-          entry.turn / 2
-        )}. `
+          entry.turn / 2,
+        )}. `,
       );
 
       if (isMyTurn) {
@@ -295,7 +295,7 @@ export function mapLogEntries(store: MobXRootStore, entry: InternalLogEntry) {
             instanceId={entry.instanceId}
             privateEntry={entry.private}
             player={activePlayer}
-          />
+          />,
         );
       } else {
         elements.push("Your opponent draws a card.");
@@ -312,21 +312,27 @@ export function mapLogEntries(store: MobXRootStore, entry: InternalLogEntry) {
         ? "https://lorcania.com/images/cards/elements/inkwell.svg"
         : "https://lorcania.com/images/cards/elements/inkless.webp";
       elements.push(
-        <Image src={img} width={8} height={8} alt="Inkless card" quality={20} />
+        <Image
+          src={img}
+          width={8}
+          height={8}
+          alt="Inkless card"
+          quality={20}
+        />,
       );
       elements.push(
         <CardLogEntry
           instanceId={entry.instanceId}
           privateEntry={entry.private}
           player={activePlayer}
-        />
+        />,
       );
       elements.push(` to inkwell. `);
       break;
     }
     case "GOING_FIRST": {
       elements.push(
-        `${entry.player} is going first, and skipping his/her draw step.`
+        `${entry.player} is going first, and skipping his/her draw step.`,
       );
       break;
     }
@@ -358,7 +364,7 @@ export function mapLogEntries(store: MobXRootStore, entry: InternalLogEntry) {
             instanceId={entry.instanceId}
             privateEntry={entry.private}
             player={activePlayer}
-          />
+          />,
         );
       }
 

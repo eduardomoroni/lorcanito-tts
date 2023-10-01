@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import { useIdleTimer } from "react-idle-timer";
-import { IdleModal } from "~/components/modals/IdleModal";
+import { IdleModal } from "~/spaces/components/modals/IdleModal";
 import { useRouter } from "next/navigation";
-import { logAnalyticsEvent } from "~/3rd-party/firebase/FirebaseAnalyticsProvider";
+import { logAnalyticsEvent } from "~/libs/3rd-party/firebase/FirebaseAnalyticsProvider";
 
 const timeout = 300_000;
 const promptBeforeIdle = 30_000;

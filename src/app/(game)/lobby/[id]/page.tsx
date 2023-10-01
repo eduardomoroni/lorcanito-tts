@@ -1,23 +1,17 @@
 import React from "react";
 import { authOptions } from "~/server/auth";
-import { adminDatabase } from "~/3rd-party/firebase/admin";
+import { adminDatabase } from "~/libs/3rd-party/firebase/admin";
 import { type GameLobby } from "~/libs/game";
-import dynamic from "next/dynamic";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { cookies } from "next/headers";
 import { createStreamClientToken } from "~/server/api/routers/chat";
-import { getOrCreateGame } from "~/3rd-party/firebase/database/game";
+import { getOrCreateGame } from "~/libs/3rd-party/firebase/database/game";
+import LobbyPageProviders from "~/app/(game)/lobby/[id]/LobbyPageProviders";
 
 export const metadata = {
   description: "Lorcanito game lobby.",
 };
-
-const LobbyPageProviders = dynamic(() => import("./LobbyPageProviders"), {
-  // TODO: I NEED TO INVESTIGATE WHEN I HAVE TIME
-  ssr: false,
-  loading: () => <p>Loading your game...</p>,
-});
 
 const getUserId = async () => {
   const session = await getServerSession(authOptions);

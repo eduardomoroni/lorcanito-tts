@@ -1,27 +1,27 @@
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import admin, { adminDatabase } from "~/3rd-party/firebase/admin";
+import admin, {
+  adminDatabase,
+  adminFirestore,
+} from "~/libs/3rd-party/firebase/admin";
 import { z } from "zod";
 import {
   createCards,
-  createEmptyGame,
   createTable,
   createTableFromCards,
   type Game,
   GameLobby,
   recreateTable,
 } from "~/libs/game";
-import { drawCardHelper } from "~/3rd-party/firebase/database/mutableHelpers";
-import {
-  type Deck,
-  type Table,
-  type TableCard,
-} from "~/providers/TabletopProvider";
+import { type Deck } from "~/spaces/providers/TabletopProvider";
 import { parseDeckList } from "~/spaces/table/deckbuilder/parseDeckList";
 import {
   deleteChannelMessages,
   sendLog,
   updateStreamGameChat,
 } from "~/server/serverGameLogger";
+import { firestore } from "firebase-admin";
+import FieldValue = firestore.FieldValue;
+import { getFirestoreGame } from "~/libs/3rd-party/firebase/firestore";
 
 function getRandomElement<T>(array: T[]): T {
   return array[Math.floor(Math.random() * array.length)] as T;
@@ -36,14 +36,21 @@ export const gameRouter = createTRPCRouter({
 
       await updateStreamGameChat(userUID, gameId);
 
+      const gameReference = adminFirestore.doc(`games/${gameId}`);
+      const game = await getFirestoreGame(gameId);
+
+      const batch = adminFirestore.batch();
+      console.log(input);
       // TODO: to avoid polluted data, we should recreate the game from scratch
-      const gameReference = adminDatabase.ref(`games/${gameId}`);
-      const updates: Record<string, unknown> = {};
-      updates[`players/${userUID}`] = true;
-      updates[`tables/${userUID}`] = createTable();
-      updates[`mode`] = "multiplayer";
-      updates[`lastActivity`] = admin.database.ServerValue.TIMESTAMP;
-      await gameReference.update(updates);
+
+      game.players[userUID] = true;
+      game.tables[userUID] = createTable();
+      game.turnPlayer = "";
+      // @ts-expect-error
+      game.lastActivity = FieldValue.serverTimestamp();
+      game.mode = "multiplayer";
+
+      await gameReference.set(game);
 
       // TODO: Add a check that at max 2 players can join a game
 
@@ -66,36 +73,38 @@ export const gameRouter = createTRPCRouter({
       //   return;
       // }
 
-      const cardsRef = adminDatabase.ref(`games/${gameId}/cards`);
-      await cardsRef.transaction((cards: Record<string, TableCard>) => {
-        if (!cards) {
-          return cards;
+      const gameReference = adminFirestore.doc(`games/${gameId}`);
+      const game = await getFirestoreGame(gameId);
+
+      Object.keys(game.cards).forEach((cardId) => {
+        const tableCard = game.cards[cardId];
+        if (tableCard && tableCard.ownerId === userUID) {
+          //@ts-expect-error this is how we delete a firebase record
+          game.cards[cardId] = null;
         }
-
-        Object.keys(cards).forEach((cardId) => {
-          const tableCard = cards[cardId];
-          if (tableCard && tableCard.ownerId === userUID) {
-            //@ts-expect-error this is how we delete a firebase record
-            cards[cardId] = null;
-          }
-        });
-
-        return cards;
       });
 
-      //TODO: REMOVE STREAM MEMBER !!
+      Object.keys(game.tables).forEach((table) => {
+        const tableCard = game.tables[table];
+        if (tableCard) {
+          tableCard.readyToStart = false;
+        }
+      });
 
-      const gameReference = adminDatabase.ref(`games/${gameId}`);
-      const updates: Record<string, null | ""> = {};
-      updates[`players/${userUID}`] = null;
-      updates[`tables/${userUID}`] = null;
-      updates[`wonDieRoll`] = null;
-      updates[`turnPlayer`] = "";
-      await gameReference.update(updates);
+      // @ts-expect-error this is how we delete a firebase record
+      game.players[userUID] = null;
+      // @ts-expect-error this is how we delete a firebase record
+      game.tables[userUID] = null;
+      game.turnPlayer = "";
+
+      await gameReference.set(game);
+
+      //TODO: REMOVE STREAM MEMBER !!
 
       const lobbyReference = adminDatabase.ref(`lobbies/${gameId}`);
       const lobbyUpdates: Record<string, unknown> = {};
       lobbyUpdates[`players/${userUID}`] = null;
+      lobbyUpdates[`wonDieRoll`] = null;
       lobbyUpdates[`lastActivity`] = admin.database.ServerValue.TIMESTAMP;
       await lobbyReference.update(lobbyUpdates);
       await adminDatabase.ref(`presence/lobbies/${gameId}`).set(null);
@@ -112,17 +121,17 @@ export const gameRouter = createTRPCRouter({
               cardId: z.string(),
               qty: z.number(),
               card: z.unknown(),
-            })
+            }),
           )
           .optional(),
-      })
+      }),
     )
     .mutation(async ({ ctx, input }) => {
       const userUID = ctx.session.user.uid;
       const { deckList, gameId } = input;
 
       const playersReference = adminDatabase.ref(
-        `lobbies/${gameId}/players/${userUID}`
+        `lobbies/${gameId}/players/${userUID}`,
       );
       const playersSnapshot = await playersReference.get();
       const players = playersSnapshot.val() as Record<string, string>;
@@ -140,23 +149,20 @@ export const gameRouter = createTRPCRouter({
       }
       const table = createTableFromCards(deckCards);
 
-      const gameReference = adminDatabase.ref(`games/${gameId}`);
-      const updates: Record<string, unknown> = {};
-      updates[`tables/${userUID}`] = table;
-      updates[`turnPlayer`] = "";
-      await gameReference.update(updates);
+      const gameReference = adminFirestore.doc(`games/${gameId}`);
+      const game = await getFirestoreGame(gameId);
 
-      const cardsRef = adminDatabase.ref(`games/${gameId}/cards`);
-      await cardsRef.transaction((cards: Record<string, TableCard>) => {
-        if (!cards) {
-          const init: Record<string, TableCard> = {};
-          Object.values(deckCards).forEach((tableCard) => {
-            init[tableCard.instanceId] = tableCard;
-          });
-          return init;
-        }
+      game.tables[userUID] = table;
+      game.turnPlayer = "";
 
-        Object.values(cards).forEach((tableCard) => {
+      if (!game.cards) {
+        game.cards = {};
+
+        Object.values(deckCards).forEach((tableCard) => {
+          game.cards[tableCard.instanceId] = tableCard;
+        });
+      } else {
+        Object.values(game.cards).forEach((tableCard) => {
           if (tableCard.ownerId === userUID) {
             //@ts-expect-error this is how we delete a firebase record
             cards[tableCard.instanceId] = null;
@@ -164,15 +170,13 @@ export const gameRouter = createTRPCRouter({
         });
 
         Object.values(deckCards).forEach((tableCard) => {
-          cards[tableCard.instanceId] = tableCard;
+          game.cards[tableCard.instanceId] = tableCard;
         });
+      }
 
-        return cards;
-      });
+      await gameReference.set(game);
 
-      // Whene creating the lobby/game, we don't have the streamId yet
       await updateStreamGameChat(userUID, gameId);
-
       await sendLog(gameId, { type: "LOAD_DECK" });
     }),
 
@@ -182,53 +186,31 @@ export const gameRouter = createTRPCRouter({
       const userUID = ctx.session.user.uid;
       const gameId = input.gameId;
 
-      const playersReference = adminDatabase.ref(`games/${gameId}/tables`);
-      const players = await playersReference.get();
+      const gameReference = adminFirestore.doc(`games/${gameId}`);
+      const game = await getFirestoreGame(gameId);
+      const players = game.tables;
 
-      if (!players.exists() || !Object.keys(players.val()).includes(userUID)) {
-        console.log(players.val());
+      if (!Object.keys(players || {}).includes(userUID)) {
         throw new Error("You are not a player in this game.");
       }
 
-      const tablesReference = adminDatabase.ref(`games/${gameId}/tables`);
-      await tablesReference.transaction((tables: Game["tables"]) => {
-        let response: Record<string, Table> = {};
-
-        if (tables) {
-          response = tables;
-        }
-
-        Object.keys(response).forEach((tableId) => {
-          response[tableId] = recreateTable(tables[tableId]);
-        });
-
-        return response;
+      Object.keys(game.tables || {}).forEach((tableId) => {
+        game.tables[tableId] = recreateTable(game.tables[tableId]);
       });
 
-      await adminDatabase
-        .ref(`games/${gameId}/cards`)
-        .transaction((cards: Game["cards"]) => {
-          if (!cards) {
-            return cards;
-          }
+      Object.keys(game.cards || {}).forEach((card) => {
+        const tableCard = game.cards[card];
+        if (tableCard) {
+          game.cards[card] = { ...tableCard, meta: null };
+        }
+      });
 
-          Object.keys(cards).forEach((card) => {
-            const tableCard = cards[card];
-            if (tableCard) {
-              cards[card] = { ...tableCard, meta: null };
-            }
-          });
+      game.turnCount = 0;
+      // @ts-expect-error this is how we delete a firebase record
+      game.lastActivity = FieldValue.serverTimestamp();
 
-          return cards;
-        });
+      await gameReference.set(game);
 
-      const gameReference = adminDatabase.ref(`games/${gameId}`);
-      const updates: Record<string, unknown> = {};
-      // updates[`turnPlayer`] = "";
-      updates[`turnCount`] = 0;
-      // updates[`mode`] = "multiplayer";
-      updates[`lastActivity`] = admin.database.ServerValue.TIMESTAMP;
-      await gameReference.update(updates);
       await deleteChannelMessages(gameId);
       await adminDatabase.ref(`logs/${gameId}`).set(null);
       await sendLog(gameId, { type: "GAME_RESTARTED", player: userUID });
@@ -237,99 +219,99 @@ export const gameRouter = createTRPCRouter({
   passTurn: protectedProcedure
     .input(z.object({ gameId: z.string(), forcePass: z.boolean().optional() }))
     .mutation(async ({ ctx, input }) => {
-      const userUID = ctx.session.user.uid;
-      const { gameId, forcePass } = input;
-      const gameReference = adminDatabase.ref(`games/${gameId}/`);
-
-      const turnPlayerReference = adminDatabase.ref(
-        `games/${gameId}/turnPlayer`
-      );
-      const turnPlayer = (await turnPlayerReference.get()).val();
-      const gameModeReference = adminDatabase.ref(`games/${gameId}/mode`);
-      const gameMode = (await gameModeReference.get()).val();
-
-      if (!forcePass) {
-        // Double click protection
-        if (gameMode === "multiplayer" && turnPlayer !== userUID) {
-          throw new Error("Turn player mismatch. " + turnPlayer + userUID);
-        }
-      }
-
-      if (turnPlayer.length === 0) {
-        await gameReference.child("turnPlayer").set(userUID);
-        await gameReference.child("turnCount").set(0);
-
-        await sendLog(gameId, { type: "GOING_FIRST", player: userUID });
-        return;
-      }
-
-      const nextPlayer = await findNextPlayer(
-        gameId,
-        userUID,
-        turnPlayer,
-        gameMode
-      );
-
-      let drawnCard = "";
-
-      await adminDatabase
-        .ref(`games/${gameId}/cards`)
-        .transaction((cards: Record<string, TableCard>) => {
-          if (!cards) {
-            return cards;
-          }
-
-          Object.values(cards).forEach((card) => {
-            if (card.ownerId === nextPlayer && card.meta) {
-              card.meta.exerted = null;
-              card.meta.playedThisTurn = null;
-            }
-          });
-
-          return cards;
-        });
-
-      await adminDatabase
-        .ref(`games/${gameId}/tables/${nextPlayer}`)
-        .transaction((table: Table) => {
-          if (!table) {
-            console.error("Table not found: ", gameId);
-            return table;
-          }
-
-          const mutatedTable = drawCardHelper(table);
-          drawnCard = mutatedTable?.zones?.hand?.slice(-1)[0] || "";
-
-          return mutatedTable;
-        });
-
-      const updates: Record<string, unknown> = {};
-      updates[`turnPlayer`] = nextPlayer;
-      updates[`turnCount`] = admin.database.ServerValue.increment(1);
-      updates[`lastActivity`] = admin.database.ServerValue.TIMESTAMP;
-      await gameReference.update(updates);
-
+      // const userUID = ctx.session.user.uid;
+      // const { gameId, forcePass } = input;
+      // const gameReference = adminDatabase.ref(`games/${gameId}/`);
+      //
+      // const turnPlayerReference = adminDatabase.ref(
+      //   `games/${gameId}/turnPlayer`,
+      // );
+      // const turnPlayer = (await turnPlayerReference.get()).val();
+      // const gameModeReference = adminDatabase.ref(`games/${gameId}/mode`);
+      // const gameMode = (await gameModeReference.get()).val();
+      //
+      // if (!forcePass) {
+      //   // Double click protection
+      //   if (gameMode === "multiplayer" && turnPlayer !== userUID) {
+      //     throw new Error("Turn player mismatch. " + turnPlayer + userUID);
+      //   }
+      // }
+      //
+      // if (turnPlayer.length === 0) {
+      //   await gameReference.child("turnPlayer").set(userUID);
+      //   await gameReference.child("turnCount").set(0);
+      //
+      //   await sendLog(gameId, { type: "GOING_FIRST", player: userUID });
+      //   return;
+      // }
+      //
+      // const nextPlayer = await findNextPlayer(
+      //   gameId,
+      //   userUID,
+      //   turnPlayer,
+      //   gameMode,
+      // );
+      //
+      // let drawnCard = "";
+      //
+      // await adminDatabase
+      //   .ref(`games/${gameId}/cards`)
+      //   .transaction((cards: Record<string, TableCard>) => {
+      //     if (!cards) {
+      //       return cards;
+      //     }
+      //
+      //     Object.values(cards).forEach((card) => {
+      //       if (card.ownerId === nextPlayer && card.meta) {
+      //         card.meta.exerted = null;
+      //         card.meta.playedThisTurn = null;
+      //       }
+      //     });
+      //
+      //     return cards;
+      //   });
+      //
+      // await adminDatabase
+      //   .ref(`games/${gameId}/tables/${nextPlayer}`)
+      //   .transaction((table: Table) => {
+      //     if (!table) {
+      //       console.error("Table not found: ", gameId);
+      //       return table;
+      //     }
+      //
+      //     const mutatedTable = drawCardHelper(table);
+      //     drawnCard = mutatedTable?.zones?.hand?.slice(-1)[0] || "";
+      //
+      //     return mutatedTable;
+      //   });
+      //
+      // const updates: Record<string, unknown> = {};
+      // updates[`turnPlayer`] = nextPlayer;
+      // updates[`turnCount`] = admin.database.ServerValue.increment(1);
+      // updates[`lastActivity`] = admin.database.ServerValue.TIMESTAMP;
+      // await gameReference.update(updates);
+      //
+      // // await sendLog(
+      // //   gameId,
+      // //   { type: "PASS_TURN", player: turnPlayer, turn: "SERVER" },
+      // //   turnPlayer
+      // // );
+      //
+      // const turnCount = (
+      //   await adminDatabase.ref(`games/${gameId}/turnCount`).get()
+      // ).val();
+      //
       // await sendLog(
       //   gameId,
-      //   { type: "PASS_TURN", player: turnPlayer, turn: "SERVER" },
-      //   turnPlayer
+      //   {
+      //     type: "NEW_TURN",
+      //     turn: turnCount,
+      //     instanceId: drawnCard,
+      //     // @ts-expect-error I need to refactor log system
+      //     private: { [nextPlayer]: { instanceId: drawnCard } },
+      //   },
+      //   nextPlayer,
       // );
-
-      const turnCount = (
-        await adminDatabase.ref(`games/${gameId}/turnCount`).get()
-      ).val();
-
-      await sendLog(
-        gameId,
-        {
-          type: "NEW_TURN",
-          turn: turnCount,
-          instanceId: drawnCard,
-          // @ts-expect-error I need to refactor log system
-          private: { [nextPlayer]: { instanceId: drawnCard } },
-        },
-        nextPlayer
-      );
     }),
 
   startGame: protectedProcedure
@@ -337,12 +319,17 @@ export const gameRouter = createTRPCRouter({
     .mutation(async ({ input }) => {
       const { gameId, playerGoingFirst } = input;
 
-      // TODO: Check whethere player exists
+      const gameReference = adminFirestore.doc(`games/${gameId}`);
+      const game = await getFirestoreGame(gameId);
 
-      await adminDatabase
-        .ref(`games/${gameId}/turnPlayer`)
-        .set(playerGoingFirst);
-      await adminDatabase.ref(`games/${gameId}/turnCount`).set(0);
+      if (!game.tables[playerGoingFirst]) {
+        throw new Error("Player not found in game.");
+      }
+
+      game.turnPlayer = playerGoingFirst;
+      game.turnCount = 0;
+
+      await gameReference.set(game);
 
       await adminDatabase.ref(`lobbies/${gameId}/gameStarted`).set(true);
 
@@ -391,13 +378,9 @@ export const gameRouter = createTRPCRouter({
 
       await sendLog(gameId, { type: "READY_TO_START", solo }, playerId);
 
-      await adminDatabase
-        .ref(`games/${gameId}/tables/${playerId}/readyToStart`)
-        .set(true);
-
-      if (solo) {
-        await adminDatabase.ref(`games/${gameId}/mode`).set("solo");
-      }
+      await adminFirestore
+        .doc(`games/${gameId}/tables/${playerId}`)
+        .update({ readyToStart: true, mode: solo ? "solo" : "multiplayer" });
     }),
 
   lobbyReady: protectedProcedure
@@ -411,8 +394,10 @@ export const gameRouter = createTRPCRouter({
       const players = playersSnapshot.val() as Record<string, boolean>;
       const playersArray = Object.keys(players);
       const allPlayersReady = playersArray.every(
-        (player) => players[player] || player == playerId
+        (player) => players[player] || player == playerId,
       );
+      console.log(playersArray);
+      console.log(allPlayersReady);
 
       const lobbyReference = adminDatabase.ref(`lobbies/${gameId}`);
       const lobbyUpdates: Record<string, unknown> = {};
@@ -456,7 +441,7 @@ async function findNextPlayer(
   gameId: string,
   userUID: string,
   turnPlayer: string,
-  gameMode: Game["mode"]
+  gameMode: Game["mode"],
 ) {
   if (gameMode === "solo") {
     return userUID;

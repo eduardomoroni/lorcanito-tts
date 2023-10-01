@@ -5,7 +5,10 @@
 import { describe, expect, it } from "@jest/globals";
 import { TestStore } from "~/engine/rules/testStore";
 import { lantern } from "~/engine/cards/TFC/items/items";
-import {liloMakingAWish, peterPanNeverLanding} from "~/engine/cards/TFC/characters/characters";
+import {
+  liloMakingAWish,
+  peterPanNeverLanding,
+} from "~/engine/cards/TFC/characters/characters";
 
 describe("Lantern", () => {
   describe("Birthday Lights - You pay 1 ⬡ less for the next character you play this turn.", () => {

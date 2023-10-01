@@ -4,9 +4,9 @@ import React, { createContext, type FC, type ReactNode } from "react";
 import { type Game } from "~/libs/game";
 import { useDatabase, useDatabaseObjectData } from "reactfire";
 import { ref } from "firebase/database";
-import { type Zones } from "~/providers/TabletopProvider";
-import { api } from "~/utils/api";
-import { logAnalyticsEvent } from "~/3rd-party/firebase/FirebaseAnalyticsProvider";
+import { type Zones } from "~/spaces/providers/TabletopProvider";
+import { api } from "~/libs/api";
+import { logAnalyticsEvent } from "~/libs/3rd-party/firebase/FirebaseAnalyticsProvider";
 import { useGameStore } from "~/engine/lib/GameStoreProvider";
 
 const Context = createContext<{ game: Game; playerId: string }>({
@@ -24,7 +24,7 @@ export const GameProvider: FC<{
     ref(database, `games/${ssrGame.id}`),
     {
       initialData: ssrGame,
-    }
+    },
   );
 
   if (data === null) {
@@ -59,7 +59,7 @@ export const usePlayerNickname = (uid: string) => {
     ref(database, `users/${uid}`),
     {
       initialData: uid,
-    }
+    },
   );
   return status === "success" ? data : uid;
 };

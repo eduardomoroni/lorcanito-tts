@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { purgeGames } from "~/3rd-party/firebase/database/game";
+import { purgeGames } from "~/libs/3rd-party/firebase/database/game";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;

@@ -1,21 +1,25 @@
 "use client";
 
 import React, { type FC, useState, Fragment } from "react";
-import { BugAntIcon, QuestionMarkCircleIcon } from "@heroicons/react/24/solid";
+import {
+  BugAntIcon,
+  Cog8ToothIcon,
+  QuestionMarkCircleIcon,
+} from "@heroicons/react/24/solid";
 import { PlayerTable } from "~/spaces/PlayerTable";
-import { OfflineBanner } from "~/components/banners/OfflineBanner";
-import { logAnalyticsEvent } from "~/3rd-party/firebase/FirebaseAnalyticsProvider";
-import { BugReportModal } from "~/components/modals/BugReportModal";
-import { HelpModal } from "~/components/modals/HelpModal";
+import { OfflineBanner } from "~/spaces/components/banners/OfflineBanner";
+import { logAnalyticsEvent } from "~/libs/3rd-party/firebase/FirebaseAnalyticsProvider";
+import { BugReportModal } from "~/spaces/components/modals/BugReportModal";
+import { HelpModal } from "~/spaces/components/modals/HelpModal";
 import { SideBar } from "~/spaces/Sidebar";
-import { StackZoneArena } from "~/spaces/StackZone";
 import { Transition } from "@headlessui/react";
-import { AlterHandModal } from "~/components/modals/AlterHandModal";
+import { AlterHandModal } from "~/spaces/components/modals/AlterHandModal";
 import { useGameStore } from "~/engine/lib/GameStoreProvider";
 import { useTurn } from "~/engine/GameProvider";
-import { useLorcanitoSounds } from "~/hooks/useLorcanitoSounds";
+import { useLorcanitoSounds } from "~/spaces/hooks/useLorcanitoSounds";
 import { EffectStackZoneArena } from "~/spaces/EffectStackZone";
 import { observer } from "mobx-react-lite";
+import { GameSettingsSlideOver } from "~/spaces/game-settings/gameSettingsSlideOver";
 
 const GameTable: FC<{ gameId: string }> = (props) => {
   const store = useGameStore();
@@ -28,6 +32,7 @@ const GameTable: FC<{ gameId: string }> = (props) => {
 
   // TODO: We have to ask for permission to play sounds
   useLorcanitoSounds();
+  const [isSlideOverOpen, setIsSlideOverOpen] = useState(false);
 
   const {
     activePlayer,
@@ -88,6 +93,11 @@ const GameTable: FC<{ gameId: string }> = (props) => {
         />
       )}
       <SideBar gameId={store.id} />
+      <Cog8ToothIcon
+        onClick={() => setIsSlideOverOpen(true)}
+        className={`absolute right-0 top-0 z-10 m-2 h-12 w-12 cursor-pointer text-slate-50 opacity-75 hover:opacity-100`}
+      />
+      <SideBar gameId={props.gameId} />
       <div className="table-perspective-outer relative h-screen w-screen rounded">
         {/*<QuestDropZone />*/}
         <Transition
@@ -145,6 +155,17 @@ const GameTable: FC<{ gameId: string }> = (props) => {
         </div>
       </div>
       <OfflineBanner />
+      <GameSettingsSlideOver
+        open={isSlideOverOpen}
+        onClose={() => {
+          setIsSlideOverOpen(false);
+          logAnalyticsEvent("game_settings", {
+            action: "open",
+          });
+        }}
+        gameId={props.gameId}
+        playerId={playerId}
+      />
     </main>
   );
 };

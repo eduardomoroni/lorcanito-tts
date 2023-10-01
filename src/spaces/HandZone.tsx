@@ -1,14 +1,14 @@
-import { useDropCardInZone } from "~/hooks/dndCard";
-import { ZoneOverlay } from "~/components/ZoneOverlay";
-import { CardImage } from "~/components/card/CardImage";
+import { useDropCardInZone } from "~/spaces/hooks/dndCard";
+import { ZoneOverlay } from "~/spaces/components/ZoneOverlay";
+import { CardImage } from "~/spaces/components/card/CardImage";
 import React, { type FC, type MouseEvent, useEffect } from "react";
-import { DragNDropOverlay } from "~/components/DragNDropOverlay";
-import { useCardPreview } from "~/providers/CardPreviewProvider";
+import { DragNDropOverlay } from "~/spaces/components/DragNDropOverlay";
+import { useCardPreview } from "~/spaces/providers/CardPreviewProvider";
 import { useHotkeysContext } from "react-hotkeys-hook";
-import { useCardContextMenu } from "~/providers/card-context-menu/useCardContextMenu";
+import { useCardContextMenu } from "~/spaces/providers/card-context-menu/useCardContextMenu";
 import { useTurn } from "~/engine/GameProvider";
 import { observer } from "mobx-react-lite";
-import type { CardModel } from "~/store/models/CardModel";
+import type { CardModel } from "~/engine/store/models/CardModel";
 
 const HandComponent: FC<{
   cards: CardModel[];

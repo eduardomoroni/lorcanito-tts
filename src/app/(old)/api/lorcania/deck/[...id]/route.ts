@@ -1,6 +1,6 @@
 // TODO: caching is not working for this route
 import { NextResponse } from "next/server";
-import { Deck } from "~/providers/TabletopProvider";
+import { Deck } from "~/spaces/providers/TabletopProvider";
 
 function fromLocarniaToLorcanito(lorcaniaDeck: unknown): string[] {
   // @ts-ignore
@@ -24,7 +24,7 @@ function fromLocarniaToLorcanito(lorcaniaDeck: unknown): string[] {
 
 export async function GET(
   request: Request,
-  context: { params: { id: Array<string> } }
+  context: { params: { id: Array<string> } },
 ) {
   const deckId = context.params?.id?.[0];
 
@@ -34,7 +34,7 @@ export async function GET(
         message: "missing deck id",
         id: deckId,
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 

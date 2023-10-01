@@ -11,7 +11,7 @@ import {
   oneJumpAhead,
   reflection,
 } from "~/engine/cards/TFC/songs/songs";
-import { CardModel } from "~/store/models/CardModel";
+import { CardModel } from "~/engine/store/models/CardModel";
 import {chiefTui, heiheiBoatSnack, liloMakingAWish, moanaOfMotunui} from "~/engine/cards/TFC/characters/characters";
 
 describe("Scry effect", () => {

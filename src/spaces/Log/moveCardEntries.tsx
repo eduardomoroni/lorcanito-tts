@@ -143,7 +143,7 @@ export function moveCard(
           />,
         );
 
-        if (position === "first") {
+        if (position === "last") {
           elements.push(` on the top of the deck`);
         } else {
           elements.push(` on the bottom of the deck`);

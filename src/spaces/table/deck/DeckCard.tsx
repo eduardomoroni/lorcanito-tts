@@ -1,9 +1,9 @@
 import React from "react";
-import { CardModel } from "~/store/models/CardModel";
+import { CardModel } from "~/engine/store/models/CardModel";
 import { useUser } from "reactfire";
-import { logAnalyticsEvent } from "~/3rd-party/firebase/FirebaseAnalyticsProvider";
+import { logAnalyticsEvent } from "~/libs/3rd-party/firebase/FirebaseAnalyticsProvider";
 import { CardCounter } from "~/spaces/table/CardCounter";
-import { FaceDownCard } from "~/components/card/FaceDownCard";
+import { FaceDownCard } from "~/spaces/components/card/FaceDownCard";
 import { TopDeckCard } from "~/spaces/table/deck/TopDeckCard";
 
 function everyFourth(n: number) {

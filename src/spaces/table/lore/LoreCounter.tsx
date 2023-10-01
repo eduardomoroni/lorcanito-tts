@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
-import { usePrevious } from "~/hooks/usePrevious";
-import { logAnalyticsEvent } from "~/3rd-party/firebase/FirebaseAnalyticsProvider";
-import { useConfirmationModal } from "~/providers/ConfirmationModalProvider";
-import { api } from "~/utils/api";
+import { usePrevious } from "~/spaces/hooks/usePrevious";
+import { logAnalyticsEvent } from "~/libs/3rd-party/firebase/FirebaseAnalyticsProvider";
+import { useConfirmationModal } from "~/spaces/providers/ConfirmationModalProvider";
+import { api } from "~/libs/api";
 import { PlusIcon, MinusIcon } from "@heroicons/react/24/outline";
 import { useGameStore } from "~/engine/lib/GameStoreProvider";
 import { observer } from "mobx-react-lite";

@@ -1,7 +1,7 @@
 import React from "react";
 import { allCards } from "~/engine/cards/cards";
 import { getCardFullName } from "~/spaces/table/deckbuilder/parseDeckList";
-import { logAnalyticsEvent } from "~/3rd-party/firebase/FirebaseAnalyticsProvider";
+import { logAnalyticsEvent } from "~/libs/3rd-party/firebase/FirebaseAnalyticsProvider";
 
 export function DeckListDeckImport(props: {
   deckList: string;

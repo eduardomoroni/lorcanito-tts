@@ -2,19 +2,18 @@
 
 import React, { type FC } from "react";
 import { GameLogProvider } from "~/spaces/Log/game-log/GameLogProvider";
-import { NotificationProvider } from "~/providers/NotificationProvider";
-import { DnDProvider } from "~/providers/DnDProvider";
+import { NotificationProvider } from "~/spaces/providers/NotificationProvider";
+import { DnDProvider } from "~/spaces/providers/DnDProvider";
 import { HotkeysProvider } from "react-hotkeys-hook";
-import { ContextMenuProvider } from "~/providers/card-context-menu/ContextMenuProvider";
-import { TargetModalProvider } from "~/providers/TargetModalProvider";
-import { ConfirmationModalProvider } from "~/providers/ConfirmationModalProvider";
+import { ContextMenuProvider } from "~/spaces/providers/card-context-menu/ContextMenuProvider";
+import { TargetModalProvider } from "~/spaces/providers/TargetModalProvider";
+import { ConfirmationModalProvider } from "~/spaces/providers/ConfirmationModalProvider";
 import LobbyPage from "./LobbyPage";
 import { Game, type GameLobby } from "~/libs/game";
-import { DeckImportProvider } from "~/providers/DeckImportProvider";
-import { PresenceProvider } from "~/providers/presence/PresenceProvider";
-import { GameLobbyProvider } from "~/providers/lobby/GameLobbyProvider";
+import { DeckImportProvider } from "~/spaces/providers/DeckImportProvider";
+import { PresenceProvider } from "~/spaces/providers/presence/PresenceProvider";
+import { GameLobbyProvider } from "~/spaces/providers/lobby/GameLobbyProvider";
 import { GameStoreProvider } from "~/engine/lib/GameStoreProvider";
-import { gameMock } from "~/app/(old)/game/[id]/gameMock";
 
 type Props = {
   lobby: GameLobby;

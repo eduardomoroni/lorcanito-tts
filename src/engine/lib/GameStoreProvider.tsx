@@ -7,21 +7,15 @@ import React, {
   useContext,
   useMemo,
 } from "react";
-import {
-  useDatabase,
-  useDatabaseObjectData,
-  useFirestore,
-  useFirestoreDocData,
-} from "reactfire";
+import { useDatabase, useFirestore, useFirestoreDocData } from "reactfire";
 import { useGameLogger } from "~/spaces/Log/game-log/GameLogProvider";
 import type { Game } from "~/libs/game";
-import { useNotification } from "~/providers/NotificationProvider";
+import { useNotification } from "~/spaces/providers/NotificationProvider";
 import { AdditionalArgs } from "~/engine/engine";
-import { ref } from "firebase/database";
-import { useYesOrNoModal } from "~/providers/YesOrNoModalProvider";
-import { MobXRootStore } from "~/store/RootStore";
+import { useYesOrNoModal } from "~/spaces/providers/YesOrNoModalProvider";
+import { MobXRootStore } from "~/engine/store/RootStore";
 import { useFirebaseSync } from "~/engine/lib/useFirebaseSync";
-import { doc } from "firebase/firestore";
+import { doc, DocumentReference } from "firebase/firestore";
 
 type ContextType = {
   playerId: string;
@@ -61,22 +55,22 @@ export const GameStoreProvider: FC<{
     playerId,
   };
 
-  const { data } = useDatabaseObjectData<Game>(
-    ref(database, `games/${gameId}`),
-    {
-      initialData: ssrGame,
-    },
-  );
-  // const gameRef = doc(useFirestore(), "games", gameId);
-  // const { data } = useFirestoreDocData<Game>(gameRef, {
-  //   initialData: ssrGame,
-  // });
+  // const { data } = useDatabaseObjectData<Game>(
+  //   ref(database, `games/${gameId}`),
+  //   {
+  //     initialData: ssrGame,
+  //   },
+  // );
+  const gameRef = doc(firestore, "games", gameId) as DocumentReference<Game>;
+  const { data } = useFirestoreDocData<Game>(gameRef, {
+    initialData: ssrGame,
+  });
   // TODO: THIS can make things out of sync
   const store = useMemo(() => {
     return new MobXRootStore(data || ssrGame, args, true);
   }, []);
 
-  useFirebaseSync(store, database, firestore, data);
+  useFirebaseSync(store, firestore, data);
 
   return (
     <Context.Provider

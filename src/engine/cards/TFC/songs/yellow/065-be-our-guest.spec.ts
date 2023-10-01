@@ -10,7 +10,7 @@ import {
   oneJumpAhead,
   reflection,
 } from "~/engine/cards/TFC/songs/songs";
-import type { CardModel } from "~/store/models/CardModel";
+import type { CardModel } from "~/engine/store/models/CardModel";
 import {chiefTui, heiheiBoatSnack, liloMakingAWish, moanaOfMotunui} from "~/engine/cards/TFC/characters/characters";
 
 describe("Be Our Guest", () => {

@@ -1,10 +1,16 @@
 import type { Effect, ExertEffect } from "~/engine/rules/effects/effectTypes";
 import type { EffectTargets } from "~/engine/rules/effects/effectTypes";
 import {
-  HealEffect,
+  AttributeEffect,
+  CardEffectTarget,
   RestrictionEffect,
 } from "~/engine/rules/effects/effectTypes";
-import { TargetFilter } from "~/components/modals/target/filters";
+import {
+  AttributeFilterValue,
+  NumericComparison,
+  StringComparison,
+  TargetFilter,
+} from "~/spaces/components/modals/target/filters";
 
 export type AbilityTypes =
   | "singer"
@@ -16,32 +22,26 @@ export type AbilityTypes =
   | "evasive"
   | "support"
   | "voiceless"
-  | "ward";
+  | "ward"
+  | "gain-ability"
+  | "effects" // I need a better solution for this
+  // TODO: Attribute and restriction are really static abilities?
+  | "restriction"
+  | "attribute";
 
 export type Cost =
   | { type: "exert" }
   | { type: "ink"; amount: number }
   | { type: "banish"; target: "self" };
 
-export type Condition = {
-  type: "hand";
-  amount: number | "less_than_opponent";
-};
-
 export type Ability =
   | ResolutionAbility
   | ActivatedAbility
   | StaticAbility
+  | PropertyStaticAbility
   | WhileStaticAbility
   | StaticTriggeredAbility
-  | DelayedTriggeredAbility
-  // TODO: This can only be fixed once we implement all abilities
-  | {
-      text?: string;
-      ability?: string;
-      type?: "static" | "resolution" | "activated";
-      name?: string;
-    };
+  | DelayedTriggeredAbility;
 
 // An ability is a property of an object that influences the game by generating
 // effects or by creating a layer on the stack that resolves and generates effects
@@ -51,9 +51,10 @@ export interface BaseAbility {
   type?:
     | "static"
     | "while-static"
+    | "static-triggered"
+    | "property-static"
     | "resolution"
     | "activated"
-    | "static-triggered"
     | "delayed-triggered";
   effects?: Effect[];
   responder?: "self" | "opponent";
@@ -82,18 +83,41 @@ export interface ActivatedAbility extends BaseAbility {
 export interface StaticAbility extends BaseAbility {
   ability: AbilityTypes;
   type: "static";
-  effect?: never;
 }
 
-export type WhileCondition = {
-  type: "turn";
-  value: "self" | "opponent";
-};
+export interface PropertyStaticAbility extends BaseAbility {
+  type: "property-static";
+  ability: "attribute";
+  effects: AttributeEffect[];
+}
+
+export type Condition =
+  | {
+      type: "play";
+      comparison: NumericComparison;
+    }
+  | {
+      type: "hand";
+      amount: number | "less_than_opponent";
+    }
+  | {
+      type: "turn";
+      value: "self" | "opponent";
+    }
+  | { type: "exerted" }
+  // TODO: I'm getting tired of this, I get back to this when I have more time
+  | { type: "not-alone" }
+  | {
+      type: "inkwell";
+      amount: number;
+    };
+
+export type WhileCondition = Condition;
 
 // 5.4.7. A while-static ability is a static ability that is functional when its while-condition is met.
 export interface WhileStaticAbility extends BaseAbility {
   type: "while-static";
-  whileCondition: WhileCondition;
+  whileCondition: WhileCondition[];
   ability: StaticAbility;
 }
 
@@ -138,7 +162,6 @@ export interface StaticTriggeredAbility extends BaseAbility {
   type: "static-triggered";
   trigger: Trigger;
   optional?: boolean;
-  effects?: never;
   layer: ResolutionAbility;
 }
 
@@ -146,7 +169,6 @@ export interface DelayedTriggeredAbility extends BaseAbility {
   type: "delayed-triggered";
   trigger: Trigger;
   optional?: boolean;
-  effects?: never;
   // number is only used during serialization
   duration: "turn" | "next_turn" | number;
   layer: ResolutionAbility;
@@ -156,6 +178,33 @@ export interface SingerAbility extends StaticAbility {
   ability: "singer";
   type: "static";
   value: number;
+}
+
+export interface GainAbilityStaticAbility extends StaticAbility {
+  type: "static";
+  ability: "gain-ability";
+  target: CardEffectTarget;
+  // TODO: This type is referring itself
+  gainedAbility: StaticAbility;
+}
+
+export interface EffectStaticAbility extends StaticAbility {
+  type: "static";
+  ability: "effects";
+  effects: Effect[];
+}
+
+export interface AttributeStaticAbility extends StaticAbility {
+  type: "static";
+  ability: "attribute";
+  effect: AttributeEffect;
+}
+
+export interface RestrictionStaticAbility extends StaticAbility {
+  type: "static";
+  ability: "restriction";
+  effect: RestrictionEffect;
+  target: CardEffectTarget;
 }
 
 export interface ShiftAbility extends StaticAbility {
@@ -171,7 +220,14 @@ export const shiftAbility = (shift: number, name: string): ShiftAbility => {
     text: `**Shift** ${5} _(You may pay 5 ⬡ to play this on top of one of your characters named ${name}.)_`,
   } as ShiftAbility;
 };
-
+export const challengerAbility = (value: number): ChallengerAbility => {
+  return {
+    type: "static",
+    ability: "challenger",
+    value: value,
+    text: `**Challenger** +${value} (_When challenging, this character get +${value}3 ※._)`,
+  };
+};
 export interface VoicelessAbility extends StaticAbility {
   ability: "voiceless";
   type: "static";
@@ -343,6 +399,31 @@ export const wheneverCharacterChallengesAndBanishes = (params: {
   ];
 };
 
+export const whenBanished = (params: {
+  effects: Effect[];
+  target?: EffectTargets;
+  name?: string;
+  text?: string;
+  optional?: boolean;
+}): StaticTriggeredAbility => {
+  const { optional, effects, name, text } = params;
+  return {
+    type: "static-triggered",
+    name,
+    text,
+    trigger: {
+      on: "banish",
+    } as BanishTrigger,
+    layer: {
+      type: "resolution",
+      optional,
+      name,
+      text,
+      effects,
+    } as ResolutionAbility,
+  };
+};
+
 export const whenBanishedInAChallenge = (params: {
   effects: Effect[];
   target?: EffectTargets;
@@ -465,7 +546,7 @@ export const wheneverQuests = (params: {
       text,
       trigger: {
         on: "quest",
-      },
+      } as Trigger,
       layer: {
         type: "resolution",
         optional,
@@ -566,6 +647,31 @@ export const exertAndCantReady = (
 export const whileStaticAbilityPredicate = (
   ability?: Ability,
 ): ability is WhileStaticAbility => ability?.type === "while-static";
+
+export const staticEffectAbilityPredicate = (
+  ability?: Ability,
+): ability is EffectStaticAbility =>
+  ability?.type === "static" && ability.ability === "effects";
+
+export const gainStaticAbilityPredicate = (
+  ability?: Ability,
+): ability is GainAbilityStaticAbility =>
+  ability?.type === "static" && ability.ability === "gain-ability";
+
+export const whileStaticAttributeAbilityPredicate = (
+  ability?: Ability,
+): ability is WhileStaticAbility & { ability: AttributeStaticAbility } =>
+  ability?.type === "while-static" && ability.ability.ability === "attribute";
+
+export const whileStaticRestrictionAbilityPredicate = (
+  ability?: Ability,
+): ability is WhileStaticAbility & { ability: RestrictionStaticAbility } =>
+  ability?.type === "while-static" && ability.ability.ability === "restriction";
+
+export const propertyStaticRestrictionAbilityPredicate = (
+  ability?: Ability,
+): ability is PropertyStaticAbility & { ability: RestrictionStaticAbility } =>
+  ability?.type === "property-static" && ability.ability === "attribute";
 
 export const staticAbilityPredicate = (
   ability?: Ability,

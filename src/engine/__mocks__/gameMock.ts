@@ -1,4 +1,5 @@
 import { Game } from "~/libs/game";
+import { Table } from "~/spaces/providers/TabletopProvider";
 
 const cards = {
   agwwar4acf91zwftou3vgy1n: {
@@ -607,10 +608,11 @@ const cards = {
   },
 };
 
-const tables = {
+const tables: Record<string, Table> = {
   player_one: {
     lore: 0,
     readyToStart: false,
+    cardsAddedToInkWellThisTurn: 0,
     zones: {
       discard: [],
       inkwell: [],
@@ -685,6 +687,7 @@ const tables = {
   player_two: {
     lore: 0,
     readyToStart: false,
+    cardsAddedToInkWellThisTurn: 0,
     zones: {
       discard: [],
       inkwell: [],

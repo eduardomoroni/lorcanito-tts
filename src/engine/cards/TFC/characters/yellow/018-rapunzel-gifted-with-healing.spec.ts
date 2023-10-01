@@ -4,7 +4,7 @@
 
 import { describe, expect, it } from "@jest/globals";
 import { TestStore } from "~/engine/rules/testStore";
-import { CardModel } from "~/store/models/CardModel";
+import { CardModel } from "~/engine/store/models/CardModel";
 import {chiefTui, rapunzelGiftedWithHealing} from "~/engine/cards/TFC/characters/characters";
 
 describe("Rapunzel - Gifted with Healing", () => {

@@ -5,10 +5,10 @@ import { PlayArea } from "~/spaces/PlayAreaZone";
 import { InkWell } from "~/spaces/InkWellZone";
 import { HandZone } from "~/spaces/HandZone";
 import { TableOverlay } from "~/spaces/table/TableOverlay";
-import { PlayerOfflineBanner } from "~/components/banners/PlayerOfflineBanner";
+import { PlayerOfflineBanner } from "~/spaces/components/banners/PlayerOfflineBanner";
 import { observer } from "mobx-react-lite";
 import { useGameStore } from "~/engine/lib/GameStoreProvider";
-import { CardModel } from "~/store/models/CardModel";
+import { CardModel } from "~/engine/store/models/CardModel";
 import { LoreCounter } from "~/spaces/table/lore/LoreCounter";
 import { ItemArea } from "~/spaces/ItemArea";
 

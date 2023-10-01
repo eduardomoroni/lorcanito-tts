@@ -4,10 +4,11 @@
 import { TestStore } from "~/engine/rules/testStore";
 import { describe, expect } from "@jest/globals";
 import {
-    donaldDuckStruttingHisStuff,
-    gastonArrogantHunter,
-    jetsamUrsulaSpy, moanaOfMotunui,
-    teKaTheBurningOne
+  donaldDuckStruttingHisStuff,
+  gastonArrogantHunter,
+  jetsamUrsulaSpy,
+  moanaOfMotunui,
+  teKaTheBurningOne,
 } from "~/engine/cards/TFC/characters/characters";
 
 describe("Reckless keyword", () => {
@@ -18,20 +19,23 @@ describe("Reckless keyword", () => {
       },
       {
         play: [moanaOfMotunui],
-      }
+      },
     );
 
     const cardUnderTest = testStore.getByZoneAndId(
       "play",
-      gastonArrogantHunter.id
+      gastonArrogantHunter.id,
     );
     expect(cardUnderTest.meta).toEqual(
-      expect.objectContaining({ exerted: undefined, playedThisTurn: undefined })
+      expect.objectContaining({
+        exerted: undefined,
+        playedThisTurn: undefined,
+      }),
     );
     const defender = testStore.getByZoneAndId(
       "play",
       moanaOfMotunui.id,
-      "player_two"
+      "player_two",
     );
     defender.updateCardMeta({ exerted: true });
     expect(defender.ready).toEqual(false);
@@ -53,20 +57,23 @@ describe("Reckless keyword", () => {
       {
         play: [moanaOfMotunui],
         deck: [moanaOfMotunui],
-      }
+      },
     );
 
     const cardUnderTest = testStore.getByZoneAndId(
       "play",
-      gastonArrogantHunter.id
+      gastonArrogantHunter.id,
     );
     expect(cardUnderTest.meta).toEqual(
-      expect.objectContaining({ exerted: undefined, playedThisTurn: undefined })
+      expect.objectContaining({
+        exerted: undefined,
+        playedThisTurn: undefined,
+      }),
     );
     const defender = testStore.getByZoneAndId(
       "play",
       moanaOfMotunui.id,
-      "player_two"
+      "player_two",
     );
     defender.updateCardMeta({ exerted: true });
     expect(defender.ready).toEqual(false);
@@ -89,17 +96,17 @@ describe("Reckless keyword", () => {
         {
           play: [moanaOfMotunui],
           deck: [donaldDuckStruttingHisStuff],
-        }
+        },
       );
 
       const cardUnderTest = testStore.getByZoneAndId(
         "play",
-        teKaTheBurningOne.id
+        teKaTheBurningOne.id,
       );
       const defender = testStore.getByZoneAndId(
         "play",
         moanaOfMotunui.id,
-        "player_two"
+        "player_two",
       );
 
       expect(testStore.store.turnPlayer).toEqual("player_one");
@@ -119,23 +126,23 @@ describe("Reckless keyword", () => {
         {
           play: [jetsamUrsulaSpy],
           deck: [jetsamUrsulaSpy],
-        }
+        },
       );
 
       const cardUnderTest = testStore.getByZoneAndId(
         "play",
-        gastonArrogantHunter.id
+        gastonArrogantHunter.id,
       );
       expect(cardUnderTest.meta).toEqual(
         expect.objectContaining({
           exerted: undefined,
           playedThisTurn: undefined,
-        })
+        }),
       );
       const defender = testStore.getByZoneAndId(
         "play",
         jetsamUrsulaSpy.id,
-        "player_two"
+        "player_two",
       );
       defender.updateCardMeta({ exerted: true });
       expect(defender.ready).toEqual(false);

@@ -9,7 +9,7 @@ import {
 export const friendsOnTheOtherSide: LorcanitoActionCard = {
   implemented: true,
   id: "3297d4fcfbba0c3cc6355fa9a2c2ea489eb8af1e",
-  url: "https://static.lorcanito.com/images/cards/TFC/64.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/64.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/64_en_friends_on_the_other_side-716.webp",
   name: "Friends On The Other Side",
@@ -45,7 +45,7 @@ export const friendsOnTheOtherSide: LorcanitoActionCard = {
 export const hakunaMatata: LorcanitoActionCard = {
   implemented: true,
   id: "7ed65f0a90cd0af2c52719aad0900c9fb28a46bd",
-  url: "https://static.lorcanito.com/images/cards/TFC/27.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/27.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/27_en_hakuna_matata-716.webp",
   name: "Hakuna Matata",
@@ -87,7 +87,7 @@ export const hakunaMatata: LorcanitoActionCard = {
 export const beOurGuest: LorcanitoActionCard = {
   implemented: true,
   id: "449d07fcd53f74ce7c468bbb02c937315bb7dc2e",
-  url: "https://static.lorcanito.com/images/cards/TFC/25.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/25.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/25_en_be_our_guest-716.webp",
   name: "Be Our Guest",
@@ -134,7 +134,7 @@ export const beOurGuest: LorcanitoActionCard = {
 export const partOfOurWorld: LorcanitoActionCard = {
   implemented: true,
   id: "9a9a8606b0b16e2aac5cbf5943711dfc9d12c2e5",
-  url: "https://static.lorcanito.com/images/cards/TFC/30.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/30.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/30_en_part_of_your_world-716.webp",
   name: "Part of Your World",
@@ -175,7 +175,7 @@ export const partOfOurWorld: LorcanitoActionCard = {
 export const reflection: LorcanitoActionCard = {
   implemented: true,
   id: "0d31960d45be3710633f8fd14bc2cb1a5d0d455b",
-  url: "https://static.lorcanito.com/images/cards/TFC/65.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/65.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/65_en_reflection-716.webp",
   name: "Reflection",
@@ -214,7 +214,7 @@ export const reflection: LorcanitoActionCard = {
 export const motherKnowsBest: LorcanitoActionCard = {
   implemented: true,
   id: "f7901284cc687c92dce00ce7a5dac93705c66bfa",
-  url: "https://static.lorcanito.com/images/cards/TFC/95.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/95.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/95_en_mother_knows_best-716.webp",
   name: "Mother Knows Best",
@@ -254,7 +254,7 @@ export const motherKnowsBest: LorcanitoActionCard = {
 export const suddenChill: LorcanitoActionCard = {
   implemented: true,
   id: "f1234c93ebdb915cbb9cd59c26bbfa53b2930dc7",
-  url: "https://static.lorcanito.com/images/cards/TFC/98.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/98.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/98_en_sudden_chill-716.webp",
   name: "Sudden Chill",
@@ -298,7 +298,7 @@ export const suddenChill: LorcanitoActionCard = {
 export const bePrepared: LorcanitoActionCard = {
   implemented: true,
   id: "66f449b309975f089015bf4e06cfca1436bf7def",
-  url: "https://static.lorcanito.com/images/cards/TFC/128.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/128.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/128_en_be_prepared-716.webp",
   name: "Be Prepared",
@@ -337,7 +337,7 @@ export const bePrepared: LorcanitoActionCard = {
 export const letItGo: LorcanitoActionCard = {
   implemented: true,
   id: "896c3caa4dccb15fe042026ef73498972c838579",
-  url: "https://static.lorcanito.com/images/cards/TFC/163.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/163.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/163_en_let_it_go-716.webp",
   name: "Let It Go",
@@ -391,7 +391,7 @@ export const letItGo: LorcanitoActionCard = {
 export const oneJumpAhead: LorcanitoActionCard = {
   implemented: true,
   id: "4e0080092bdad6211fafb326d79891fc4ca48659",
-  url: "https://static.lorcanito.com/images/cards/TFC/164.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/164.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/164_en_one_jump_ahead-716.webp",
   name: "One Jump Ahead",
@@ -431,7 +431,7 @@ export const oneJumpAhead: LorcanitoActionCard = {
 export const aWholeNewWorld: LorcanitoActionCard = {
   implemented: true,
   id: "154bf7f324ddab1008d75b3a79fcb215fc3771dc",
-  url: "https://static.lorcanito.com/images/cards/TFC/195.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/195.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/195_en_a_whole_new_world-716.webp",
   name: "A Whole New World",
@@ -476,7 +476,7 @@ export const aWholeNewWorld: LorcanitoActionCard = {
 export const grabYourSword: LorcanitoActionCard = {
   implemented: true,
   id: "6092b9532d04b3dbeb5d69ed55ce007becc59d7f",
-  url: "https://static.lorcanito.com/images/cards/TFC/198.webp",
+  url: "https://lorcanito.imgix.net/images/cards/EN/001/198.webp",
   alternativeUrl:
     "https://images.lorcania.com/cards/tfc/198_en_grab_your_sword-716.webp",
   name: "Grab Your Sword",

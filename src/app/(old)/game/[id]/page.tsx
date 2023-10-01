@@ -1,10 +1,9 @@
 import React from "react";
 import { redirect } from "next/navigation";
-import { adminDatabase } from "~/3rd-party/firebase/admin";
 import { type Game } from "~/libs/game";
 import { getServerSession } from "next-auth";
 import { authOptions } from "~/server/auth";
-import { getOrCreateGame } from "~/3rd-party/firebase/database/game";
+import { getOrCreateGame } from "~/libs/3rd-party/firebase/database/game";
 import { headers } from "next/headers";
 import { UAParser } from "ua-parser-js";
 import { cookies } from "next/headers";
@@ -13,6 +12,7 @@ import { cookies } from "next/headers";
 // import GamePage from "~/app/game/[id]/actual";
 import dynamic from "next/dynamic";
 import { createStreamClientToken } from "~/server/api/routers/chat";
+import { getFirestoreGame } from "~/libs/3rd-party/firebase/firestore";
 
 const GamePage = dynamic(() => import("./actual"), {
   ssr: false,
@@ -29,11 +29,10 @@ const getGame = async (gameId: string, userUid: string | undefined) => {
   }
 
   if (gameId !== userUid) {
-    const dataSnapshot = await adminDatabase.ref(`games/${gameId}`).get();
-    const game: Game = dataSnapshot.val() as Game;
+    const game = await getFirestoreGame(gameId);
 
     if (!game) {
-      redirect(`/game/${userUid}`);
+      redirect(`/not-found?lobbyId=${gameId}&userUid=${userUid}`);
     } else {
       return {
         props: { game },

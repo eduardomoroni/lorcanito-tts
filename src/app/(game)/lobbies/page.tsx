@@ -1,21 +1,15 @@
 import React from "react";
 import { authOptions } from "~/server/auth";
 
-import dynamic from "next/dynamic";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { cookies } from "next/headers";
 import { createStreamClientToken } from "~/server/api/routers/chat";
+import LobbiesProviders from "~/app/(game)/lobbies/LobbiesProviders";
 
 export const metadata = {
   description: "Lorcanito Lobbies.",
 };
-
-const LobbyPageProviders = dynamic(() => import("./LobbiesProviders"), {
-  // TODO: I NEED TO INVESTIGATE WHEN I HAVE TIME
-  ssr: false,
-  loading: () => <p>Loading lobbies.</p>,
-});
 
 const getUserId = async () => {
   const session = await getServerSession(authOptions);
@@ -39,5 +33,5 @@ export default async function Lobby({ params }: { params: { id: string } }) {
   }
   const streamToken = await createStreamClientToken(userUid || "");
 
-  return <LobbyPageProviders userId={userUid} streamToken={streamToken} />;
+  return <LobbiesProviders userId={userUid} streamToken={streamToken} />;
 }

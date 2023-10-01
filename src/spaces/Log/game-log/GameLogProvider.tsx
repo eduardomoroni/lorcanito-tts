@@ -3,8 +3,8 @@
 import { createContext, useCallback, useContext, useState } from "react";
 import { createId } from "@paralleldrive/cuid2";
 import { useUser } from "reactfire";
-import { type Zones } from "~/providers/TabletopProvider";
-import { SingletonChat } from "~/providers/stream-chat-provider/StreamChatProvider";
+import { type Zones } from "~/spaces/providers/TabletopProvider";
+import { SingletonChat } from "~/spaces/providers/stream-chat-provider/StreamChatProvider";
 import { type InternalLogEntry, type LogEntry } from "~/spaces/Log/types";
 import { type UserResponse } from "stream-chat";
 
@@ -40,7 +40,7 @@ function isPrivateEntry(newEntry: InternalLogEntry) {
 export const createLogEntry = (
   logEntry: LogEntry,
   sender: string | "SYSTEM",
-  newLogKey?: string | null
+  newLogKey?: string | null,
 ) => {
   // @ts-expect-error TODO: fix this PASS_TURN needs to be fixed
   const player = logEntry.sender || sender;
@@ -104,7 +104,7 @@ export function useGameLogContext() {
 
 async function pushLogToStreamClient(
   logEntry: LogEntry,
-  streamUser?: UserResponse
+  streamUser?: UserResponse,
 ) {
   await SingletonChat.sendMessage(
     {
@@ -112,7 +112,7 @@ async function pushLogToStreamClient(
       silent: true,
       logEntry: logEntry,
     },
-    { skip_push: true }
+    { skip_push: true },
   );
 }
 
@@ -127,7 +127,7 @@ function replaceUndefinedByNull(obj: InternalLogEntry): InternalLogEntry {
 
       return acc;
     },
-    {}
+    {},
   );
 
   return reduce as unknown as InternalLogEntry;

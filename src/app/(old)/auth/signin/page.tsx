@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { type ChangeEvent, useCallback, useState } from "react";
 
-import { AuthLayout } from "~/components/AuthLayout";
-import { Button } from "~/components/Button";
-import { TextField } from "~/components/Fields";
-import { Logo } from "~/components/Logo";
-import { signIn } from "~/3rd-party/firebase";
+import { AuthLayout } from "~/spaces/components/AuthLayout";
+import { Button } from "~/spaces/components/Button";
+import { TextField } from "~/spaces/components/Fields";
+import { Logo } from "~/spaces/components/Logo";
+import { signIn } from "~/libs/3rd-party/firebase";
 import { usePathname, useSearchParams } from "next/navigation";
 
 export default function SignInPage() {

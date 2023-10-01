@@ -1,12 +1,12 @@
 import React, { type FC, useEffect } from "react";
-import GameChat from "~/components/messaging/GameChat";
+import GameChat from "~/spaces/components/messaging/GameChat";
 import { RighHandSideButtons } from "~/spaces/table/RightHandSideButtons/RighHandSideButtons";
-import { useConfirmationModal } from "~/providers/ConfirmationModalProvider";
+import { useConfirmationModal } from "~/spaces/providers/ConfirmationModalProvider";
 import { useTurn } from "~/engine/GameProvider";
-import { api } from "~/utils/api";
-import { logAnalyticsEvent } from "~/3rd-party/firebase/FirebaseAnalyticsProvider";
+import { api } from "~/libs/api";
+import { logAnalyticsEvent } from "~/libs/3rd-party/firebase/FirebaseAnalyticsProvider";
 import { useRouter } from "next/navigation";
-import { useGameLobby } from "~/providers/lobby/GameLobbyProvider";
+import { useGameLobby } from "~/spaces/providers/lobby/GameLobbyProvider";
 
 // https://www.contus.com/blog/best-chat-sdk/
 export const SideBar: FC<{
@@ -14,7 +14,7 @@ export const SideBar: FC<{
 }> = (props) => {
   const confirm = useConfirmationModal(
     "Welcome to Lorcanito!",
-    "This is a work in progress. Please report any bugs on Discord. Most of the game interactions are based on dragging and dropping cards, left and right click."
+    "This is a work in progress. Please report any bugs on Discord. Most of the game interactions are based on dragging and dropping cards, left and right click.",
   );
   const [lobby] = useGameLobby();
   const router = useRouter();
@@ -37,7 +37,7 @@ export const SideBar: FC<{
           router.push(`/lobby/${lobby.id}`);
         },
         "Lobby is open",
-        "This might mean your opponent left the game. Would you like to navigate back to lobby?"
+        "This might mean your opponent left the game. Would you like to navigate back to lobby?",
       );
     }
   }, [lobby?.gameStarted]);
@@ -69,7 +69,7 @@ export const SideBar: FC<{
                     restartGame();
                   },
                   "Restart Game",
-                  "Are you sure you want to restart the game?"
+                  "Are you sure you want to restart the game?",
                 );
               }}
               className="relative inline-flex items-center rounded-l-md bg-slate-200 px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10"
@@ -88,7 +88,7 @@ export const SideBar: FC<{
                 confirm(
                   backToLobby,
                   "Back to lobby",
-                  "Are you sure? You and your opponent are going to be redirected to game lobby, and the current game state will be lost. You will be able to start a new match. Would you like to proceed?"
+                  "Are you sure? You and your opponent are going to be redirected to game lobby, and the current game state will be lost. You will be able to start a new match. Would you like to proceed?",
                 );
               }}
               className="relative -ml-px inline-flex items-center rounded-r-md bg-slate-200 px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10"

@@ -1,12 +1,12 @@
-import { type Deck, type DeckCard } from "~/providers/TabletopProvider";
+import { type Deck, type DeckCard } from "~/spaces/providers/TabletopProvider";
 import { allCards } from "~/engine/cards/cards";
 import { LorcanitoCard } from "~/engine/cards/cardTypes";
 
 export function getCardFullName(card: LorcanitoCard) {
-  if (!card.title) {
-    return card.name.toLowerCase();
-  } else {
+  if ("title" in card && card.title) {
     return `${card.name.toLowerCase()} - ${card.title?.toLowerCase()}`;
+  } else {
+    return card.name.toLowerCase();
   }
 }
 

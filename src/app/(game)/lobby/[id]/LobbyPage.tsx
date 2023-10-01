@@ -5,24 +5,24 @@ import { useRouter } from "next/navigation";
 import {
   useFirebaseUser,
   useFirebaseUserId,
-} from "~/3rd-party/firebase/FirebaseSessionProvider";
+} from "~/libs/3rd-party/firebase/FirebaseSessionProvider";
 import { useDatabase, useSigninCheck } from "reactfire";
-import GameChat from "~/components/messaging/GameChat";
-import { type Tab, Tabs } from "~/components/tabs/Tabs";
-import { Button } from "~/components/button/Button";
-import { ImportDeckTab } from "~/components/tabs/ImportDeckTab";
-import { DeckCardTab } from "~/components/tabs/DeckCardTab";
-import { HandSimulatorTab } from "~/components/tabs/HandSimulatorTab";
-import { PlayerId, Players } from "~/spaces/table/GameSettings";
-import { useGameLobby } from "~/providers/lobby/GameLobbyProvider";
-import { useDeckImport } from "~/providers/DeckImportProvider";
-import { api } from "~/utils/api";
-import { logAnalyticsEvent } from "~/3rd-party/firebase/FirebaseAnalyticsProvider";
+import GameChat from "~/spaces/components/messaging/GameChat";
+import { type Tab, Tabs } from "~/spaces/components/tabs/Tabs";
+import { Button } from "~/spaces/components/button/Button";
+import { ImportDeckTab } from "~/spaces/components/tabs/ImportDeckTab";
+import { DeckCardTab } from "~/spaces/components/tabs/DeckCardTab";
+import { HandSimulatorTab } from "~/spaces/components/tabs/HandSimulatorTab";
+import { useGameLobby } from "~/spaces/providers/lobby/GameLobbyProvider";
+import { useDeckImport } from "~/spaces/providers/DeckImportProvider";
+import { api } from "~/libs/api";
+import { logAnalyticsEvent } from "~/libs/3rd-party/firebase/FirebaseAnalyticsProvider";
 import { StartGameModal } from "~/app/(game)/lobby/[id]/components/StartGameModal";
-import { StreamChatProvider } from "~/providers/stream-chat-provider/StreamChatProvider";
-import { DeckListTab } from "~/components/tabs/DeckListTab";
-import { setUpLobbyPresence } from "~/3rd-party/firebase/database/presence";
+import { StreamChatProvider } from "~/spaces/providers/stream-chat-provider/StreamChatProvider";
+import { DeckListTab } from "~/spaces/components/tabs/DeckListTab";
+import { setUpLobbyPresence } from "~/libs/3rd-party/firebase/database/presence";
 import { ref, set } from "firebase/database";
+import { PlayerId, Players } from "~/spaces/game-settings/GameSettings";
 
 const deckCardsTab = { name: "Deck Cards", key: "deck-cards" };
 const deckListTab = { name: "Deck List", key: "deck-list" };
@@ -35,7 +35,7 @@ const tabs: Tab[] = [
 ];
 
 export const LobbyPage: FC<{ lobbyId: string; streamToken: string }> = (
-  props
+  props,
 ) => {
   const { lobbyId, streamToken } = props;
   const { deck } = useDeckImport();
@@ -47,7 +47,7 @@ export const LobbyPage: FC<{ lobbyId: string; streamToken: string }> = (
   const router = useRouter();
 
   const [selectedTab, setSelectedTab] = useState<Tab>(
-    deck.length ? deckListTab : importDeck
+    deck.length ? deckListTab : importDeck,
   );
   const [gameLobby, userUID] = useGameLobby();
   const players = Object.keys(gameLobby.players || {});
@@ -72,7 +72,7 @@ export const LobbyPage: FC<{ lobbyId: string; streamToken: string }> = (
   useEffect(() => {
     const isFullRef = ref(
       database,
-      `presence/lobbies/${gameLobby.gameId}/full`
+      `presence/lobbies/${gameLobby.gameId}/full`,
     );
     if (gameLobby.players && Object.keys(gameLobby.players).length === 1) {
       set(isFullRef, false);
@@ -99,7 +99,7 @@ export const LobbyPage: FC<{ lobbyId: string; streamToken: string }> = (
   }
 
   const opponentId = Object.keys(gameLobby?.players || {}).find(
-    (player) => player !== userUID
+    (player) => player !== userUID,
   );
 
   return (
@@ -217,6 +217,7 @@ function RightHandSide(props: { lobbyId: string }) {
 
   const waitingForOthers =
     playerHasJoined && deck.length > 0 && gameLobby.players[userUID];
+
   if (waitingForOthers) {
     buttonCopy = "Waiting for others to be ready";
     onClick = loadDeck;

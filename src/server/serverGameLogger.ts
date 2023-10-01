@@ -1,6 +1,6 @@
 import { StreamChat } from "stream-chat";
 import { createLogEntry } from "~/spaces/Log/game-log/GameLogProvider";
-import { adminDatabase } from "~/3rd-party/firebase/admin";
+import { adminDatabase } from "~/libs/3rd-party/firebase/admin";
 import { type InternalLogEntry, type LogEntry } from "~/spaces/Log/types";
 
 const api_key = process.env.NEXT_PUBLIC_STREAM_API_KEY;

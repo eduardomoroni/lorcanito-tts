@@ -1,12 +1,12 @@
-import { ZoneOverlay } from "~/components/ZoneOverlay";
+import { ZoneOverlay } from "~/spaces/components/ZoneOverlay";
 import React, { FC, useEffect } from "react";
-import { LorcanaCardImage } from "~/components/card/LorcanaCardImage";
-import { useCardPreview } from "~/providers/CardPreviewProvider";
+import { LorcanaCardImage } from "~/spaces/components/card/LorcanaCardImage";
+import { useCardPreview } from "~/spaces/providers/CardPreviewProvider";
 import { useGameStore } from "~/engine/lib/GameStoreProvider";
-import { useTargetModal } from "~/providers/TargetModalProvider";
-import { CardModel } from "~/store/models/CardModel";
-import { useYesOrNoModal } from "~/providers/YesOrNoModalProvider";
-import { useScryModal } from "~/providers/ScryModalProvider";
+import { useTargetModal } from "~/spaces/providers/TargetModalProvider";
+import { CardModel } from "~/engine/store/models/CardModel";
+import { useYesOrNoModal } from "~/spaces/providers/YesOrNoModalProvider";
+import { useScryModal } from "~/spaces/providers/ScryModalProvider";
 import { scryEffectPredicate } from "~/engine/rules/effects/effectTypes";
 import { staticTriggeredAbilityPredicate } from "~/engine/rules/abilities/abilities";
 
@@ -58,7 +58,7 @@ export const EffectStackZoneArena: FC = () => {
       });
     } else if (musk) {
       openYesOrNoModal({
-        title: `Choose a target for ${title}`,
+        title: `Would you like to activate: ${title}`,
         text: subtitle,
         onYes: () => {
           // musketeer tabard

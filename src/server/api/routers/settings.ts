@@ -1,6 +1,6 @@
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { z } from "zod";
-import { adminDatabase } from "~/3rd-party/firebase/admin";
+import { adminDatabase } from "~/libs/3rd-party/firebase/admin";
 
 export const settingsRouter = createTRPCRouter({
   loadDeck: protectedProcedure

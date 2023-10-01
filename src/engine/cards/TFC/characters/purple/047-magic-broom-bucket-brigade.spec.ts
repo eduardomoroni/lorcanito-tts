@@ -7,73 +7,86 @@ import { createRuleEngine } from "~/engine/engine";
 import { createMockGame } from "~/engine/__mocks__/createGameMock";
 import { TestStore } from "~/engine/rules/testStore";
 import {
-    captainColonelsLieutenant,
-    heiheiBoatSnack,
-    magicBroomBucketBrigade, mickeyMouseTrueFriend, moanaOfMotunui
+  captainColonelsLieutenant,
+  heiheiBoatSnack,
+  magicBroomBucketBrigade,
+  mickeyMouseTrueFriend,
+  moanaOfMotunui,
 } from "~/engine/cards/TFC/characters/characters";
 const testPlayer = "player_one";
 const opponent = "player_two";
 
 describe("Magic Broom - Bucket Brigade", () => {
   it("Weep effect - Own Discard", () => {
-    const engine = createRuleEngine(
-      createMockGame({
-        inkwell: [magicBroomBucketBrigade, magicBroomBucketBrigade],
-        hand: [magicBroomBucketBrigade],
-        discard: [mickeyMouseTrueFriend, moanaOfMotunui],
-      }),
-    );
-
-    const cardUnderTest = engine.get.byZoneAndId({
-      zone: "hand",
-      lorcanitoId: magicBroomBucketBrigade.id,
-      owner: testPlayer,
+    const testStore = new TestStore({
+      inkwell: [magicBroomBucketBrigade, magicBroomBucketBrigade],
+      hand: [magicBroomBucketBrigade],
+      discard: [mickeyMouseTrueFriend, moanaOfMotunui],
     });
 
-    engine.moves.playCardFromHand(cardUnderTest);
+    const cardUnderTest = testStore.getByZoneAndId(
+      "hand",
+      magicBroomBucketBrigade.id,
+    );
 
-    const cardsInPlay = engine.get.zoneCards("play", testPlayer);
-    expect(cardsInPlay).toEqual(expect.arrayContaining([cardUnderTest]));
-    expect(engine.get.effects()).toHaveLength(1);
-    expect(engine.get.zoneCards("discard", testPlayer)).toHaveLength(2);
+    expect(testStore.getZonesCardCount("player_one").discard).toEqual(2);
 
-    const effect = engine.get.effects()[0];
-    if (effect) {
-      const cardToShuffle = engine.get.zoneCards("discard", testPlayer)[0];
-      engine.moves.resolveEffect(effect?.id, { targetId: cardToShuffle });
-    }
-    expect(engine.get.zoneCards("discard", testPlayer)).toHaveLength(1);
+    cardUnderTest.playFromHand();
+
+    expect(testStore.store.stackLayerStore.layers).toHaveLength(1);
+
+    const target = testStore.getByZoneAndId(
+      "discard",
+      mickeyMouseTrueFriend.id,
+    );
+    testStore.resolveTopOfStack({ targetId: target.instanceId });
+
+    expect(testStore.store.stackLayerStore.layers).toHaveLength(0);
+    expect(testStore.getZonesCardCount("player_one")).toEqual(
+      expect.objectContaining({
+        discard: 1,
+        play: 1,
+        deck: 1,
+      }),
+    );
   });
 
   it("Weep effect - Opponent's Discard", () => {
-    const engine = createRuleEngine(
-      createMockGame(
-        {
-          inkwell: [magicBroomBucketBrigade, magicBroomBucketBrigade],
-          hand: [magicBroomBucketBrigade],
-        },
-        {
-          discard: [mickeyMouseTrueFriend, moanaOfMotunui],
-        },
-      ),
+    const testStore = new TestStore(
+      {
+        inkwell: [magicBroomBucketBrigade, magicBroomBucketBrigade],
+        hand: [magicBroomBucketBrigade],
+      },
+      {
+        discard: [mickeyMouseTrueFriend, moanaOfMotunui],
+      },
     );
 
-    const cardUnderTest = engine.get.byZoneAndId({
-      zone: "hand",
-      lorcanitoId: magicBroomBucketBrigade.id,
-      owner: testPlayer,
-    });
+    const cardUnderTest = testStore.getByZoneAndId(
+      "hand",
+      magicBroomBucketBrigade.id,
+    );
 
-    engine.moves.playCardFromHand(cardUnderTest);
+    expect(testStore.getZonesCardCount("player_two").discard).toEqual(2);
 
-    expect(engine.get.zoneCards("discard", opponent)).toHaveLength(2);
+    cardUnderTest.playFromHand();
 
-    const effect = engine.get.effects()[0];
-    if (effect) {
-      const cardToShuffle = engine.get.zoneCards("discard", opponent)[0];
-      engine.moves.resolveEffect(effect?.id, { targetId: cardToShuffle });
-    }
-    expect(engine.get.zoneCards("discard", opponent)).toHaveLength(1);
+    expect(testStore.store.stackLayerStore.layers).toHaveLength(1);
+
+    const target = testStore.getByZoneAndId(
+      "discard",
+      mickeyMouseTrueFriend.id,
+      "player_two",
+    );
+    testStore.resolveTopOfStack({ targetId: target.instanceId });
+
+    expect(testStore.store.stackLayerStore.layers).toHaveLength(0);
+    expect(testStore.getZonesCardCount("player_two")).toEqual(
+      expect.objectContaining({
+        discard: 1,
+        deck: 1,
+      }),
+    );
   });
 
   it("Weep effect - Skipping", () => {

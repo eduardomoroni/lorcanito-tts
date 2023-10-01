@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "~/server/auth";
 import type { NextRequest } from "next/server";
-import { createGameLobby } from "~/3rd-party/firebase/database/game";
+import { createGameLobby } from "~/libs/3rd-party/firebase/database/game";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;

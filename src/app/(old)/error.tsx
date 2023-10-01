@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useLayoutEffect } from "react";
-import { logAnalyticsEvent } from "~/3rd-party/firebase/FirebaseAnalyticsProvider";
+import { logAnalyticsEvent } from "~/libs/3rd-party/firebase/FirebaseAnalyticsProvider";
 import "./error.css";
-import { api } from "~/utils/api";
-import { useFirebaseUserId } from "~/3rd-party/firebase/FirebaseSessionProvider";
+import { api } from "~/libs/api";
+import { useFirebaseUserId } from "~/libs/3rd-party/firebase/FirebaseSessionProvider";
 
 import * as Sentry from "@sentry/nextjs";
 

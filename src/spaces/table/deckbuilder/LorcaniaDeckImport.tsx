@@ -2,8 +2,8 @@
 
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { api } from "~/utils/api";
-import { logAnalyticsEvent } from "~/3rd-party/firebase/FirebaseAnalyticsProvider";
+import { api } from "~/libs/api";
+import { logAnalyticsEvent } from "~/libs/3rd-party/firebase/FirebaseAnalyticsProvider";
 
 export function LorcaniaDeckImport(props: {
   deckList: string;

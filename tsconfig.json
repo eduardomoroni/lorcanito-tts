@@ -1,10 +1,12 @@
 {
   "compilerOptions": {
-    "strict": true,
-    "noImplicitReturns": true,
+    //    "typeRoots": ["./node_modules/@types"],
+    "strict": false,
+    "noImplicitReturns": false,
     "useDefineForClassFields": true,
-    "types": ["jest", "node"],
-    "target": "ES6",
+    "forceConsistentCasingInFileNames": true,
+    //    "types": ["jest", "node"],
+    "target": "es2020",
     "lib": [
       "dom",
       "dom.iterable",
@@ -14,7 +16,6 @@
     "allowJs": true,
     "checkJs": false,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
@@ -29,28 +30,32 @@
       "~/*": [
         "./src/*"
       ],
+      "@/spaces/*": [
+        "./src/spaces/*"
+      ],
       "@/*": [
-        "./src/studio/*"
+        "./src/spaces/studio/*"
       ]
     },
     "plugins": [
       {
         "name": "next"
       }
-    ]
+    ],
+    "strictNullChecks": true
   },
   "include": [
+    ".next/types/**/*.ts",
     ".eslintrc.cjs",
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     "**/*.cjs",
-    "**/*.mjs",
-    ".next/types/**/*.ts"
+    "**/*.mjs"
   ],
   "exclude": [
     "**/node_modules",
     "**/**/node_modules",
-    "**/dist",
+    "**/dist"
   ]
 }

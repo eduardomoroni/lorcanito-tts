@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
-import Dropdown from "~/components/dropdowns/Dropdown";
+import Dropdown from "~/spaces/components/dropdowns/Dropdown";
 import { DeckListDeckImport } from "~/spaces/table/deckbuilder/DeckListDeckImport";
 import { LorcaniaDeckImport } from "~/spaces/table/deckbuilder/LorcaniaDeckImport";
 import { StarterDecksImport } from "~/spaces/table/deckbuilder/imports/StarterDecksImport";
-import { useDeckImport } from "~/providers/DeckImportProvider";
+import { useDeckImport } from "~/spaces/providers/DeckImportProvider";
 import { DreambornDeckImport } from "~/spaces/table/deckbuilder/DreambornDeckImport";
 
 const MODES = {
@@ -32,7 +32,7 @@ export function DeckTextArea(props: { playerHasJoined: boolean }) {
     ? modes
     : window.localStorage.getItem("deckMode");
   const [importMode, setImportMode] = useState<string>(
-    initialState || MODES.starters
+    initialState || MODES.starters,
   );
 
   useEffect(() => {
@@ -45,7 +45,7 @@ export function DeckTextArea(props: { playerHasJoined: boolean }) {
           ? MODES.lorcania
           : referrer === "dreamborn"
           ? MODES.dreamborn
-          : MODES.starters
+          : MODES.starters,
       );
     }
   }, [importMode]);
