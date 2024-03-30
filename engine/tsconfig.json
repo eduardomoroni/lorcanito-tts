@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitReturns": false,
+    "useDefineForClassFields": true,
+    "forceConsistentCasingInFileNames": true,
+    "target": "es2020",
+    "lib": ["esnext", "ES2023"],
+    "allowJs": false,
+    "checkJs": false,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "incremental": true,
+    "noUncheckedIndexedAccess": true,
+    "strictNullChecks": true,
+    "paths": {
+      "@lorcanito/engine": ["./src/index.ts"],
+      "@lorcanito/engine/*": ["./src/*"]
+    }
+  }
+}

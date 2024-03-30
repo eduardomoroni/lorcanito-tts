@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Footer } from "~/spaces/components/Footer";
-import { Header } from "~/spaces/components/header/Header";
-import { Hero } from "~/spaces/components/Hero";
+import { Footer } from "~/client/components/Footer";
+import { Header } from "~/client/components/header/Header";
+import { Hero } from "~/client/components/Hero";
 
 export const metadata: Metadata = {
   title: "Lorcanito - Play Disney Lorcana Online",

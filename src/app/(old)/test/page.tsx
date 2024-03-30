@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { LoreAndInkCounter } from "~/spaces/components/counter/LoreAndInkCounter";
+import { LoreAndInkCounter } from "~/client/components/counter/LoreAndInkCounter";
 
 export default function Home() {
   return (

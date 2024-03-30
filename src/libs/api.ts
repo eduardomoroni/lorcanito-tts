@@ -28,6 +28,13 @@ export const api = createTRPCNext<AppRouter>({
        */
       transformer: superjson,
 
+      // https://trpc.io/docs/v9/links#disabling-request-batching
+      batching: {
+        enabled: false,
+      },
+
+      abortOnUnmount: false,
+
       /**
        * Links used to determine request flow from client to server.
        *

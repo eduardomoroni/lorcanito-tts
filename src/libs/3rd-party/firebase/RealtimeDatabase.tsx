@@ -4,7 +4,7 @@ import React, { type FC, type ReactNode } from "react";
 import { DatabaseProvider, useFirebaseApp } from "reactfire";
 
 export const RealtimeDatabaseProvider: FC<{ children: ReactNode }> = (
-  props
+  props,
 ) => {
   const firebaseApp = useFirebaseApp();
   const database = getDatabase(firebaseApp);

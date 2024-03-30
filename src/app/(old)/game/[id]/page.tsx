@@ -1,9 +1,7 @@
 import React from "react";
 import { redirect } from "next/navigation";
-import { type Game } from "~/libs/game";
 import { getServerSession } from "next-auth";
 import { authOptions } from "~/server/auth";
-import { getOrCreateGame } from "~/libs/3rd-party/firebase/database/game";
 import { headers } from "next/headers";
 import { UAParser } from "ua-parser-js";
 import { cookies } from "next/headers";
@@ -13,8 +11,9 @@ import { cookies } from "next/headers";
 import dynamic from "next/dynamic";
 import { createStreamClientToken } from "~/server/api/routers/chat";
 import { getFirestoreGame } from "~/libs/3rd-party/firebase/firestore";
+import * as Sentry from "@sentry/nextjs";
 
-const GamePage = dynamic(() => import("./actual"), {
+const GamePage = dynamic(() => import("@/spaces/spaces/game/actual"), {
   ssr: false,
   loading: () => <p>Loading your game...</p>,
 });
@@ -25,26 +24,18 @@ const getGame = async (gameId: string, userUid: string | undefined) => {
   }
 
   if (!gameId) {
-    redirect(`/`);
+    redirect(`/lobbies`);
   }
 
-  if (gameId !== userUid) {
-    const game = await getFirestoreGame(gameId);
+  const game = await getFirestoreGame(gameId);
 
-    if (!game) {
-      redirect(`/not-found?lobbyId=${gameId}&userUid=${userUid}`);
-    } else {
-      return {
-        props: { game },
-      };
-    }
+  if (!game) {
+    redirect(`/not-found?lobbyId=${gameId}&userUid=${userUid}`);
+  } else {
+    return {
+      props: { game },
+    };
   }
-
-  const response: Game = await getOrCreateGame(gameId);
-
-  return {
-    props: { game: response },
-  };
 };
 
 const GameServerComponent = async ({ params }: { params: { id: string } }) => {
@@ -71,7 +62,10 @@ const GameServerComponent = async ({ params }: { params: { id: string } }) => {
     isMobile = ua.device.type === "mobile";
   } catch (e) {
     console.error(e);
+    Sentry.captureException(e);
   }
+
+  game.lastActivity = Date.now();
 
   // TODO: get player id
   return (

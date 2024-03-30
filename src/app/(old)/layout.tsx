@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import React from "react";
-import "~/styles/globals.css";
+import "~/client/styles/globals.css";
 import "focus-visible";
 
 export const metadata: Metadata = {

@@ -26,6 +26,7 @@ import {
   persistentSingleTabManager,
 } from "firebase/firestore";
 import { getApp } from "firebase/app";
+import * as Sentry from "@sentry/nextjs";
 
 export const Providers: React.FC<{
   children: React.ReactNode;
@@ -48,6 +49,7 @@ export const Providers: React.FC<{
     }
   } catch (e) {
     console.error(e);
+    Sentry.captureException(e);
     firestore.current = getFirestore(app);
   }
 

@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { AuthLayout } from "~/spaces/components/AuthLayout";
-import { Button } from "~/spaces/components/Button";
-import { Logo } from "~/spaces/components/Logo";
+import { AuthLayout } from "~/client/components/AuthLayout";
+import { Button } from "~/client/components/Button";
+import { Logo } from "~/client/components/Logo";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useFirebaseUser } from "~/libs/3rd-party/firebase/FirebaseSessionProvider";

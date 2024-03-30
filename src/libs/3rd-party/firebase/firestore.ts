@@ -1,5 +1,5 @@
 import { adminFirestore } from "~/libs/3rd-party/firebase/admin";
-import { Game } from "~/libs/game";
+import type { Game } from "@lorcanito/engine";
 
 export async function getFirestoreGame(gameId: string) {
   const gameReference = adminFirestore.doc(`games/${gameId}`);

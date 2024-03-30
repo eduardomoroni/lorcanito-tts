@@ -1,4 +1,4 @@
-import { MDXComponents } from "./src/spaces/studio/components/MDXComponents";
+import { MDXComponents } from "./src/client/studio/components/MDXComponents";
 
 export function useMDXComponents(components) {
   return {

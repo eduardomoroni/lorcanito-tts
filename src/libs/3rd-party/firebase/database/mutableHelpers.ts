@@ -1,4 +1,4 @@
-import type { Table } from "~/spaces/providers/TabletopProvider";
+import type { Table } from "@lorcanito/engine";
 
 // use moveCardHelper instead
 export function drawCardHelper(table?: Table) {

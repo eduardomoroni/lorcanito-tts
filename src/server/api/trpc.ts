@@ -18,10 +18,10 @@ import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 import { type Session } from "next-auth";
 
 import { getServerAuthSession } from "~/server/auth";
-import { prisma } from "~/server/db";
 
-type CreateContextOptions = {
+export type CreateContextOptions = {
   session: Session | null;
+  store: MobXRootStore | undefined;
 };
 
 /**
@@ -34,10 +34,13 @@ type CreateContextOptions = {
  *
  * @see https://create.t3.gg/en/usage/trpc#-serverapitrpcts
  */
-const createInnerTRPCContext = (opts: CreateContextOptions) => {
+export const createInnerTRPCContext = (
+  opts: CreateContextOptions,
+): CreateContextOptions => {
   return {
     session: opts.session,
-    prisma,
+    store: opts.store,
+    // prisma,
   };
 };
 
@@ -55,6 +58,7 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
 
   return createInnerTRPCContext({
     session,
+    store: undefined,
   });
 };
 
@@ -67,7 +71,12 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
  */
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
-import { ZodError } from "zod";
+import { z, ZodError } from "zod";
+import type { Dependencies, LogEntry } from "@lorcanito/engine";
+import { MobXRootStore } from "@lorcanito/engine";
+import { createConverter } from "~/libs/3rd-party/firebase/database/gameConverter";
+import { getGameStore } from "~/libs/3rd-party/firebase/database/game";
+import { sendLog } from "~/server/serverGameLogger";
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
@@ -111,8 +120,10 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
   if (!ctx.session || !ctx.session.user) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
+
   return next({
     ctx: {
+      ...ctx,
       // infers the `session` as non-nullable
       session: { ...ctx.session, user: ctx.session.user },
     },
@@ -127,4 +138,96 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
  *
  * @see https://trpc.io/docs/procedures
  */
-export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
+export const authenticatedProcedure = t.procedure.use(enforceUserIsAuthed);
+
+/**
+ * Player procedure
+ *
+ * If you want a query or mutation to ONLY be accessible to logged in player, that is a player of the game, use this.
+ * These request will have the game as part of the context.
+ *
+ */
+export const playerProcedure = authenticatedProcedure
+  .input(z.object({ gameId: z.string() }))
+  .use(async (opts) => {
+    const { ctx } = opts;
+    const playerId = ctx.session.user.uid;
+
+    if (!playerId) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "You're not logged in",
+      });
+    }
+
+    // This is to work-around the lack of a better support for dependency injection in tRPC
+    // https://github.com/trpc/trpc/issues/4191 - We could have a middleware that receives as input the game id
+    let store = ctx.store;
+    if (!store) {
+      const deps: Dependencies = {
+        playerId: playerId,
+        logger: {
+          log: async (entry: LogEntry) => {
+            sendLog(opts.input.gameId, entry, playerId);
+            console.log(entry);
+          },
+        },
+        notifier: {
+          sendNotification: console.log,
+          clearNotification: console.log,
+          clearAllNotifications: console.log,
+        },
+        modals: {
+          openYesOrNoModal: console.log,
+          openTargetModal: console.log,
+          openScryModal: console.log,
+        },
+      };
+      const converter = createConverter(deps);
+      store = await getGameStore(opts.input.gameId, converter);
+
+      if (!store) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "GameId doesn't exist",
+        });
+      }
+    }
+
+    if (store?.playerTable(playerId) === undefined) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "You're not a player of this game",
+      });
+    }
+
+    if (playerId !== store?.activePlayer) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "You're performing an action targeting another player",
+      });
+    }
+
+    if (store?.gameHasStarted() && store?.priorityPlayer !== playerId) {
+      if (!opts.path.startsWith("settings.") && !store.manualMode) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You don't have priority",
+        });
+      }
+    }
+
+    if (store.winner) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "Game has ended",
+      });
+    }
+
+    return opts.next({
+      ctx: {
+        ...opts.ctx,
+        store,
+      },
+    });
+  });

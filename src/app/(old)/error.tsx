@@ -1,10 +1,8 @@
 "use client";
 
-import { useEffect, useLayoutEffect } from "react";
+import { useEffect } from "react";
 import { logAnalyticsEvent } from "~/libs/3rd-party/firebase/FirebaseAnalyticsProvider";
 import "./error.css";
-import { api } from "~/libs/api";
-import { useFirebaseUserId } from "~/libs/3rd-party/firebase/FirebaseSessionProvider";
 
 import * as Sentry from "@sentry/nextjs";
 
@@ -20,14 +18,10 @@ process.env.NODE_ENV === "production" &&
 
 export default function Error({
   error,
-  reset,
 }: {
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  const userId = useFirebaseUserId();
-  const purge = api.game.purgeAndRecreateGame.useMutation();
-
   useEffect(() => {
     // Log the error to an error reporting service
     console.error(error);

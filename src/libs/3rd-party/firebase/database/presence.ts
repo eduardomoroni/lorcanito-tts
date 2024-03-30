@@ -10,6 +10,7 @@ import {
 } from "firebase/database";
 import { GameLobby } from "~/libs/game";
 import type { User } from "@firebase/auth";
+import * as Sentry from "@sentry/nextjs";
 
 export function setUpPlayerPresence(uid: string) {
   const db = getDatabase();
@@ -30,7 +31,7 @@ export function setUpPlayerPresence(uid: string) {
 
       // When I disconnect, update the last time I was seen online
       onDisconnect(ref(db, `presence/players/${uid}/lastOnline`)).set(
-        serverTimestamp()
+        serverTimestamp(),
       );
     }
   });
@@ -45,9 +46,20 @@ export type LobbyPresence = {
   full: boolean;
 };
 
+export function removeLobbyPresence(gameId: string) {
+  try {
+    const db = getDatabase();
+    const reference = ref(db, `presence/lobbies/${gameId}`);
+    set(reference, null);
+  } catch (error) {
+    Sentry.captureException(error);
+    console.error(error);
+  }
+}
+
 export function setUpLobbyPresence(
   gameLobby: GameLobby,
-  firebaseUser: User | null
+  firebaseUser: User | null,
 ) {
   const db = getDatabase();
 

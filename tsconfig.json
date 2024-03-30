@@ -1,18 +1,12 @@
 {
   "compilerOptions": {
-    //    "typeRoots": ["./node_modules/@types"],
     "strict": false,
     "noImplicitReturns": false,
     "useDefineForClassFields": true,
     "forceConsistentCasingInFileNames": true,
-    //    "types": ["jest", "node"],
+    "types": ["cypress", "@testing-library/cypress", "jest"],
     "target": "es2020",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext",
-      "ES2023"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext", "ES2023"],
     "allowJs": true,
     "checkJs": false,
     "skipLibCheck": true,
@@ -27,15 +21,11 @@
     "noUncheckedIndexedAccess": true,
     "baseUrl": "./",
     "paths": {
-      "~/*": [
-        "./src/*"
-      ],
-      "@/spaces/*": [
-        "./src/spaces/*"
-      ],
-      "@/*": [
-        "./src/spaces/studio/*"
-      ]
+      "~/*": ["./src/*"],
+      "@/spaces/*": ["./src/client/*"],
+      "@/*": ["./src/client/studio/*"],
+      "@lorcanito/engine": ["./engine/src/index.ts"],
+      "@lorcanito/engine/*": ["./engine/src/*"]
     },
     "plugins": [
       {
@@ -53,9 +43,5 @@
     "**/*.cjs",
     "**/*.mjs"
   ],
-  "exclude": [
-    "**/node_modules",
-    "**/**/node_modules",
-    "**/dist"
-  ]
+  "exclude": ["**/node_modules", "**/**/node_modules", "**/dist"]
 }

@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { type ChangeEvent, useCallback, useState } from "react";
 
-import { AuthLayout } from "~/spaces/components/AuthLayout";
-import { Button } from "~/spaces/components/Button";
-import { TextField } from "~/spaces/components/Fields";
-import { Logo } from "~/spaces/components/Logo";
+import { AuthLayout } from "~/client/components/AuthLayout";
+import { Button } from "~/client/components/Button";
+import { TextField } from "~/client/components/Fields";
+import { Logo } from "~/client/components/Logo";
 import { signIn } from "~/libs/3rd-party/firebase";
 import { usePathname, useSearchParams } from "next/navigation";
 

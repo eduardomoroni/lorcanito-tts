@@ -1,9 +1,9 @@
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { createTRPCRouter, authenticatedProcedure } from "~/server/api/trpc";
 import { z } from "zod";
 import { StreamChat } from "stream-chat";
 import { sendLog, updateStreamUser } from "~/server/serverGameLogger";
 
-import type { InternalLogEntry } from "~/spaces/Log/types";
+import type { InternalLogEntry } from "@lorcanito/engine";
 
 const api_key = process.env.NEXT_PUBLIC_STREAM_API_KEY;
 const api_secret = process.env.STREAM_API_SECRET;
@@ -16,15 +16,15 @@ export async function createStreamClientToken(userUID: string) {
 
 export const chatRouter = createTRPCRouter({
   // TODO: I could also move this to our JWT token
-  getToken: protectedProcedure
+  getToken: authenticatedProcedure
     .input(z.object({}))
     .query(async ({ ctx }): Promise<string> => {
       const userUID = ctx.session.user.uid;
       return createStreamClientToken(userUID);
     }),
-  sendLogs: protectedProcedure
+  sendLogs: authenticatedProcedure
     .input(
-      z.object({ gameId: z.string(), entry: z.object({ type: z.string() }) })
+      z.object({ gameId: z.string(), entry: z.object({ type: z.string() }) }),
     )
     .query(async ({ ctx, input }) => {
       const userUID = ctx.session.user.uid;

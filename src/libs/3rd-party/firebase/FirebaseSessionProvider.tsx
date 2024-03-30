@@ -9,7 +9,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import { SessionProvider, useSession } from "next-auth/react";
+import { SessionProvider, signIn, useSession } from "next-auth/react";
 import type { User } from "@firebase/auth";
 import type { Auth } from "firebase/auth";
 
@@ -50,10 +50,10 @@ const SyncSessions: FC<{
 
     if (!!nextAuthSession && !!firebaseUser) {
       console.log("Sucessfully logged in", nextAuthSession, firebaseUser);
-    } else {
+    } else if (!nextAuthSession && !firebaseUser) {
       console.log("Not logged in", nextAuthSession, firebaseUser);
     }
-  }, [nextAuthSession, firebaseUser, emulatorEnabled]);
+  }, [nextAuthSession, firebaseUser, emulatorEnabled, idToken]);
 
   return (
     <FirebaseSession.Provider value={firebaseUser}>

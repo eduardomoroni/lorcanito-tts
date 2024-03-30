@@ -2,8 +2,8 @@
 
 import { type ChangeEvent, useCallback, useEffect, useState } from "react";
 
-import { Button } from "~/spaces/components/Button";
-import { TextField } from "~/spaces/components/Fields";
+import { Button } from "~/client/components/Button";
+import { TextField } from "~/client/components/Fields";
 import { signInWithCredentials } from "~/libs/3rd-party/firebase";
 import { useAuth, useFirebaseApp, useUser } from "reactfire";
 import { signIn, useSession } from "next-auth/react";
@@ -28,14 +28,17 @@ export default function SignInPage() {
   useEffect(() => {
     return auth.onAuthStateChanged(async (user) => {
       if (user && !session) {
-        console.log("User signed in", user);
-        console.log(session);
+        // console.log("User signed in", user);
+        // console.log(session);
         user.getIdToken().then((token) => {
+          console.log("token", token);
           signIn("credentials", {
             idToken: token,
             redirect: false,
           })
-            .then(console.log)
+            .then(() => {
+              console.log("Signed in with credentials");
+            })
             .catch(console.error);
         });
       }

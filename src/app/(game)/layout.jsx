@@ -9,11 +9,11 @@ export const metadata = {
   },
 };
 
-export default function Layout({ children }) {
+export default function Layout({ children, ...rest }) {
   return (
     <html
       lang="en"
-      className="h-screen max-h-screen bg-neutral-950 text-base antialiased dark"
+      className="dark h-screen max-h-screen bg-neutral-950 text-base antialiased"
     >
       <body className="flex h-screen max-h-screen flex-col">
         <RootLayout>{children}</RootLayout>

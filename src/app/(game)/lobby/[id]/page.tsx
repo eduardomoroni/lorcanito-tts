@@ -6,9 +6,11 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { cookies } from "next/headers";
 import { createStreamClientToken } from "~/server/api/routers/chat";
-import { getOrCreateGame } from "~/libs/3rd-party/firebase/database/game";
-import LobbyPageProviders from "~/app/(game)/lobby/[id]/LobbyPageProviders";
+import LobbyPageProviders from "~/client/spaces/lobby/LobbyPageProviders";
+import { joinLobby } from "~/server/lobbyActions";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 export const metadata = {
   description: "Lorcanito game lobby.",
 };
@@ -52,17 +54,23 @@ export default async function Lobby({ params }: { params: { id: string } }) {
   }
 
   const lobby = await getLobby(lobbyId);
-  const game = await getOrCreateGame(lobbyId);
+
+  if (!lobby.players[userUid] && Object.keys(lobby.players).length <= 2) {
+    await joinLobby(userUid, lobbyId);
+  } else if (!lobby.players[userUid]) {
+    return redirect(`/lobby-full`);
+  }
 
   if (!lobby) {
     return <span> Lobby not found, please try again</span>;
   }
   const streamToken = await createStreamClientToken(userUid || "");
 
+  console.log(lobby);
+
   return (
     <LobbyPageProviders
       lobby={lobby}
-      game={game}
       userId={userUid}
       streamToken={streamToken}
     />

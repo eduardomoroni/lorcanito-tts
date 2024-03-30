@@ -32,6 +32,6 @@ export function copyTextToClipboard(text: string) {
     },
     function (err) {
       console.error("Async: Could not copy text: ", err);
-    }
+    },
   );
 }

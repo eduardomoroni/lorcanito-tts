@@ -1,5 +1,4 @@
 import type { FirebaseApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
 import { signInWithCredentials } from "~/libs/3rd-party/firebase";
 
 function signInProgrammatically(email: string, password: string) {
@@ -9,7 +8,7 @@ function signInProgrammatically(email: string, password: string) {
       cy.wrap(firebase).as("firebaseApp");
     });
 
-  cy.get("@firebaseApp").then((firebaseApp) => {
+  return cy.get("@firebaseApp").then((firebaseApp) => {
     signInWithCredentials(
       email,
       password,
@@ -17,14 +16,13 @@ function signInProgrammatically(email: string, password: string) {
     )
       .then((userCredential) => {
         const user = userCredential.user;
-        console.log(user);
+
+        return cy.wrap(user);
       })
       .catch((error) => {
         console.error(error);
       });
   });
-
-  // return cy.wrap(signIn);
 }
 
 Cypress.Commands.add(
@@ -34,24 +32,31 @@ Cypress.Commands.add(
     password = Cypress.env(`PASSWORD`) as string,
   ) => {
     cy.session(
-      "player_one_session",
+      email,
       () => {
-        cy.intercept("POST", "**/api/auth/callback/credentials?").as(
+        cy.intercept("GET", "/api/auth/session").as("session");
+        cy.intercept("POST", "**/api/auth/callback/credentials").as(
           "credentials",
         );
         cy.visit("/auth/cypress");
         signInProgrammatically(email, password);
         cy.wait("@credentials");
+        cy.wait("@session");
       },
       {
         validate: async () => {
-          cy.get("@firebaseApp").then((firebaseApp) => {
-            // This is not the best, we should ideally call an endpoint that requires both auths present  (firebase and next-auth)
-            cy.getCookie(Cypress.env(`COOKIE_NAME`)).should("exist");
+          cy.request("PATCH", "/api/auth/status").then(({ body, status }) => {
+            if (status !== 200) {
+              throw new Error("Failed to login");
+            }
+
+            window.localStorage.setItem("userId", body.id);
           });
         },
         cacheAcrossSpecs: true,
       },
-    );
+    ).then(async () => {
+      const sessionData = await Cypress.session.getSession(email);
+    });
   },
 );

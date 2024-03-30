@@ -12,6 +12,7 @@ import { AnalyticsProvider } from "reactfire";
 import { useFirebaseUser } from "~/libs/3rd-party/firebase/FirebaseSessionProvider";
 import { usePathname, useSearchParams } from "next/navigation";
 import * as process from "process";
+import * as Sentry from "@sentry/nextjs";
 
 export function NavigationEvents() {
   const pathname = usePathname();
@@ -35,7 +36,7 @@ export function NavigationEvents() {
 
 export function logAnalyticsEvent(
   eventName: string,
-  eventParams?: { [key: string]: unknown }
+  eventParams?: { [key: string]: unknown },
 ) {
   try {
     if (process.env.NODE_ENV === "production") {
@@ -44,6 +45,7 @@ export function logAnalyticsEvent(
       console.info(eventName, eventParams);
     }
   } catch (e) {
+    Sentry.captureException(e);
     console.error(e);
   }
 }

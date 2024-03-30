@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useIdleTimer } from "react-idle-timer";
-import { IdleModal } from "~/spaces/components/modals/IdleModal";
+import { IdleModal } from "~/client/components/modals/IdleModal";
 import { useRouter } from "next/navigation";
 import { logAnalyticsEvent } from "~/libs/3rd-party/firebase/FirebaseAnalyticsProvider";
 

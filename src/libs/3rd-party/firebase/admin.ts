@@ -23,7 +23,11 @@ if (!admin.apps.length) {
     //   uid: "lorcanito-simulator",
     // },
   };
+
   admin.initializeApp(options);
+  admin.firestore().settings({
+    ignoreUndefinedProperties: true,
+  });
 }
 
 export const adminDatabase = admin.database();

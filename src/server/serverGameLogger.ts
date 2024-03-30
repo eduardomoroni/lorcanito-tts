@@ -1,7 +1,8 @@
 import { StreamChat } from "stream-chat";
-import { createLogEntry } from "~/spaces/Log/game-log/GameLogProvider";
 import { adminDatabase } from "~/libs/3rd-party/firebase/admin";
-import { type InternalLogEntry, type LogEntry } from "~/spaces/Log/types";
+import { type InternalLogEntry, type LogEntry } from "@lorcanito/engine";
+import { createLogEntry } from "@lorcanito/engine";
+import * as Sentry from "@sentry/nextjs";
 
 const api_key = process.env.NEXT_PUBLIC_STREAM_API_KEY;
 const api_secret = process.env.STREAM_API_SECRET;
@@ -17,12 +18,11 @@ export function getStreamServerClient() {
   return StreamChat.getInstance(api_key || "", api_secret);
 }
 
-export async function getGameChatChannel(gameId: string) {
+export function getGameChatChannel(gameId: string) {
   const serverClient = getStreamServerClient();
 
   return serverClient.channel("messaging", gameId, {
-    image: "https://goo.gl/Zefkbx",
-    name: "Lorcanito Game",
+    name: "Lorcanito Game: " + gameId,
   });
 }
 
@@ -48,6 +48,11 @@ export async function updateStreamGameChat(userId: string, gameId: string) {
   await channel.addMembers([userId]);
 }
 
+export async function removeStreamGameChat(userId: string, gameId: string) {
+  const channel = await getGameChatChannel(gameId);
+  await channel.removeMembers([userId]);
+}
+
 export async function deleteChannelMessages(gameId: string) {
   const channel = await getGameChatChannel(gameId);
   await channel.truncate({
@@ -61,24 +66,26 @@ export async function deleteChannelMessages(gameId: string) {
 }
 
 async function pushLogToStreamServer(
-  logEntry: InternalLogEntry,
-  gameId: string
+  logEntry: InternalLogEntry | InternalLogEntry[],
+  gameId: string,
+  pushNotification: boolean = false,
 ) {
-  const gameChatChannel = await getGameChatChannel(gameId);
+  // TODO: Doing this on a loop can delay the response of the request
+  const gameChatChannel = getGameChatChannel(gameId);
 
   await gameChatChannel.sendMessage(
     {
       user: systemUser,
-      silent: true,
+      silent: !pushNotification,
       logEntry: logEntry,
     },
-    { skip_push: true }
+    { skip_push: !pushNotification },
   );
 }
 
 async function pushLogToFirebaseServer(
   logEntry: InternalLogEntry,
-  gameId: string
+  gameId: string,
 ) {
   const logReference = adminDatabase.ref(`logs/${gameId}/`);
   await logReference.push(logEntry);
@@ -86,13 +93,21 @@ async function pushLogToFirebaseServer(
 
 export async function sendLog(
   gameId: string,
-  entry: LogEntry,
-  sender = "SYSTEM"
+  entry: LogEntry | LogEntry[],
+  sender = "SYSTEM",
+  pushNotification: boolean = false,
 ) {
-  const logEntry = createLogEntry(entry, sender);
+  const logEntry = Array.isArray(entry)
+    ? entry.map((item) => createLogEntry(item, sender))
+    : createLogEntry(entry, sender);
 
-  await Promise.all([
-    pushLogToFirebaseServer(logEntry, gameId),
-    pushLogToStreamServer(logEntry, gameId),
-  ]);
+  try {
+    await Promise.all([
+      // pushLogToFirebaseServer(logEntry, gameId),
+      pushLogToStreamServer(logEntry, gameId, pushNotification),
+    ]);
+  } catch (e) {
+    Sentry.captureException(e);
+    console.error(e);
+  }
 }

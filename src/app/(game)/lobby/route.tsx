@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "~/server/auth";
 import type { NextRequest } from "next/server";
-import { createGameLobby } from "~/libs/3rd-party/firebase/database/game";
+import { createLobby } from "~/server/lobbyActions";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
   }
 
   // TODO: Add a check here, as people can abuse this
-  const newLobby = await createGameLobby(userUid);
+  const newLobby = await createLobby(userUid);
 
-  redirect(`/lobby/${newLobby.id}?${request.nextUrl?.searchParams}`);
+  redirect(`/lobby/${newLobby.id}`);
 }

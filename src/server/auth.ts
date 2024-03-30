@@ -3,6 +3,7 @@ import { getServerSession, type NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import admin from "~/libs/3rd-party/firebase/admin";
 import { type DecodedIdToken } from "firebase-admin/lib/auth/token-verifier";
+import * as Sentry from "@sentry/nextjs";
 
 /**
  * Options for NextAuth.js used to configure adapters, providers, callbacks, etc.
@@ -28,21 +29,6 @@ export const authOptions: NextAuthOptions = {
             .auth()
             .verifyIdToken(idToken);
 
-          // Create the session cookie. This will also verify the ID token in the process.
-          // The session cookie will have the same claims as the ID token.
-          // To only allow session cookie setting on recent sign-in, auth_time in ID token
-          // can be checked to ensure user was recently signed in before creating a session cookie.
-          // const expiresIn = 60 * 60 * 24 * 5 * 1000;
-          // const sessionCookie = await admin
-          //   .auth()
-          //   .createSessionCookie(idToken, { expiresIn: expiresIn });
-          // const options = {
-          //   maxAge: expiresIn,
-          //   httpOnly: true,
-          //   secure: true,
-          // };
-          // res.cookie("session", sessionCookie, options);
-
           // TODO: I'm not sure about this
           const customToken = await admin
             .auth()
@@ -57,7 +43,9 @@ export const authOptions: NextAuthOptions = {
             customToken: customToken,
           } as const;
         } catch (error) {
+          console.warn("Error creating custom token:", error);
           console.error(error);
+          Sentry.captureException(error);
           return null;
         }
       },

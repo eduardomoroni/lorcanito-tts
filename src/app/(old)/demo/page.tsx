@@ -1,5 +1,5 @@
-import { Footer } from "~/spaces/components/Footer";
-import { Header } from "~/spaces/components/header/StaticHeader";
+import { Footer } from "~/client/components/Footer";
+import { Header } from "~/client/components/header/StaticHeader";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

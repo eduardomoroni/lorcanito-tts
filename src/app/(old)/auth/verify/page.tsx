@@ -2,15 +2,16 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { AuthLayout } from "~/spaces/components/AuthLayout";
-import { Button } from "~/spaces/components/Button";
-import { Logo } from "~/spaces/components/Logo";
+import { AuthLayout } from "~/client/components/AuthLayout";
+import { Button } from "~/client/components/Button";
+import { Logo } from "~/client/components/Logo";
 import { useEffect, useState } from "react";
 import { confirmSignIn } from "~/libs/3rd-party/firebase";
 import { signIn } from "next-auth/react";
 import { shouldConnectAuthEmulator } from "~/libs/3rd-party/firebase/emulator";
 import { useAuth } from "reactfire";
 import { browserSessionPersistence, setPersistence } from "firebase/auth";
+import * as Sentry from "@sentry/nextjs";
 
 let counter = 0;
 
@@ -27,7 +28,7 @@ export default function Page() {
         window.localStorage.getItem("emailForSignIn") ||
         urlSearchParams?.get("email") ||
         window.prompt(
-          "As a security measure, please confirm your e-mail address"
+          "As a security measure, please confirm your e-mail address",
         ) ||
         "";
 
@@ -42,7 +43,7 @@ export default function Page() {
         if (!result) {
           console.error("Not able to get user");
           window.alert(
-            "Something went wrong. Please try again, make sure you are using the same browser during the whole process"
+            "Something went wrong. Please try again, make sure you are using the same browser during the whole process",
           );
           return;
         }
@@ -68,6 +69,7 @@ export default function Page() {
         console.error(e);
         // Strict mode runs twice,
         console.error("Counter: ", counter);
+        Sentry.captureException(e);
         setError(e);
       }
     }

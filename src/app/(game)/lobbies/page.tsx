@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { cookies } from "next/headers";
 import { createStreamClientToken } from "~/server/api/routers/chat";
-import LobbiesProviders from "~/app/(game)/lobbies/LobbiesProviders";
+import LobbiesProviders from "~/client/spaces/lobbies/LobbiesProviders";
 
 export const metadata = {
   description: "Lorcanito Lobbies.",
